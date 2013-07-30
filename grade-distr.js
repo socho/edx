@@ -5,15 +5,15 @@ var gradeDistr = (function() {
 ////////////////////////////////// global variables 
 //stuff goes here    
 ////////////////////////////////// helper functions
-    // Object.prototype.keys = function ()
-    // {
-    //   var keys = [];
-    //   for(var i in this) if (this.hasOwnProperty(i))
-    //   {
-    //     keys.push(i);
-    //   }
-    //   return keys;
-    // } 
+    Object.prototype.keys = function ()
+    {
+      var keys = [];
+      for(var i in this) if (this.hasOwnProperty(i))
+      {
+        keys.push(i);
+      }
+      return keys;
+    } 
 
 //stuff goes here
 
@@ -37,7 +37,6 @@ var gradeDistr = (function() {
     }
 
     function View(div, model, controller){
-        console.log(quizzes)
         // console.log(quizzes["Quiz 22"].length)
         // console.log(quizzes["Quiz 23"].length)
         // console.log(quizzes["Quiz 24"].length)
@@ -65,7 +64,7 @@ var gradeDistr = (function() {
         +'</div>'
         );
 
-        $('.col-lg-8').append('<div class = "graph-container"></div>')
+        $('.col-lg-8').append('<div class = "graph-container"></div>');
            //  var svg_w = 700;
            //  var svg_h = 100;
 
@@ -147,9 +146,9 @@ var gradeDistr = (function() {
             'margin-top': '5px'
         });
 
-        var quizzes = $('<div id="quizzes"></div>');
+        var checkboxes = $('<div id="checkboxes-div"></div>');
         var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
-        quizzes.css( {
+        checkboxes.css( {
             'border': '1px solid black',
             'border-radius': '10px',
             'width': '300px',
@@ -160,13 +159,13 @@ var gradeDistr = (function() {
 
 
         
-        $('#column2').append(sliderDiv, legend, quizzes);
+        $('#column2').append(sliderDiv, legend, checkboxes);
         $('#legend').append(labelLegend);
         $('#sliderbg').append(labelSlider, sliderObj);
-        $('#quizzes').append(labelQuiz);
+        $('#checkboxes-div').append(labelQuiz);
         for (var key in quizzes) {
             var noSpaceKey = key.replace(/\s+/g, '');
-            $('#quizzes').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
+            $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
         }
 
     }
