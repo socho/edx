@@ -5,3 +5,8 @@
 .assignment-row {
 	text-align: center;
 }
+
+.bar rect {
+	fill: steelblue;
+	shape-rendering: crispEdges;
+}
