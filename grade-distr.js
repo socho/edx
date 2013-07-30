@@ -9,6 +9,7 @@ var gradeDistr = (function() {
 
     function Model(){
 
+
     }
 
     function Controller(model){
@@ -16,6 +17,28 @@ var gradeDistr = (function() {
     }
 
     function View(div, model, controller){
+        div.append(
+         '<div class="container">'
+        +   '<div class = "assignment-row">'
+        +   '<div class = "btn-group">'
+        +       '<button type = "button" class="btn btn-default btn-l">L</button>'
+        +       '<div class = "btn-group">'
+        +           '<button type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Assignment<span class="caret"></span></button>'
+        +           '<ul class="dropdown-menu">'
+        +               '<li><a> first link </a></li>'
+        +           '</ul>'
+        +       '</div>'
+        +       '<button type = "button" class="btn btn-default btn-r">R</button>'
+        +   '</div>'
+        +'</div>'
+        +'<div class = "body-content">'
+        +   '<div class = "row">'
+        +       '<div class="col-lg-8">1</div>'
+        +       '<div class="col-lg-4">2</div>'
+        +   '</div>'
+        +'</div>'
+        );
+
 
     }
 
