@@ -5,20 +5,21 @@ var gradeDistr = (function() {
 ////////////////////////////////// global variables 
 //stuff goes here    
 ////////////////////////////////// helper functions
-Object.prototype.keys = function ()
-{
-  var keys = [];
-  for(var i in this) if (this.hasOwnProperty(i))
-  {
-    keys.push(i);
-  }
-  return keys;
-}  
+    // Object.prototype.keys = function ()
+    // {
+    //   var keys = [];
+    //   for(var i in this) if (this.hasOwnProperty(i))
+    //   {
+    //     keys.push(i);
+    //   }
+    //   return keys;
+    // } 
+
 //stuff goes here
 
 
     function Model(){
-        function getQuizData(quizname) {
+        function getquizzes(quizname) {
             return quizzes[quizname];
         }
 
@@ -26,8 +27,8 @@ Object.prototype.keys = function ()
             return quizzes.keys();
         }
 
-        function getPeopleData() {}
-        return {getQuizData: getQuizData, getQuizNames: getQuizNames};
+        // function getPeopleData() {}
+        return {getquizzes: getquizzes, getQuizNames: getQuizNames};
 
     }
 
@@ -36,13 +37,11 @@ Object.prototype.keys = function ()
     }
 
     function View(div, model, controller){
-        console.log(quizzes["Quiz 21"].length)
-        console.log(quizzes["Quiz 22"].length)
-        console.log(quizzes["Quiz 23"].length)
-        console.log(quizzes["Quiz 24"].length)
-        console.log(quizzes["Quiz 25"].length)
-
-
+        console.log(quizzes)
+        // console.log(quizzes["Quiz 22"].length)
+        // console.log(quizzes["Quiz 23"].length)
+        // console.log(quizzes["Quiz 24"].length)
+        // console.log(quizzes["Quiz 25"].length)
 
         div.append(
          '<div class="container">'
@@ -61,7 +60,7 @@ Object.prototype.keys = function ()
         +'<div class = "body-content">'
         +   '<div class = "row">'
         +       '<div class="col-lg-8">1</div>'
-        +       '<div class="col-lg-4">2</div>'
+        +       '<div class="col-lg-4" id="column2"></div>'
         +   '</div>'
         +'</div>'
         );
@@ -70,7 +69,7 @@ Object.prototype.keys = function ()
            //  var svg_w = 700;
            //  var svg_h = 100;
 
-           //  var dataset = quizdata["Quiz 21"];
+           //  var dataset = quizzes["Quiz 21"];
            //  var bardata = dataset.map(function(item){
            //      return item.grade;
            //  });
@@ -105,6 +104,70 @@ Object.prototype.keys = function ()
 
 
 
+        //slider
+        var sliderDiv = $('<div id="sliderbg">');
+        sliderDiv.css({ 
+            'background-color': '#fff', 
+            'border': 'solid 1px black',
+            'border-radius': '10px', 
+            'width': '300px', 
+            'height': '95px',
+            'padding': '0px 15px 0px 7px',
+            'margin-top': '5px'
+        });
+
+        var sliderObj = $('<div id="slider">')
+        var labelSlider = $('<p><label for="amount">Grade range:</label><input id="amount" style="border: 0; background-color: #fff; color: #f6931f; font-weight: bold;" /></p>');
+
+        // sliderObj.slider({
+        //     range: "min",
+        //     min: 0,
+        //     max: 100,
+        //     values: [ 25, 75 ],
+        //     slide: function( event, ui ) {
+        //         $( "#amount" ).val( " %" + ui.values[ 0 ] + " - %" + ui.values[ 1 ] );
+        //     }
+        // }).slider('pips', {
+        //      first: 'label',
+        //     last: 'label',
+        //     rest: false,
+        // });
+
+        $( "#amount" ).val( " %" + $( "#slider" ).slider( "values", 0 ) +
+      " - %" + $( "#slider" ).slider( "values", 1 ) )
+
+        var legend = $('<div id="legend"></div>');
+        var labelLegend = $('<label for="legend">Legend:</label>')
+        legend.css( {
+            'border': '1px solid black',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '200px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+        var quizzes = $('<div id="quizzes"></div>');
+        var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
+        quizzes.css( {
+            'border': '1px solid black',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '200px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+
+        
+        $('#column2').append(sliderDiv, legend, quizzes);
+        $('#legend').append(labelLegend);
+        $('#sliderbg').append(labelSlider, sliderObj);
+        $('#quizzes').append(labelQuiz);
+        for (var key in quizzes) {
+            var noSpaceKey = key.replace(/\s+/g, '');
+            $('#quizzes').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
+        }
 
     }
 
