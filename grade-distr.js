@@ -5,15 +5,18 @@ var gradeDistr = (function() {
 ////////////////////////////////// global variables 
 //stuff goes here    
 ////////////////////////////////// helper functions
-Object.prototype.keys = function ()
-{
-  var keys = [];
-  for(var i in this) if (this.hasOwnProperty(i))
-  {
-    keys.push(i);
-  }
-  return keys;
-}  
+
+    Object.prototype.keys = function ()
+    {
+      var keys = [];
+      for(var i in this) if (this.hasOwnProperty(i))
+      {
+        keys.push(i);
+      }
+      return keys;
+    } 
+
+
 //stuff goes here
 
 
@@ -101,6 +104,72 @@ Object.prototype.keys = function ()
            //      .attr("y", 0)
            //      .attr("width", function(d){return (d.dx*20-5)})
            //      .attr("height", function(d){return d.y;});
+
+        //slider
+        var sliderDiv = $('<div id="sliderbg">');
+        sliderDiv.css({ 
+            'background-color': '#fff', 
+            'border': 'solid 1px black',
+            'border-radius': '10px', 
+            'width': '300px', 
+            'height': '95px',
+            'padding': '0px 15px 0px 7px',
+            'margin-top': '5px'
+        });
+
+        var sliderObj = $('<div id="slider">')
+        var labelSlider = $('<p><label for="amount">Grade range:</label><input id="amount" style="border: 0; background-color: #fff; color: #f6931f; font-weight: bold;" /></p>');
+
+        // sliderObj.slider({
+        //     range: "min",
+        //     min: 0,
+        //     max: 100,
+        //     values: [ 25, 75 ],
+        //     slide: function( event, ui ) {
+        //         $( "#amount" ).val( " %" + ui.values[ 0 ] + " - %" + ui.values[ 1 ] );
+        //     }
+        // }).slider('pips', {
+        //      first: 'label',
+        //     last: 'label',
+        //     rest: false,
+        // });
+
+        $( "#amount" ).val( " %" + $( "#slider" ).slider( "values", 0 ) +
+      " - %" + $( "#slider" ).slider( "values", 1 ) )
+
+        var legend = $('<div id="legend"></div>');
+        var labelLegend = $('<label for="legend">Legend:</label>')
+        legend.css( {
+            'border': '1px solid black',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '200px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+        var checkboxes = $('<div id="checkboxes-div"></div>');
+        var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
+        checkboxes.css( {
+            'border': '1px solid black',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '200px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+
+        
+        $('#column2').append(sliderDiv, legend, checkboxes);
+        $('#legend').append(labelLegend);
+        $('#sliderbg').append(labelSlider, sliderObj);
+        $('#checkboxes-div').append(labelQuiz);
+        for (var key in quizzes) {
+            var noSpaceKey = key.replace(/\s+/g, '');
+            $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
+        }
+
 
     }
 
