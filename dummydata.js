@@ -1,17 +1,17 @@
-var quizdata = 
+var quizzes = 
 {
     "Quiz 21": [
-        {
-            "timestamp": "Timestamp",
-            "username": "Username",
-            "question1": "Question 1",
-            "reason": "Enter a one sentence reason for each choice you are unsure about.",
-            "grade": "Grade"
-        },
-        {
-            "username": "TRUTH",
-            "question1": "A,D"
-        },
+        // {
+        //     "timestamp": "Timestamp",
+        //     "username": "Username",
+        //     "question1": "Question 1",
+        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
+        //     "grade": "Grade"
+        // },
+        // {
+        //     "username": "TRUTH",
+        //     "question1": "A,D"
+        // },
         {
             "timestamp": "2013-04-22T20:51:46.000Z",
             "username": "snollygostercompass",
@@ -273,7 +273,7 @@ var quizdata =
             "username": "whispericy",
             "question1": "A, B, D, E, H",
             "reason": "- I thought kerning had more to do with text/font design than icons like this.\n- I'm not sure how right-to-left languages or double buffering applies to this example.",
-            "grade": "7"
+            "grade": 7
         },
         {
             "timestamp": "2013-04-22T20:53:42.000Z",
