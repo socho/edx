@@ -4,11 +4,30 @@ var gradeDistr = (function() {
     
 ////////////////////////////////// global variables 
 //stuff goes here    
-////////////////////////////////// helper functions    
+////////////////////////////////// helper functions
+Object.prototype.keys = function ()
+{
+  var keys = [];
+  for(var i in this) if (this.hasOwnProperty(i))
+  {
+    keys.push(i);
+  }
+  return keys;
+}  
 //stuff goes here
 
-    function Model(){
 
+    function Model(){
+        function getQuizData(quizname) {
+            return quizzes[quizname];
+        }
+
+        function getQuizNames() {
+            return quizzes.keys();
+        }
+
+        function getPeopleData() {}
+        return {getQuizData: getQuizData, getQuizNames: getQuizNames};
 
     }
 
@@ -17,6 +36,14 @@ var gradeDistr = (function() {
     }
 
     function View(div, model, controller){
+        console.log(quizzes["Quiz 21"].length)
+        console.log(quizzes["Quiz 22"].length)
+        console.log(quizzes["Quiz 23"].length)
+        console.log(quizzes["Quiz 24"].length)
+        console.log(quizzes["Quiz 25"].length)
+
+
+
         div.append(
          '<div class="container">'
         +   '<div class = "assignment-row">'
@@ -38,6 +65,45 @@ var gradeDistr = (function() {
         +   '</div>'
         +'</div>'
         );
+
+        $('.col-lg-8').append('<div class = "graph-container"></div>')
+           //  var svg_w = 700;
+           //  var svg_h = 100;
+
+           //  var dataset = quizdata["Quiz 21"];
+           //  var bardata = dataset.map(function(item){
+           //      return item.grade;
+           //  });
+           // console.log(bardata);
+
+           //  var x = d3.scale.linear()
+           //          .domain([0,10])
+           //          .range([0,svg_w]);
+
+           //  var histogramData = d3.layout.histogram()
+           //              .bins(5)(bardata);
+
+           //  console.log(histogramData);
+
+           //  var svg = d3.select(".graph-container").append("svg")
+           //          .attr("width",svg_w)
+           //          .attr("height",svg_h)
+           //          .append("g");
+           //  var bars = svg.selectAll(".bar")
+           //          .data(histogramData)
+           //          .enter().append("g")
+           //          .attr("class","bar")
+            
+           //  bars.append("rect")
+           //      .attr("x", function(d){
+           //          return d.x*20;
+           //      })
+           //      .attr("y", 0)
+           //      .attr("width", function(d){return (d.dx*20-5)})
+           //      .attr("height", function(d){return d.y;});
+
+
+
 
 
     }
