@@ -15,6 +15,7 @@ var gradeDistr = (function() {
       return keys;
     } 
 
+
 //stuff goes here
 
 
@@ -30,6 +31,7 @@ var gradeDistr = (function() {
         // function getPeopleData() {}
         return {getquizzes: getquizzes, getQuizNames: getQuizNames};
 
+
     }
 
     function Controller(model){
@@ -37,10 +39,14 @@ var gradeDistr = (function() {
     }
 
     function View(div, model, controller){
-        // console.log(quizzes["Quiz 22"].length)
-        // console.log(quizzes["Quiz 23"].length)
-        // console.log(quizzes["Quiz 24"].length)
-        // console.log(quizzes["Quiz 25"].length)
+
+        console.log(quizzes["Quiz 21"].length)
+        console.log(quizzes["Quiz 22"].length)
+        console.log(quizzes["Quiz 23"].length)
+        console.log(quizzes["Quiz 24"].length)
+        console.log(quizzes["Quiz 25"].length)
+
+
 
         div.append(
          '<div class="container">'
@@ -59,16 +65,16 @@ var gradeDistr = (function() {
         +'<div class = "body-content">'
         +   '<div class = "row">'
         +       '<div class="col-lg-8">1</div>'
-        +       '<div class="col-lg-4" id="column2"></div>'
+        +       '<div class="col-lg-4">2</div>'
         +   '</div>'
         +'</div>'
         );
 
-        $('.col-lg-8').append('<div class = "graph-container"></div>');
+        $('.col-lg-8').append('<div class = "graph-container"></div>')
            //  var svg_w = 700;
            //  var svg_h = 100;
 
-           //  var dataset = quizzes["Quiz 21"];
+           //  var dataset = quizdata["Quiz 21"];
            //  var bardata = dataset.map(function(item){
            //      return item.grade;
            //  });
@@ -99,8 +105,6 @@ var gradeDistr = (function() {
            //      .attr("y", 0)
            //      .attr("width", function(d){return (d.dx*20-5)})
            //      .attr("height", function(d){return d.y;});
-
-
 
 
         //slider
@@ -167,6 +171,7 @@ var gradeDistr = (function() {
             var noSpaceKey = key.replace(/\s+/g, '');
             $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
         }
+
 
     }
 

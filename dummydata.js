@@ -1,17 +1,17 @@
 var quizzes = 
 {
     "Quiz 21": [
-        {
-            "timestamp": "Timestamp",
-            "username": "Username",
-            "question1": "Question 1",
-            "reason": "Enter a one sentence reason for each choice you are unsure about.",
-            "grade": "Grade"
-        },
-        {
-            "username": "TRUTH",
-            "question1": "A,D"
-        },
+        // {
+        //     "timestamp": "Timestamp",
+        //     "username": "Username",
+        //     "question1": "Question 1",
+        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
+        //     "grade": "Grade"
+        // },
+        // {
+        //     "username": "TRUTH",
+        //     "question1": "A,D"
+        // },
         {
             "timestamp": "2013-04-22T20:51:46.000Z",
             "username": "snollygostercompass",
