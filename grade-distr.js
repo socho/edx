@@ -5,15 +5,15 @@ var gradeDistr = (function() {
 ////////////////////////////////// global variables 
 //stuff goes here    
 ////////////////////////////////// helper functions
-Object.prototype.keys = function ()
-{
-  var keys = [];
-  for(var i in this) if (this.hasOwnProperty(i))
-  {
-    keys.push(i);
-  }
-  return keys;
-}  
+// Object.prototype.keys = function ()
+// {
+//   var keys = [];
+//   for(var i in this) if (this.hasOwnProperty(i))
+//   {
+//     keys.push(i);
+//   }
+//   return keys;
+// }  
 //stuff goes here
 
 
@@ -36,11 +36,11 @@ Object.prototype.keys = function ()
     }
 
     function View(div, model, controller){
-        console.log(quizzes["Quiz 21"].length)
-        console.log(quizzes["Quiz 22"].length)
-        console.log(quizzes["Quiz 23"].length)
-        console.log(quizzes["Quiz 24"].length)
-        console.log(quizzes["Quiz 25"].length)
+        // console.log(quizzes["Quiz 21"].length)
+        // console.log(quizzes["Quiz 22"].length)
+        // console.log(quizzes["Quiz 23"].length)
+        // console.log(quizzes["Quiz 24"].length)
+        // console.log(quizzes["Quiz 25"].length)
 
 
 
@@ -61,12 +61,12 @@ Object.prototype.keys = function ()
         +'<div class = "body-content">'
         +   '<div class = "row">'
         +       '<div class="col-lg-8">1</div>'
-        +       '<div class="col-lg-4">2</div>'
+        +       '<div class="col-lg-4" id="column2">2</div>'
         +   '</div>'
         +'</div>'
         );
 
-        $('.col-lg-8').append('<div class = "graph-container"></div>')
+        // $('.col-lg-8').append('<div class = "graph-container"></div>');
            //  var svg_w = 700;
            //  var svg_h = 100;
 
