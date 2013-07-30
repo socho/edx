@@ -1,4 +1,4 @@
-var markovChain = (function() {
+var gradeDistr = (function() {
     
     var exports = {};
     
@@ -39,5 +39,5 @@ var markovChain = (function() {
 }());
 
 $(document).ready(function() {
-    markovChain.setup($('.markov'));
+    gradeDistr.setup($('.gradeDistr'));
 });
