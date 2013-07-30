@@ -102,10 +102,6 @@ Object.prototype.keys = function ()
            //      .attr("width", function(d){return (d.dx*20-5)})
            //      .attr("height", function(d){return d.y;});
 
-
-
-
-
     }
 
 
