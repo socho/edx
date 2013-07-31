@@ -104,6 +104,18 @@ var gradeDistr = (function() {
 
 
         // COLUMN 2
+
+        var legend = $('<div id="legend"></div>');
+        var labelLegend = $('<label for="legend">Legend:</label>');
+        legend.css( {
+            'border': '1px solid black',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '200px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
         //slider
         var sliderDiv = $('<div id="sliderbg">');
         sliderDiv.css({ 
@@ -117,34 +129,40 @@ var gradeDistr = (function() {
         });
 
         var sliderObj = $('<div id="slider">')
-        var labelSlider = $('<p><label for="amount">Grade range:</label><input id="amount" style="border: 0; background-color: #fff; color: #f6931f; font-weight: bold;" /></p>');
+        var labelSlider = $('<p><label for="amount">Grade range:</label>\
+            <input id="amount" style="width: 250px;\
+                    border: 0;\
+                    background-color: #fff;\
+                    color: #f6931f;\
+                    font-size: 12px;\
+                    font-weight: bold;\
+                    margin-bottom: -100px" /></p>');
+
+        $('#column2').append(sliderDiv, legend, checkboxes);
+        $('#sliderbg').append(labelSlider, sliderObj);
+        $('#legend').append(labelLegend);
+
         sliderObj.slider({
-            range: "min",
+            range: true,
             min: 0,
             max: 100,
             values: [ 25, 75 ],
             slide: function( event, ui ) {
-                $( "#amount" ).val( " %" + ui.values[ 0 ] + " - %" + ui.values[ 1 ] );
+                var min = 0;
+                var max = 100;
+                var mid = Math.abs(ui.values[1] - ui.values[0]);
+                $( "#amount" ).val( "Bottom: %" + Math.abs(ui.values[0] - min) + ", Mid: %" + mid + ", Top: %" + Math.abs(max - ui.values[1]));
             }
         }).slider('pips', {
              first: 'label',
             last: 'label',
             rest: false,
         });
+        var bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+        var middle = Math.abs(sliderObj.slider("values", 1) - sliderObj.slider("values", 0));
+        var top = Math.abs(100 - sliderObj.slider("values", 1));
+        $( "#amount" ).val( "Bottom: %" + bottom + ", Mid: %" + middle + ", Top: %" + top );
 
-        $( "#amount" ).val( " %" + $( "#slider" ).slider( "values", 0 ) +
-      " - %" + $( "#slider" ).slider( "values", 1 ) );
-
-        var legend = $('<div id="legend"></div>');
-        var labelLegend = $('<label for="legend">Legend:</label>');
-        legend.css( {
-            'border': '1px solid black',
-            'border-radius': '10px',
-            'width': '300px',
-            'height': '200px',
-            'padding': '5px',
-            'margin-top': '5px'
-        });
 
         var checkboxes = $('<div id="checkboxes-div"></div>');
         var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
@@ -159,9 +177,7 @@ var gradeDistr = (function() {
 
 
         
-        $('#column2').append(sliderDiv, legend, checkboxes);
-        $('#sliderbg').append(labelSlider, sliderObj);
-        $('#legend').append(labelLegend);
+        
         $('#checkboxes-div').append(labelQuiz);
         for (var key in quizzes) {
             var noSpaceKey = key.replace(/\s+/g, '');
@@ -179,7 +195,7 @@ var gradeDistr = (function() {
   //setup main structure of app
     function setup(div) {
 
-       var model = Model();
+        var model = Model();
         var controller = Controller(model);
         view = View(div, model, controller);
 
