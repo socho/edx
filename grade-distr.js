@@ -141,43 +141,6 @@ var gradeDistr = (function() {
         +'</div>'
         );
 
-        // $('.col-lg-8').append('<div class = "graph-container"></div>');
-           //  var svg_w = 700;
-           //  var svg_h = 100;
-
-           //  var dataset = quizdata["Quiz 21"];
-           //  var bardata = dataset.map(function(item){
-           //      return item.grade;
-           //  });
-           // console.log(bardata);
-
-           //  var x = d3.scale.linear()
-           //          .domain([0,10])
-           //          .range([0,svg_w]);
-
-           //  var histogramData = d3.layout.histogram()
-           //              .bins(5)(bardata);
-
-           //  console.log(histogramData);
-
-           //  var svg = d3.select(".graph-container").append("svg")
-           //          .attr("width",svg_w)
-           //          .attr("height",svg_h)
-           //          .append("g");
-           //  var bars = svg.selectAll(".bar")
-           //          .data(histogramData)
-           //          .enter().append("g")
-           //          .attr("class","bar")
-            
-           //  bars.append("rect")
-           //      .attr("x", function(d){
-           //          return d.x*20;
-           //      })
-           //      .attr("y", 0)
-           //      .attr("width", function(d){return (d.dx*20-5)})
-           //      .attr("height", function(d){return d.y;});
-
-
         // COLUMN 2
 
         var legend = $('<div id="legend"></div>');
@@ -289,14 +252,13 @@ var gradeDistr = (function() {
         } 
 
         ////////
-        //temporary
+        //temporary Column 1 stuff
         ////////
         $('#column1').append("<div class='chart-container'></div>");
         model.calcAverage(["Quiz 21", "Quiz 22"]);
         var data = model.groupPeopleByAvr("Quiz 22",30,70);
 
         var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        console.log(outerWidth);
         var outerHeight = 600;
 
         var margin = { top: 20, right: 20, bottom: 20, left: 20 };
@@ -334,7 +296,6 @@ var gradeDistr = (function() {
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         // Y AXIS GRID LINES
-
         chart.selectAll("line").data(yScale.ticks(10))
             .enter().append("line")
             .attr("x1", 0)
@@ -343,7 +304,6 @@ var gradeDistr = (function() {
             .attr("y2", yScale);
 
         //Y AXIS LABELS
-
         chart.selectAll(".yscale-label").data(yScale.ticks(10))
             .enter().append("text")
             .attr("class", "yscale-label")
@@ -352,6 +312,17 @@ var gradeDistr = (function() {
             .attr("dx", -margin.left/8)
             .attr("text-anchor", "end")
             .attr("dy", "0.3em")
+            .text(String);
+
+        //X AXIS LABELS
+        chart.selectAll(".xscale-label").data(xScale.domain())
+            .enter().append("text")
+            .attr("class", "xscale-label")
+            .attr("x", function(d){return xScale(d)+xScale.rangeBand()/2;})
+            .attr("y", chartHeight+margin.bottom*0.8)
+            // .attr("dy",)
+            .attr("text-anchor", "center")
+            // .attr("dx",)
             .text(String);
 
 
