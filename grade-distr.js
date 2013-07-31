@@ -144,29 +144,29 @@ var gradeDistr = (function() {
         // COLUMN 2
 
         var legend = $('<div id="legend"></div>');
-        var labelLegend = $('<label for="legend">Legend:</label>');
+        var labelLegend = $('<label for="legend"><h4>Legend:</h4></label>');
         var legendTable = $('<div id="legend-list"></div>')
         legend.css( {
-            'border': '1px solid black',
+            'background-color': '#fff',
             'border-radius': '10px',
             'width': '300px',
-            'height': '200px',
+            'height': '150px',
             'padding': '5px',
             'margin-top': '5px'
         });
 
-        var topBlock = $('<div id="topblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: blue;"></div><p style="margin-left: 15px;"></p></div>');
-        var middleBlock = $('<div id="middleblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: lavender;"></div><p style="margin-left: 15px;"></p></div>');
-        var bottomBlock = $('<div id="bottomblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: teal;"></div><p style="margin-left: 15px;"></p></div>');
+        var topBlock = $('<div id="topblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: lightblue;"></div><p style="margin-left: 15px;"></p></div>');
+        var middleBlock = $('<div id="middleblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: darkgray;"></div><p style="margin-left: 15px;"></p></div>');
+        var bottomBlock = $('<div id="bottomblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: lightpink;"></div><p style="margin-left: 15px;"></p></div>');
         
-        legendTable.css( {'margin-left': '20px', 'margin-top': '20px'} );
+        legendTable.css( {'margin-left': '20px', 'margin-top': '10px'} );
         legendTable.append(topBlock, middleBlock, bottomBlock);
 
 
         var checkboxes = $('<div id="checkboxes-div"></div>');
-        var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
+        var labelQuiz = $('<label for="ops"><h4>Averaged Over:</h4></label><br>');
         checkboxes.css( {
-            'border': '1px solid black',
+            'background-color': '#fff',
             'border-radius': '10px',
             'width': '300px',
             'height': '200px',
@@ -179,16 +179,16 @@ var gradeDistr = (function() {
         var sliderDiv = $('<div id="sliderbg">');
         sliderDiv.css({ 
             'background-color': '#fff', 
-            'border': 'solid 1px black',
             'border-radius': '10px', 
             'width': '300px', 
             'height': '95px',
             'padding': '0px 15px 0px 7px',
-            'margin-top': '5px'
+            'margin-top': '5px',
+            'margin-bottom': '40px'
         });
 
-        var sliderObj = $('<div id="slider">')
-        var labelSlider = $('<p><label for="amount">Grade range:</label>\
+        var sliderObj = $('<div id="slider">');
+        var labelSlider = $('<p><label for="amount"><h4>Grade Range:</h4></label>\
             <input id="amount" style="width: 250px;\
                     border: 0;\
                     background-color: #fff;\
@@ -203,7 +203,7 @@ var gradeDistr = (function() {
         $('#checkboxes-div').append(labelQuiz);
         for (var key in quizzes) {
             var noSpaceKey = key.replace(/\s+/g, '');
-            $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
+            $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '"> ' + key +  '<br>');
         }
 
         //adjusts the div height for the checkbox area
