@@ -6,36 +6,84 @@ var gradeDistr = (function() {
 //stuff goes here    
 ////////////////////////////////// helper functions
 //stuff goes here
-
     function Model(){
+        //define peopleDict
+        var peopleData = {};
+        for (var quiz in quizzes){
+            console.log(quiz);
+            var sheet = quizzes[quiz];
+            for (var i = 0; i < sheet.length; i++) {
+                var row = sheet[i];
+                var name = row["username"];
+                if (name in peopleData) {
+                    peopleData[name][quiz] = row;
+                }
+                else {
+                    peopleData[name]= {};
+                    peopleData[name][quiz] = row;
+                }
+            }
+        }
+
+        function getPeopleData(){return peopleData;}
+
         function getQuizData(quizname) {
             return quizzes[quizname];
         }
 
-        function getQuizNames() {
-            return quizzes.keys();
+        /**
+        bottomPct, topPct in percentage(%).
+        **/
+        function groupPeopleByAvr(assignment, lowPct, highPct) {
+            var peopleArray = [];
+            var bottomArray = [];
+            var middleArray = [];
+            var topArray = [];
+
+            for (var key in peopleData) {
+                if (assignment in peopleData[key]) {
+                    peopleArray.push(peopleData[key]);
+                }
+            }
+
+            //setup sorting function
+            function orderByAvrAscending(a,b) {
+                return a["avr"] - b["avr"];
+            }
+            peopleArray.sort(orderByAvrAscending); //sort
+            // for (var i = 0; i < peopleArray.length; i++) {
+            //     console.log(peopleArray[i]["avr"]);
+            // }
+
+            var totalNumPeople = peopleArray.length;
+            for (var i = 0; i < totalNumPeople; i++){
+                if (i < Math.round(totalNumPeople*lowPct/100)){bottomArray.push(peopleArray[i]);}
+                else if (i < Math.round(totalNumPeople*highPct/100)){middleArray.push(peopleArray[i]);}
+                else {topArray.push(peopleArray[i]);}
+            }
+
+            bottomArray
+            return [bottomArray,middleArray,topArray];
         }
 
-        function getPeopleData() {
-            var peopleDict = {};
-            for (var quiz in quizzes){
-                var sheet = quizzes[quiz];
-                for (var i = 0; i < sheet.length; i++) {
-                    var row = sheet[i];
-                    var name = row["username"];
-                    if (name in peopleDict) {
-                        peopleDict[name][quiz] = row;
-                    }
-                    else {
-                        peopleDict[name]= {};
-                        peopleDict[name][quiz] = quizzes;
+        function calcAverage(quizzesOfInterest) {
+            for (var person in peopleData){
+                var personData = peopleData[person];
+                personData["avr"] = 0;
+                var sum = 0;
+                for (var i = 0; i < quizzesOfInterest.length; i++){
+                    var quizname = quizzesOfInterest[i];
+                    if (quizname in personData) {
+                        sum += parseFloat(personData[quizname]["grade"]);
                     }
                 }
-            } 
-            return peopleDict; 
+                var avr = sum / quizzesOfInterest.length;
+                personData["avr"] = avr;
+            }
+            // console.log(peopleData["abundantchatter"]["avr"]);
         }
 
-        return {getQuizData: getQuizData, getQuizNames: getQuizNames};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function Controller(model){
@@ -179,13 +227,19 @@ var gradeDistr = (function() {
   //setup main structure of app
     function setup(div) {
 
-       var model = Model();
+        var model = Model();
         var controller = Controller(model);
         view = View(div, model, controller);
+        
+        exports.view = view; //delete later
 
     }
    
     exports.setup = setup;
+
+    exports.model = Model; //delete later
+    exports.control = Controller; //delete later
+
     return exports;
 
 }());
