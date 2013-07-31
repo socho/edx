@@ -228,9 +228,9 @@ var gradeDistr = (function() {
                 var max = 100;
                 var mid = Math.abs(ui.values[1] - ui.values[0]);
                 $( "#amount" ).val( "Bottom: %" + Math.abs(ui.values[0] - min) + ", Mid: %" + mid + ", Top: %" + Math.abs(max - ui.values[1]));
-                $('#topblock p').html('Top ' + Math.abs(ui.values[0] - min) + '%');
+                $('#topblock p').html('Top ' + Math.abs(max - ui.values[1]) + '%');
                 $('#middleblock p').html('Middle ' + mid + '%');
-                $('#bottomblock p').html('Bottom ' + Math.abs(max - ui.values[1]) + '%');
+                $('#bottomblock p').html('Bottom ' + Math.abs(ui.values[0] - min) + '%');
 
                 
             
