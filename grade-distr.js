@@ -215,7 +215,10 @@ var gradeDistr = (function() {
             var noSpaceKey = key.replace(/\s+/g, '');
             $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
         }
-        
+
+        //adjusts the div height for the checkbox area
+        var checkboxHeight = parseInt($('#checkboxes-div input').css('height').replace(/\D+/, ''));
+        console.log($('#checkboxes-div').css('height', checkboxHeight* 15));
 
 
         sliderObj.slider({
