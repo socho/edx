@@ -116,6 +116,19 @@ var gradeDistr = (function() {
             'margin-top': '5px'
         });
 
+        
+        var checkboxes = $('<div id="checkboxes-div"></div>');
+        var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
+        checkboxes.css( {
+            'border': '1px solid black',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '200px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+
         //slider
         var sliderDiv = $('<div id="sliderbg">');
         sliderDiv.css({ 
@@ -141,6 +154,12 @@ var gradeDistr = (function() {
         $('#column2').append(sliderDiv, legend, checkboxes);
         $('#sliderbg').append(labelSlider, sliderObj);
         $('#legend').append(labelLegend);
+        $('#checkboxes-div').append(labelQuiz);
+        for (var key in quizzes) {
+            var noSpaceKey = key.replace(/\s+/g, '');
+            $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
+        }
+
 
         sliderObj.slider({
             range: true,
@@ -164,25 +183,10 @@ var gradeDistr = (function() {
         $( "#amount" ).val( "Bottom: %" + bottom + ", Mid: %" + middle + ", Top: %" + top );
 
 
-        var checkboxes = $('<div id="checkboxes-div"></div>');
-        var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
-        checkboxes.css( {
-            'border': '1px solid black',
-            'border-radius': '10px',
-            'width': '300px',
-            'height': '200px',
-            'padding': '5px',
-            'margin-top': '5px'
-        });
-
 
         
         
-        $('#checkboxes-div').append(labelQuiz);
-        for (var key in quizzes) {
-            var noSpaceKey = key.replace(/\s+/g, '');
-            $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
-        }
+        
 
        //NAVIGATION
         var dropdown = $('.dropdown-menu');
