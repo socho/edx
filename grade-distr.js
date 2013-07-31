@@ -44,20 +44,19 @@ var gradeDistr = (function() {
          '<div class="container">'
         +   '<div class = "assignment-row">'
         +   '<div class = "btn-group">'
-        +       '<button type = "button" class="btn btn-default btn-l">L</button>'
+        +       '<button type = "button" class="btn btn-default btn-l"><span class="glyphicon glyphicon-arrow-left"></span></button>'
         +       '<div class = "btn-group">'
         +           '<button type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Assignment<span class="caret"></span></button>'
         +           '<ul class="dropdown-menu">'
-        +               '<li><a> first link </a></li>'
         +           '</ul>'
         +       '</div>'
-        +       '<button type = "button" class="btn btn-default btn-r">R</button>'
+        +       '<button type = "button" class="btn btn-default btn-r"><span class="glyphicon glyphicon-arrow-right"></span></button>'
         +   '</div>'
         +'</div>'
         +'<div class = "body-content">'
         +   '<div class = "row">'
         +       '<div class="col-lg-8">1</div>'
-        +       '<div class="col-lg-4" id="column2">2</div>'
+        +       '<div class="col-lg-4" id="column2"></div>'
         +   '</div>'
         +'</div>'
         );
@@ -98,6 +97,8 @@ var gradeDistr = (function() {
            //      .attr("width", function(d){return (d.dx*20-5)})
            //      .attr("height", function(d){return d.y;});
 
+
+        // COLUMN 2
         //slider
         var sliderDiv = $('<div id="sliderbg">');
         sliderDiv.css({ 
@@ -112,20 +113,19 @@ var gradeDistr = (function() {
 
         var sliderObj = $('<div id="slider">')
         var labelSlider = $('<p><label for="amount">Grade range:</label><input id="amount" style="border: 0; background-color: #fff; color: #f6931f; font-weight: bold;" /></p>');
-
-        // sliderObj.slider({
-        //     range: "min",
-        //     min: 0,
-        //     max: 100,
-        //     values: [ 25, 75 ],
-        //     slide: function( event, ui ) {
-        //         $( "#amount" ).val( " %" + ui.values[ 0 ] + " - %" + ui.values[ 1 ] );
-        //     }
-        // }).slider('pips', {
-        //      first: 'label',
-        //     last: 'label',
-        //     rest: false,
-        // });
+        sliderObj.slider({
+            range: "min",
+            min: 0,
+            max: 100,
+            values: [ 25, 75 ],
+            slide: function( event, ui ) {
+                $( "#amount" ).val( " %" + ui.values[ 0 ] + " - %" + ui.values[ 1 ] );
+            }
+        }).slider('pips', {
+             first: 'label',
+            last: 'label',
+            rest: false,
+        });
 
         $( "#amount" ).val( " %" + $( "#slider" ).slider( "values", 0 ) +
       " - %" + $( "#slider" ).slider( "values", 1 ) )
@@ -155,13 +155,21 @@ var gradeDistr = (function() {
 
         
         $('#column2').append(sliderDiv, legend, checkboxes);
-        $('#legend').append(labelLegend);
         $('#sliderbg').append(labelSlider, sliderObj);
+        $('#legend').append(labelLegend);
         $('#checkboxes-div').append(labelQuiz);
         for (var key in quizzes) {
             var noSpaceKey = key.replace(/\s+/g, '');
             $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
         }
+
+
+        //NAVIGATION
+        var dropdown = $('.dropdown-menu');
+        for (var key in quizzes) {
+            var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
+            dropdown.append(link);
+        } 
 
 
     }
