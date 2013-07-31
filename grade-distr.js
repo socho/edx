@@ -152,39 +152,10 @@ var gradeDistr = (function() {
 
 
         // COLUMN 2
-        //slider
-        var sliderDiv = $('<div id="sliderbg">');
-        sliderDiv.css({ 
-            'background-color': '#fff', 
-            'border': 'solid 1px black',
-            'border-radius': '10px', 
-            'width': '300px', 
-            'height': '95px',
-            'padding': '0px 15px 0px 7px',
-            'margin-top': '5px'
-        });
-
-        var sliderObj = $('<div id="slider">')
-        var labelSlider = $('<p><label for="amount">Grade range:</label><input id="amount" style="border: 0; background-color: #fff; color: #f6931f; font-weight: bold;" /></p>');
-        sliderObj.slider({
-            range: "min",
-            min: 0,
-            max: 100,
-            values: [ 25, 75 ],
-            slide: function( event, ui ) {
-                $( "#amount" ).val( " %" + ui.values[ 0 ] + " - %" + ui.values[ 1 ] );
-            }
-        }).slider('pips', {
-             first: 'label',
-            last: 'label',
-            rest: false,
-        });
-
-        $( "#amount" ).val( " %" + $( "#slider" ).slider( "values", 0 ) +
-      " - %" + $( "#slider" ).slider( "values", 1 ) );
 
         var legend = $('<div id="legend"></div>');
         var labelLegend = $('<label for="legend">Legend:</label>');
+        var legendTable = $('<div id="legend-list"></div>')
         legend.css( {
             'border': '1px solid black',
             'border-radius': '10px',
@@ -193,6 +164,14 @@ var gradeDistr = (function() {
             'padding': '5px',
             'margin-top': '5px'
         });
+
+        var topBlock = $('<div id="topblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: blue;"></div><p style="margin-left: 15px;"></p></div>');
+        var middleBlock = $('<div id="middleblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: lavender;"></div><p style="margin-left: 15px;"></p></div>');
+        var bottomBlock = $('<div id="bottomblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: teal;"></div><p style="margin-left: 15px;"></p></div>');
+        
+        legendTable.css( {'margin-left': '20px', 'margin-top': '20px'} );
+        legendTable.append(topBlock, middleBlock, bottomBlock);
+
 
         var checkboxes = $('<div id="checkboxes-div"></div>');
         var labelQuiz = $('<label for="ops">Averaged Over:</label><br>');
@@ -206,15 +185,71 @@ var gradeDistr = (function() {
         });
 
 
-        
+        //slider
+        var sliderDiv = $('<div id="sliderbg">');
+        sliderDiv.css({ 
+            'background-color': '#fff', 
+            'border': 'solid 1px black',
+            'border-radius': '10px', 
+            'width': '300px', 
+            'height': '95px',
+            'padding': '0px 15px 0px 7px',
+            'margin-top': '5px'
+        });
+
+        var sliderObj = $('<div id="slider">')
+        var labelSlider = $('<p><label for="amount">Grade range:</label>\
+            <input id="amount" style="width: 250px;\
+                    border: 0;\
+                    background-color: #fff;\
+                    color: #f6931f;\
+                    font-size: 12px;\
+                    font-weight: bold;\
+                    margin-bottom: -100px" /></p>');
+
         $('#column2').append(sliderDiv, legend, checkboxes);
         $('#sliderbg').append(labelSlider, sliderObj);
-        $('#legend').append(labelLegend);
+        $('#legend').append(labelLegend, legendTable);
         $('#checkboxes-div').append(labelQuiz);
         for (var key in quizzes) {
             var noSpaceKey = key.replace(/\s+/g, '');
             $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
         }
+        
+
+
+        sliderObj.slider({
+            range: true,
+            min: 0,
+            max: 100,
+            values: [ 25, 75 ],
+            slide: function( event, ui ) {
+                var min = 0;
+                var max = 100;
+                var mid = Math.abs(ui.values[1] - ui.values[0]);
+                $( "#amount" ).val( "Bottom: %" + Math.abs(ui.values[0] - min) + ", Mid: %" + mid + ", Top: %" + Math.abs(max - ui.values[1]));
+                $('#topblock p').html('Top ' + Math.abs(ui.values[0] - min) + '%');
+                $('#middleblock p').html('Middle ' + mid + '%');
+                $('#bottomblock p').html('Bottom ' + Math.abs(max - ui.values[1]) + '%');
+
+                
+            
+            }
+        }).slider('pips', {
+             first: 'label',
+            last: 'label',
+            rest: false,
+        });
+        var bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+        var middle = Math.abs(sliderObj.slider("values", 1) - sliderObj.slider("values", 0));
+        var top = Math.abs(100 - sliderObj.slider("values", 1));
+        $( "#amount" ).val( "Bottom: %" + bottom + ", Mid: %" + middle + ", Top: %" + top );
+        $('#topblock p').append('Top ' + top + '%');
+        $('#middleblock p').append('Middle ' + middle + '%');
+        $('#bottomblock p').append('Bottom ' + bottom + '%');
+
+        
+        
 
        //NAVIGATION
         var dropdown = $('.dropdown-menu');
