@@ -133,10 +133,10 @@ var gradeDistr = (function() {
         });
 
         $( "#amount" ).val( " %" + $( "#slider" ).slider( "values", 0 ) +
-      " - %" + $( "#slider" ).slider( "values", 1 ) )
+      " - %" + $( "#slider" ).slider( "values", 1 ) );
 
         var legend = $('<div id="legend"></div>');
-        var labelLegend = $('<label for="legend">Legend:</label>')
+        var labelLegend = $('<label for="legend">Legend:</label>');
         legend.css( {
             'border': '1px solid black',
             'border-radius': '10px',
@@ -168,18 +168,16 @@ var gradeDistr = (function() {
             $('#checkboxes-div').append('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + noSpaceKey + '" name="' + noSpaceKey + '">' + key +  '<br>');
         }
 
-        //NAVIGATION
+       //NAVIGATION
         var dropdown = $('.dropdown-menu');
         for (var key in quizzes) {
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
- 
     }
 
   //setup main structure of app
     function setup(div) {
-
 
        var model = Model();
         var controller = Controller(model);
@@ -194,4 +192,5 @@ var gradeDistr = (function() {
 
 $(document).ready(function() {
     gradeDistr.setup($('.gradeDistr'));
+
 });
