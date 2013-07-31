@@ -62,8 +62,35 @@ var gradeDistr = (function() {
                 else {topArray.push(peopleArray[i]);}
             }
 
-            bottomArray
-            return [bottomArray,middleArray,topArray];
+            //need to rewrite
+            counter = [0,0,0,0,0,0,0,0,0,0,0];
+            for (var i = 0; i < bottomArray.length; i++){
+                var grade = parseInt(bottomArray[i][assignment]["grade"]);
+                counter[grade] += 1;
+            }
+            newBottomArray = [];
+            for (var i = 0; i <= 10; i++){
+                newBottomArray.push({"y":counter[i]});
+            }
+            counter = [0,0,0,0,0,0,0,0,0,0,0];
+            for (var i = 0; i < middleArray.length; i++){
+                var grade = parseInt(middleArray[i][assignment]["grade"]);
+                counter[grade] += 1;
+            }
+            newMiddleArray = [];
+            for (var i = 0; i <= 10; i++){
+                newMiddleArray.push({"y":counter[i]});
+            }
+            counter = [0,0,0,0,0,0,0,0,0,0,0];
+            for (var i = 0; i < topArray.length; i++){
+                var grade = parseInt(topArray[i][assignment]["grade"]);
+                counter[grade] += 1;
+            }
+            newTopArray = [];
+            for (var i = 0; i <= 10; i++){
+                newTopArray.push({"y":counter[i]});
+            }
+            return [newBottomArray,newMiddleArray,newTopArray];
         }
 
         function calcAverage(quizzesOfInterest) {
@@ -108,7 +135,7 @@ var gradeDistr = (function() {
         +'</div>'
         +'<div class = "body-content">'
         +   '<div class = "row">'
-        +       '<div class="col-lg-8">1</div>'
+        +       '<div class="col-lg-8" id="column1"></div>'
         +       '<div class="col-lg-4" id="column2"></div>'
         +   '</div>'
         +'</div>'
@@ -257,6 +284,89 @@ var gradeDistr = (function() {
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
+
+        ////////
+        //temporary
+        ////////
+        $('#column1').append("<div class='chart-container'></div>");
+        model.calcAverage(["Quiz 21", "Quiz 22"]);
+        var data = model.groupPeopleByAvr("Quiz 22",30,70);
+
+        var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
+        console.log(outerWidth);
+        var outerHeight = 600;
+
+        var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+
+        var chartWidth = outerWidth - margin.left - margin.right;
+        var chartHeight = outerHeight - margin.top - margin.bottom;
+
+        var color_scale = d3.scale.ordinal().range(["lightpink", "darkgray", "lightblue"]);
+        
+        var stack = d3.layout.stack();
+        var stackedData = stack(data);
+
+        var yGroupMax = d3.max(stackedData, function(layer) { 
+                            return d3.max(layer, function(d) { return d.y; })
+                        });
+
+        var yStackMax = d3.max(stackedData, function(layer) { 
+                            return d3.max(layer, function(d) { return d.y + d.y0; })
+                        });
+
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
+
+        var yScale = d3.scale.linear()
+            .domain([0, yStackMax]).range([chartHeight, 0]);
+
+        //INITIALIZE THE CHART
+
+        var chart = d3.select(".chart-container")
+            .append("svg")  
+                .attr("class", "chart")
+                .attr("height", outerHeight)
+                .attr("width", outerWidth)
+            .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Y AXIS GRID LINES
+
+        chart.selectAll("line").data(yScale.ticks(10))
+            .enter().append("line")
+            .attr("x1", 0)
+            .attr("x2", chartWidth)
+            .attr("y1", yScale)
+            .attr("y2", yScale);
+
+        //Y AXIS LABELS
+
+        chart.selectAll(".yscale-label").data(yScale.ticks(10))
+            .enter().append("text")
+            .attr("class", "yscale-label")
+            .attr("x", 0)
+            .attr("y", yScale)
+            .attr("dx", -margin.left/8)
+            .attr("text-anchor", "end")
+            .attr("dy", "0.3em")
+            .text(String);
+
+
+        //grabs all the layers and forms groups out of them
+        var layerGroups = chart.selectAll(".layer").data(stackedData)
+            .enter().append("g")
+            .attr("class", "layer")
+            .style("fill", function(d,i){return color_scale(i);});
+
+        //THE BARS (FOR STACKED BAR CHARTS)
+        var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
+            .enter().append("rect")
+            .attr("x", function(d, i) { return xScale(i); })
+            .attr("y", function(d) { return yScale(d.y + d.y0) })
+            .attr("width", xScale.rangeBand())
+            .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+
+
     }
 
   //setup main structure of app

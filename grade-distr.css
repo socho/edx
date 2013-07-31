@@ -6,7 +6,11 @@
 	text-align: center;
 }
 
-.bar rect {
-	fill: steelblue;
+.chart rect {
+	stroke: white;
 	shape-rendering: crispEdges;
+}
+
+.chart line {
+	stroke: lightgrey;
 }
