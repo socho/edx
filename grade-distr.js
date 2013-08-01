@@ -106,14 +106,25 @@ var gradeDistr = (function() {
             var newThreeArrays = [[],[],[]];
             for (var index = 0; index < threeArrays.length; index++) {
                 var thisArray = threeArrays[index];
-                counter = [0,0,0,0,0,0,0,0,0,0];
+                var counter = [];
+                var groupedPeople = []; 
+                for (var i = 0; i < 10; i++) {
+                    counter.push(0);
+                    groupedPeople.push([]);
+                }
                 for (var i = 0; i < thisArray.length; i++){
                     var grade = parseInt(thisArray[i][assignment]["grade"]);
-                    if (grade == 10) {counter[9] += 1;}
-                    else {counter[grade] += 1;}
+                    if (grade == 10) {
+                        counter[9] += 1;
+                        groupedPeople[9].push(thisArray[i]);
+                    }
+                    else {
+                        counter[grade] += 1;
+                        groupedPeople[grade].push(thisArray[i]);
+                    }
                 }
                 for (var i = 0; i < 10; i++){
-                    newThreeArrays[index].push({"y":counter[i]});
+                    newThreeArrays[index].push({"y":counter[i], "people": groupedPeople[i]});
                 }
             }
            return newThreeArrays;
