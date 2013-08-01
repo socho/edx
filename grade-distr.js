@@ -183,7 +183,7 @@ var gradeDistr = (function() {
         +   '<div class = "btn-group">'
         +       '<button type = "button" class="btn btn-default btn-l"><span class="glyphicon glyphicon-chevron-left"></span></button>'
         +       '<div class = "btn-group">'
-        +           '<button type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Assignment<span class="caret"></span></button>'
+        +           '<button id="asgn-nav" type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Quiz 21<span class="caret"></span></button>'
         +           '<ul class="dropdown-menu">'
         +           '</ul>'
         +       '</div>'
@@ -508,9 +508,10 @@ var gradeDistr = (function() {
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
                 //inNav = true;
+                $('#asgn-nav').text(String($(this).attr('id')));
                 var quizzesOfInterest = [];
                 var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                // console.log(quizzesOfInterest.length);
+                console.log('selected: ', selectedBoxes);
                 selectedBoxes.each(function() {
                     quizzesOfInterest.push($(this).val());
                 });
@@ -520,12 +521,23 @@ var gradeDistr = (function() {
             });
         });
 
-        
+        var selectedBoxes = [];
         checkboxes.find('input[type=checkbox]').each(function() {
             $(this).on('click', function() {
-                console.log($(this).val());
+                
+                if (($.inArray($(this).val(), selectedBoxes) == -1)) {
+                    selectedBoxes.push($(this).val());
+                    selectedBoxes.sort();
+                } else {
+                    var index = selectedBoxes.indexOf($(this).val());
+                    selectedBoxes.splice(index, 1);
+                }
+                // console.log('selected boxes: ', selectedBoxes);
+                controller.calcAverage(selectedBoxes);
+                controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, 100-top);
             });
         });
+
 
         model.on('changed', function(data) {
             // inNav = false;
