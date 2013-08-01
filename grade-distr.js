@@ -142,8 +142,10 @@ var gradeDistr = (function() {
                         sum += parseFloat(personData[quizname]["grade"]);
                     }
                 }
-                var avr = sum / quizzesOfInterest.length;
-                personData["avr"] = avr;
+                if (quizzesOfInterest.length != 0){
+                    var avr = sum / quizzesOfInterest.length;
+                    personData["avr"] = avr;
+                }
             }
             // console.log(peopleData["abundantchatter"]["avr"]);
         }
@@ -513,7 +515,7 @@ var gradeDistr = (function() {
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
                 //inNav = true;
-                $('#asgn-nav').text(String($(this).attr('id')));
+                $('#asgn-nav').html(String($(this).attr('id'))+"<span class='caret'></span>");
                 var quizzesOfInterest = [];
                 var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
                 console.log('selected: ', selectedBoxes);
