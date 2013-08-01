@@ -62,36 +62,21 @@ var gradeDistr = (function() {
                 else {topArray.push(peopleArray[i]);}
             }
 
-            //need to rewrite
-            counter = [0,0,0,0,0,0,0,0,0,0];
-            for (var i = 0; i < bottomArray.length; i++){
-                var grade = parseInt(bottomArray[i][assignment]["grade"]);
-                if (grade == 10) {counter[9] += 1;}
-                else {counter[grade] += 1;}
+            var threeArrays = [bottomArray,middleArray,topArray];
+            var newThreeArrays = [[],[],[]];
+            for (var index = 0; index < threeArrays.length; index++) {
+                var thisArray = threeArrays[index];
+                counter = [0,0,0,0,0,0,0,0,0,0];
+                for (var i = 0; i < thisArray.length; i++){
+                    var grade = parseInt(thisArray[i][assignment]["grade"]);
+                    if (grade == 10) {counter[9] += 1;}
+                    else {counter[grade] += 1;}
+                }
+                for (var i = 0; i < 10; i++){
+                    newThreeArrays[index].push({"y":counter[i]});
+                }
             }
-            newBottomArray = [];
-            for (var i = 0; i < 10; i++){
-                newBottomArray.push({"y":counter[i]});
-            }
-            counter = [0,0,0,0,0,0,0,0,0,0];
-            for (var i = 0; i < middleArray.length; i++){
-                var grade = parseInt(middleArray[i][assignment]["grade"]);
-                counter[grade] += 1;
-            }
-            newMiddleArray = [];
-            for (var i = 0; i < 10; i++){
-                newMiddleArray.push({"y":counter[i]});
-            }
-            counter = [0,0,0,0,0,0,0,0,0,0];
-            for (var i = 0; i < topArray.length; i++){
-                var grade = parseInt(topArray[i][assignment]["grade"]);
-                counter[grade] += 1;
-            }
-            newTopArray = [];
-            for (var i = 0; i < 10; i++){
-                newTopArray.push({"y":counter[i]});
-            }
-            return [newBottomArray,newMiddleArray,newTopArray];
+           return newThreeArrays;
         }
 
         function calcAverage(quizzesOfInterest) {
