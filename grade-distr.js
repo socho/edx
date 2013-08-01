@@ -166,7 +166,7 @@ var gradeDistr = (function() {
         }
 
         function groupPeopleByAvr(assignment, lowPct, highPct) {
-            model.groupPeopleByAvr(assignment, lowPct, highPct);
+            return model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
         return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
@@ -350,8 +350,8 @@ var gradeDistr = (function() {
 
         function updateGraph(assignment, quizzesOfInterest, lowPct, highPct) {
             controller.calcAverage(quizzesOfInterest);
-            var data = controller.groupPeopleByAvr(assignment,lowPct,highPct);
-            
+            var data = controller.groupPeopleByAvr(assignment,lowPct,highPct); //need to ask question
+            console.log('data: ', data);
             var stack = d3.layout.stack();
             var stackedData = stack(data);
 
@@ -415,7 +415,7 @@ var gradeDistr = (function() {
                 .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
         }
 
-        model.on()
+        updateGraph("Quiz 21", ["Quiz 21", "Quiz 22"], 30, 70);
     }
 
   //setup main structure of app
