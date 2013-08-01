@@ -45,7 +45,7 @@ var gradeDistr = (function() {
         var handler = UpdateHandler();
 
 
-        //define peopleDict
+        //define peopleData
         var peopleData = {};
         for (var quiz in quizzes){
             console.log(quiz);
@@ -372,7 +372,7 @@ var gradeDistr = (function() {
             .attr("x", function(d){return xScale(d);})
             .attr("y", chartHeight)
             .attr("text-anchor", "center")
-            .attr("dx", function(d){return xScale.rangeBand()/2;})
+            // .attr("dx", function(d){return xScale.rangeBand()/2;})
             .attr("dy", margin.bottom*0.5)
             .text(String);
         
