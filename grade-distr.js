@@ -179,7 +179,9 @@ var gradeDistr = (function() {
         +'</div>'
         +'<div class = "body-content">'
         +   '<div class = "row">'
-        +       '<div class="col-lg-8" id="column1"></div>'
+        +       '<div class="col-lg-8" id="column1">'
+        +           '<div class="chart-container"></div>'
+        +       '</div>'
         +       '<div class="col-lg-4" id="column2"></div>'
         +   '</div>'
         +'</div>'
@@ -296,12 +298,8 @@ var gradeDistr = (function() {
         } 
 
         ////////
-        //temporary Column 1 stuff
+        //setup variables for Graph
         ////////
-        $('#column1').append("<div class='chart-container'></div>");
-        controller.calcAverage(["Quiz 21", "Quiz 22"]);
-        var data = controller.groupPeopleByAvr("Quiz 25",30,70);
-
         var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
         var outerHeight = 600;
 
@@ -312,70 +310,23 @@ var gradeDistr = (function() {
 
         var color_scale = d3.scale.ordinal().range(["lightpink", "darkgray", "lightblue"]);
         
-        var stack = d3.layout.stack();
-        var stackedData = stack(data);
-
-        var yGroupMax = d3.max(stackedData, function(layer) { 
-                            return d3.max(layer, function(d) { return d.y; })
-                        });
-
-        var yStackMax = d3.max(stackedData, function(layer) { 
-                            return d3.max(layer, function(d) { return d.y + d.y0; })
-                        });
-
-        var xScale = d3.scale.ordinal()
-            .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
-
-        var yScale = d3.scale.linear()
-            .domain([0, yStackMax]).range([chartHeight, 0]);
-
         //INITIALIZE THE CHART
-
         var chart = d3.select(".chart-container")
             .append("svg")  
                 .attr("class", "chart")
                 .attr("height", outerHeight)
                 .attr("width", outerWidth)
             .append("g")
+                .attr("class", "innerChart")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        // Y AXIS GRID LINES
-        chart.selectAll("line").data(yScale.ticks(10))
-            .enter().append("line")
-            .attr("x1", 0)
-            .attr("x2", chartWidth)
-            .attr("y1", yScale)
-            .attr("y2", yScale);
-
-        //Y AXIS LABELS
-        chart.selectAll(".yscale-label").data(yScale.ticks(10))
-            .enter().append("text")
-            .attr("class", "yscale-label")
-            .attr("x", 0)
-            .attr("y", yScale)
-            .attr("dx", -margin.left/8)
-            .attr("text-anchor", "end")
-            .attr("dy", "0.3em")
-            .text(String);
-        
+        //Y-AXIS LABEL
         chart.append("text")
             .attr("class", "yaxis-label")
             .attr("x",0)
             .attr("dx", -margin.left/4)
             .attr("y", chartHeight/2)
             .text("#Students");
-
-        //X AXIS LABELS
-        chart.selectAll(".xscale-label").data(xScale.domain())
-            .enter().append("text")
-            .attr("class", "xscale-label")
-            .attr("x", function(d){return xScale(d);})
-            .attr("y", chartHeight)
-            .attr("text-anchor", "center")
-            // .attr("dx", function(d){return xScale.rangeBand()/2;})
-            .attr("dy", margin.bottom*0.5)
-            .text(String);
-        
+        //X-AXIS LABEL
         chart.append("text")
             .attr("class", "xaxis-label")
             .attr("x",chartWidth/2)
@@ -383,21 +334,75 @@ var gradeDistr = (function() {
             .attr("dy", margin.bottom)
             .text("Grade");
 
+        ///////////////////
 
-        //grabs all the layers and forms groups out of them
-        var layerGroups = chart.selectAll(".layer").data(stackedData)
-            .enter().append("g")
-            .attr("class", "layer")
-            .style("fill", function(d,i){return color_scale(i);});
 
-        //THE BARS (FOR STACKED BAR CHARTS)
-        var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
-            .enter().append("rect")
-            .attr("x", function(d, i) { return xScale(i); })
-            .attr("y", function(d) { return yScale(d.y + d.y0) })
-            .attr("width", xScale.rangeBand())
-            .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+        function updateGraph(assignment, quizzesOfInterest, lowPct, highPct) {
+            controller.calcAverage(quizzesOfInterest);
+            var data = controller.groupPeopleByAvr(assignment,lowPct,highPct);
+            
+            var stack = d3.layout.stack();
+            var stackedData = stack(data);
 
+            var yGroupMax = d3.max(stackedData, function(layer) { 
+                                return d3.max(layer, function(d) { return d.y; })
+                            });
+
+            var yStackMax = d3.max(stackedData, function(layer) { 
+                                return d3.max(layer, function(d) { return d.y + d.y0; })
+                            });
+
+            var xScale = d3.scale.ordinal()
+                .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
+
+            var yScale = d3.scale.linear()
+                .domain([0, yStackMax]).range([chartHeight, 0]);
+
+
+            // Y AXIS GRID LINES
+            chart.selectAll("line").data(yScale.ticks(10))
+                .enter().append("line")
+                .attr("x1", 0)
+                .attr("x2", chartWidth)
+                .attr("y1", yScale)
+                .attr("y2", yScale);
+
+            //Y TICK MARKS
+            chart.selectAll(".yscale-label").data(yScale.ticks(10))
+                .enter().append("text")
+                .attr("class", "yscale-label")
+                .attr("x", 0)
+                .attr("y", yScale)
+                .attr("dx", -margin.left/8)
+                .attr("text-anchor", "end")
+                .attr("dy", "0.3em")
+                .text(String);            
+
+            //X TICK MARKS
+            chart.selectAll(".xscale-label").data(xScale.domain())
+                .enter().append("text")
+                .attr("class", "xscale-label")
+                .attr("x", function(d){return xScale(d);})
+                .attr("y", chartHeight)
+                .attr("text-anchor", "center")
+                // .attr("dx", function(d){return xScale.rangeBand()/2;})
+                .attr("dy", margin.bottom*0.5)
+                .text(String);
+            
+            //grabs all the layers and forms groups out of them
+            var layerGroups = chart.selectAll(".layer").data(stackedData)
+                .enter().append("g")
+                .attr("class", "layer")
+                .style("fill", function(d,i){return color_scale(i);});
+
+            //THE BARS (FOR STACKED BAR CHARTS)
+            var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
+                .enter().append("rect")
+                .attr("x", function(d, i) { return xScale(i); })
+                .attr("y", function(d) { return yScale(d.y + d.y0) })
+                .attr("width", xScale.rangeBand())
+                .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+        }
 
         model.on()
     }
