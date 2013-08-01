@@ -143,19 +143,19 @@ var gradeDistr = (function() {
 
 
         function getPeopleData() {
-            return model.getPeopleData();
+            model.getPeopleData();
         }
 
         function getQuizData() {
-            return model.getQuizData();
+            model.getQuizData();
         }
 
         function calcAverage(selectedQuizzes) {
-            return model.calcAverage(selectedQuizzes);
+            model.calcAverage(selectedQuizzes);
         }
 
         function groupPeopleByAvr(assignment, lowPct, highPct) {
-            return groupPeopleByAvr(assignment, lowPct, highPct);
+            groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
         return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
@@ -299,8 +299,8 @@ var gradeDistr = (function() {
         //temporary Column 1 stuff
         ////////
         $('#column1').append("<div class='chart-container'></div>");
-        model.calcAverage(["Quiz 21", "Quiz 22"]);
-        var data = model.groupPeopleByAvr("Quiz 25",30,70);
+        controller.calcAverage(["Quiz 21", "Quiz 22"]);
+        var data = controller.groupPeopleByAvr("Quiz 25",30,70);
 
         var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
         var outerHeight = 600;
@@ -399,6 +399,7 @@ var gradeDistr = (function() {
             .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
 
 
+        model.on()
     }
 
   //setup main structure of app
