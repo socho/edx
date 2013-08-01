@@ -11,8 +11,7 @@ var gradeDistr = (function() {
 
     function UpdateHandler() {
         var handlers = {};
-        
-        
+               
         /*
         creates a new listener request
         event = event to listen to 
@@ -335,13 +334,16 @@ var gradeDistr = (function() {
             .append("g")
                 .attr("class", "innerChart")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
         //Y-AXIS LABEL
         chart.append("text")
             .attr("class", "yaxis-label")
             .attr("x",0)
-            .attr("dx", -margin.left/4)
-            .attr("y", chartHeight/2)
+            .attr("y", 0)
+            .attr("transform", function(d) {return "rotate(-90)" })
+            .attr("dx",-chartHeight/2)
             .text("#Students");
+
         //X-AXIS LABEL
         chart.append("text")
             .attr("class", "xaxis-label")
@@ -352,8 +354,7 @@ var gradeDistr = (function() {
 
         ///////////////////
 
-
-        function updateGraph(data) { //assignment, quizzesOfInterest, lowPct, highPct, 
+        function drawInitialGraph(data) { //assignment, quizzesOfInterest, lowPct, highPct, 
             //controller.calcAverage(quizzesOfInterest);
             //var data = controller.groupPeopleByAvr(assignment,lowPct,highPct); //need to ask question
             // console.log('data: ', data);
@@ -412,8 +413,79 @@ var gradeDistr = (function() {
                 .style("fill", function(d,i){return color_scale(i);});
 
             //THE BARS (FOR STACKED BAR CHARTS)
+                        console.log(layerGroups.selectAll("rect"));
+
             var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
                 .enter().append("rect")
+                .attr("x", function(d, i) { return xScale(i); })
+                .attr("y", function(d) { return yScale(d.y + d.y0) })
+                .attr("width", xScale.rangeBand())
+                .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+        }
+
+        function updateGraph(data){
+            //assignment, quizzesOfInterest, lowPct, highPct) {
+            // controller.calcAverage(quizzesOfInterest);
+            // var data = controller.groupPeopleByAvr(assignment,lowPct,highPct); //need to ask question
+            // console.log('data: ', data);
+            var stack = d3.layout.stack();
+            var stackedData = stack(data);
+
+            var yGroupMax = d3.max(stackedData, function(layer) { 
+                                return d3.max(layer, function(d) { return d.y; })
+                            });
+
+            var yStackMax = d3.max(stackedData, function(layer) { 
+                                return d3.max(layer, function(d) { return d.y + d.y0; })
+                            });
+
+            var xScale = d3.scale.ordinal()
+                .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
+
+            var yScale = d3.scale.linear()
+                .domain([0, yStackMax]).range([chartHeight, 0]);
+
+
+            // Y AXIS GRID LINES
+            //chart.selectAll("line").remove();
+            chart.selectAll("line").data(yScale.ticks(10))
+                .transition()
+                .attr("x1", 0)
+                .attr("x2", chartWidth)
+                .attr("y1", yScale)
+                .attr("y2", yScale);
+
+            //Y TICK MARKS
+            chart.selectAll(".yscale-label").remove();
+            chart.selectAll(".yscale-label").data(yScale.ticks(10))
+                .enter().append("text")
+                .attr("class", "yscale-label")
+                .attr("x", 0)
+                .attr("y", yScale)
+                .attr("dx", -margin.left/8)
+                .attr("text-anchor", "end")
+                .attr("dy", "0.3em")
+                .text(String);            
+
+            //X TICK MARKS
+            chart.selectAll(".xscale-label").remove();
+            chart.selectAll(".xscale-label").data(xScale.domain())
+                .enter().append("text")
+                .attr("class", "xscale-label")
+                .attr("x", function(d){return xScale(d);})
+                .attr("y", chartHeight)
+                .attr("text-anchor", "center")
+                // .attr("dx", function(d){return xScale.rangeBand()/2;})
+                .attr("dy", margin.bottom*0.5)
+                .text(String);
+            
+            //grabs all the layers and forms groups out of them
+            var layerGroups = chart.selectAll(".layer").data(stackedData)
+                .style("fill", function(d,i){return color_scale(i);});
+
+            //THE BARS (FOR STACKED BAR CHARTS)
+            var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
+                .transition().duration(500)
                 .attr("x", function(d, i) { return xScale(i); })
                 .attr("y", function(d) { return yScale(d.y + d.y0) })
                 .attr("width", xScale.rangeBand())
