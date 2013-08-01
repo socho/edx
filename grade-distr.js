@@ -155,7 +155,7 @@ var gradeDistr = (function() {
         }
 
         function groupPeopleByAvr(assignment, lowPct, highPct) {
-            groupPeopleByAvr(assignment, lowPct, highPct);
+            model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
         return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
