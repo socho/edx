@@ -128,6 +128,7 @@ var gradeDistr = (function() {
                 }
             }
             handler.trigger('changed', newThreeArrays);
+            return newThreeArrays;
         }
 
         function calcAverage(quizzesOfInterest) {
@@ -354,9 +355,9 @@ var gradeDistr = (function() {
 
         ///////////////////
 
-        function drawInitialGraph(data) { //assignment, quizzesOfInterest, lowPct, highPct, 
-            //controller.calcAverage(quizzesOfInterest);
-            //var data = controller.groupPeopleByAvr(assignment,lowPct,highPct); //need to ask question
+        function drawInitialGraph() { //assignment, quizzesOfInterest, lowPct, highPct, 
+            controller.calcAverage(["Quiz 21"]);
+            var data = model.groupPeopleByAvr("Quiz 21", 25, 75); //need to ask question
             // console.log('data: ', data);
             var stack = d3.layout.stack();
             var stackedData = stack(data);
@@ -422,6 +423,8 @@ var gradeDistr = (function() {
                 .attr("width", xScale.rangeBand())
                 .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
         }
+
+        drawInitialGraph();
 
         function updateGraph(data){
             //assignment, quizzesOfInterest, lowPct, highPct) {
