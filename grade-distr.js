@@ -6,7 +6,45 @@ var gradeDistr = (function() {
 //stuff goes here    
 ////////////////////////////////// helper functions
 //stuff goes here
+
+    function UpdateHandler() {
+        var handlers = {};
+        
+        
+        /*
+        creates a new listener request
+        event = event to listen to 
+        callback = function to call in the case of the event
+        */
+        function on(event, callback) {
+            var callbacks = handlers[event];
+            if (callbacks === undefined) {
+                callbacks = [];
+            }
+            callbacks.push(callback);
+            handlers[event] = callbacks;
+        }
+        
+         /*
+        calls all functions that are listeners
+        event = event that occured
+        data = data to pass to the callback functions.
+        */
+        function trigger(event, data) {
+            var callbacks = handlers[event];
+            if (callbacks !== undefined) {
+                for (var i = 0; i < callbacks.length; i += 1)
+                    callbacks[i](data);
+            }
+        }
+        
+        return {on: on, trigger: trigger};
+    }
+
     function Model(){
+        var handler = UpdateHandler();
+
+
         //define peopleDict
         var peopleData = {};
         for (var quiz in quizzes){
@@ -25,10 +63,12 @@ var gradeDistr = (function() {
             }
         }
 
-        function getPeopleData(){return peopleData;}
+        function getPeopleData(){
+            handler.trigger('getting ppl data', peopleData);
+        }
 
         function getQuizData(quizname) {
-            return quizzes[quizname];
+            handler.trigger('getting quiz data', quizzes[quizname]);
         }
 
         /**
@@ -48,7 +88,7 @@ var gradeDistr = (function() {
 
             //setup sorting function
             function orderByAvrAscending(a,b) {
-                return a["avr"] - b["avr"];
+                handler.trigger('avg asc', a["avr"] - b["avr"]);
             }
             peopleArray.sort(orderByAvrAscending); //sort
             // for (var i = 0; i < peopleArray.length; i++) {
@@ -115,6 +155,24 @@ var gradeDistr = (function() {
 
     function Controller(model){
 
+
+        function getPeopleData() {
+            return model.getPeopleData();
+        }
+
+        function getQuizData() {
+            return model.getQuizData();
+        }
+
+        function calcAverage(selectedQuizzes) {
+            return model.calcAverage(selectedQuizzes);
+        }
+
+        function groupPeopleByAvr(assignment, lowPct, highPct) {
+            return groupPeopleByAvr(assignment, lowPct, highPct);
+        }
+        
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
