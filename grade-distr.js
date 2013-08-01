@@ -50,7 +50,6 @@ var gradeDistr = (function() {
         //define peopleData
         var peopleData = {};
         for (var quiz in quizzes){
-            console.log(quiz);
             var sheet = quizzes[quiz];
             for (var i = 0; i < sheet.length; i++) {
                 var row = sheet[i];
@@ -66,19 +65,17 @@ var gradeDistr = (function() {
         }
 
         function getPeopleData(){
-            handler.trigger('getting ppl data', peopleData);
+            
         }
 
         function getQuizData(quizname) {
-            handler.trigger('getting quiz data', quizzes[quizname]);
+            
         }
 
         /**
         bottomPct, topPct in percentage(%).
         **/
         function groupPeopleByAvr(assignment, lowPct, highPct) {
-            console.log('here!');
-            console.log(assignment, lowPct, highPct);
             var peopleArray = [];
             var bottomArray = [];
             var middleArray = [];
@@ -105,14 +102,10 @@ var gradeDistr = (function() {
                 else if (i < Math.round((totalNumPeople*highPct)/100)){middleArray.push(peopleArray[i]);}
                 else {topArray.push(peopleArray[i]);}
             }
-            console.log("top", topArray);
-            console.log("mid", middleArray);
-            console.log("bottom", bottomArray);
 
             var threeArrays = [bottomArray,middleArray,topArray];
             var newThreeArrays = [[],[],[]];
             for (var index = 0; index < threeArrays.length; index++) {
-                console.log('here! 2');
                 var thisArray = threeArrays[index];
                 var counter = [];
                 var groupedPeople = []; 
@@ -120,10 +113,8 @@ var gradeDistr = (function() {
                     counter.push(0);
                     groupedPeople.push([]);
                 }
-                console.log('here! 3', thisArray);
                 for (var i = 0; i < thisArray.length; i++){
                     var grade = parseInt(thisArray[i][assignment]["grade"]);
-                    console.log('grade: ', grade);
                     if (grade == 10) {
                         counter[9] += 1;
                         groupedPeople[9].push(thisArray[i]);
@@ -156,19 +147,13 @@ var gradeDistr = (function() {
             }
             // console.log(peopleData["abundantchatter"]["avr"]);
         }
-        //testing
-        function test(txt) {
-            handler.trigger('test', txt);
-        }
+        
 
-        return {test: test, getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
     }
 
     function Controller(model){
-        //testing
-        function test(txt) {
-            model.test(txt);
-        }
+        
 
         function getPeopleData() {
             model.getPeopleData();
@@ -186,7 +171,7 @@ var gradeDistr = (function() {
             model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {test: test, getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
@@ -283,7 +268,7 @@ var gradeDistr = (function() {
 
         //adjusts the div height for the checkbox area
         var checkboxHeight = parseInt($('#checkboxes-div input').css('height').replace(/\D+/, ''));
-        console.log($('#checkboxes-div').css('height', checkboxHeight* 15));
+        $('#checkboxes-div').css('height', checkboxHeight * 15);
 
 
         sliderObj.slider({
@@ -442,12 +427,7 @@ var gradeDistr = (function() {
                 EVENT LISTENERS
 
         */
-        //testing
-        var button = $('<button class="btn btn-default">Test</button>');
-        checkboxes.append(button);
-        button.on('click', function() {
-            controller.test('hey');
-        })
+        
 
         
         dropdown.find('li').each(function() {
@@ -460,22 +440,25 @@ var gradeDistr = (function() {
                     quizzesOfInterest.push($(this).val());
                 });
                 controller.calcAverage(quizzesOfInterest);
-                console.log(quizzesOfInterest);
                 controller.groupPeopleByAvr(String($(this).attr('id')), bottom, 100-top);
                 // console.log($(this).text());
+            });
+        });
+
+        
+        checkboxes.find('input[type=checkbox]').each(function() {
+            $(this).on('click', function() {
+                console.log($(this).val());
             });
         });
 
         model.on('changed', function(data) {
             // inNav = false;
             updateGraph(data);
-            console.log(data);
             //updateGraph(data);
         });
 
-        model.on('test', function(data) { //will call the function to update
-            console.log('test: ', data);
-        });
+    
     }
 
   //setup main structure of app
