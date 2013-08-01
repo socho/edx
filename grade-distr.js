@@ -342,16 +342,21 @@ var gradeDistr = (function() {
             .attr("x",0)
             .attr("y", 0)
             .attr("transform", function(d) {return "rotate(-90)" })
-            .attr("dx",-chartHeight/2)
-            .text("#Students");
+            .attr("dx", -chartHeight/2)
+            .attr("dy", -margin.left*0.75)
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "middle")
+            .text("Number of Students");
 
         //X-AXIS LABEL
         chart.append("text")
             .attr("class", "xaxis-label")
             .attr("x",chartWidth/2)
             .attr("y", chartHeight)
-            .attr("dy", margin.bottom)
-            .text("Grade");
+            .attr("dy", margin.bottom*0.85)
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "middle")
+            .text("Grade (out of 10)");
 
         ///////////////////
 
