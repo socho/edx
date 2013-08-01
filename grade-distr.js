@@ -103,31 +103,32 @@ var gradeDistr = (function() {
             }
 
             //need to rewrite
-            counter = [0,0,0,0,0,0,0,0,0,0,0];
+            counter = [0,0,0,0,0,0,0,0,0,0];
             for (var i = 0; i < bottomArray.length; i++){
                 var grade = parseInt(bottomArray[i][assignment]["grade"]);
-                counter[grade] += 1;
+                if (grade == 10) {counter[9] += 1;}
+                else {counter[grade] += 1;}
             }
             newBottomArray = [];
-            for (var i = 0; i <= 10; i++){
+            for (var i = 0; i < 10; i++){
                 newBottomArray.push({"y":counter[i]});
             }
-            counter = [0,0,0,0,0,0,0,0,0,0,0];
+            counter = [0,0,0,0,0,0,0,0,0,0];
             for (var i = 0; i < middleArray.length; i++){
                 var grade = parseInt(middleArray[i][assignment]["grade"]);
                 counter[grade] += 1;
             }
             newMiddleArray = [];
-            for (var i = 0; i <= 10; i++){
+            for (var i = 0; i < 10; i++){
                 newMiddleArray.push({"y":counter[i]});
             }
-            counter = [0,0,0,0,0,0,0,0,0,0,0];
+            counter = [0,0,0,0,0,0,0,0,0,0];
             for (var i = 0; i < topArray.length; i++){
                 var grade = parseInt(topArray[i][assignment]["grade"]);
                 counter[grade] += 1;
             }
             newTopArray = [];
-            for (var i = 0; i <= 10; i++){
+            for (var i = 0; i < 10; i++){
                 newTopArray.push({"y":counter[i]});
             }
             return [newBottomArray,newMiddleArray,newTopArray];
@@ -314,12 +315,12 @@ var gradeDistr = (function() {
         ////////
         $('#column1').append("<div class='chart-container'></div>");
         model.calcAverage(["Quiz 21", "Quiz 22"]);
-        var data = model.groupPeopleByAvr("Quiz 22",30,70);
+        var data = model.groupPeopleByAvr("Quiz 25",30,70);
 
         var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
         var outerHeight = 600;
 
-        var margin = { top: 20, right: 20, bottom: 20, left: 20 };
+        var margin = { top: 20, right: 20, bottom: 40, left: 40 };
 
         var chartWidth = outerWidth - margin.left - margin.right;
         var chartHeight = outerHeight - margin.top - margin.bottom;
@@ -371,17 +372,31 @@ var gradeDistr = (function() {
             .attr("text-anchor", "end")
             .attr("dy", "0.3em")
             .text(String);
+        
+        chart.append("text")
+            .attr("class", "yaxis-label")
+            .attr("x",0)
+            .attr("dx", -margin.left/4)
+            .attr("y", chartHeight/2)
+            .text("#Students");
 
         //X AXIS LABELS
         chart.selectAll(".xscale-label").data(xScale.domain())
             .enter().append("text")
             .attr("class", "xscale-label")
-            .attr("x", function(d){return xScale(d)+xScale.rangeBand()/2;})
-            .attr("y", chartHeight+margin.bottom*0.8)
-            // .attr("dy",)
+            .attr("x", function(d){return xScale(d);})
+            .attr("y", chartHeight)
             .attr("text-anchor", "center")
-            // .attr("dx",)
+            .attr("dx", function(d){return xScale.rangeBand()/2;})
+            .attr("dy", margin.bottom*0.5)
             .text(String);
+        
+        chart.append("text")
+            .attr("class", "xaxis-label")
+            .attr("x",chartWidth/2)
+            .attr("y", chartHeight)
+            .attr("dy", margin.bottom)
+            .text("Grade");
 
 
         //grabs all the layers and forms groups out of them
