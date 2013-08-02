@@ -296,7 +296,7 @@ var gradeDistr = (function() {
                 var mid = Math.abs(ui.values[1] - ui.values[0]);
                 var bottom = Math.abs(ui.values[0] - min);
                 var top = Math.abs(max - ui.values[1]);
-                $( "#amount" ).val( "Bottom: %" + bottom + ", Mid: %" + mid + ", Top: %" + top);
+                $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + mid + "%, Top: " + top + "%");
                 $('#topblock p').html('Top ' + top + '%');
                 $('#middleblock p').html('Middle ' + mid + '%');
                 $('#bottomblock p').html('Bottom ' + bottom + '%');
@@ -317,7 +317,7 @@ var gradeDistr = (function() {
         var bottom = Math.abs(sliderObj.slider("values", 0) - 0);
         var middle = Math.abs(sliderObj.slider("values", 1) - sliderObj.slider("values", 0));
         var top = Math.abs(100 - sliderObj.slider("values", 1));
-        $( "#amount" ).val( "Bottom: %" + bottom + ", Mid: %" + middle + ", Top: %" + top );
+        $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + middle + "%, Top: " + top + "%");
         $('#topblock p').append('Top ' + top + '%');
         $('#middleblock p').append('Middle ' + middle + '%');
         $('#bottomblock p').append('Bottom ' + bottom + '%');
@@ -442,8 +442,6 @@ var gradeDistr = (function() {
                 .style("fill", function(d,i){return color_scale(i);});
 
             //THE BARS (FOR STACKED BAR CHARTS)
-                        console.log(layerGroups.selectAll("rect"));
-
             var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
                 .enter().append("rect")
                 .attr("x", function(d, i) { return xScale(i); })
@@ -539,6 +537,7 @@ var gradeDistr = (function() {
                 .attr("y", function(d) { return yScale(d.y + d.y0) })
                 .attr("width", xScale.rangeBand())
                 .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+
         }
 
         // updateGraph("Quiz 21", ["Quiz 21", "Quiz 22"], 30, 70);
@@ -578,9 +577,7 @@ var gradeDistr = (function() {
 
         $('.btn-l').on('click', function(){
             var quizzesArray = controller.getQuizzesArray();
-            console.log("quizzesArray", quizzesArray);
             var index = quizzesArray.indexOf($('#asgn-nav').text());
-            console.log(index);
             if (index != 0){
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 var quizzesOfInterest = [];
@@ -596,7 +593,6 @@ var gradeDistr = (function() {
         $('.btn-r').on('click', function(){
             var quizzesArray = controller.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
-            console.log(index);
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
                 var quizzesOfInterest = [];
