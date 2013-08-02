@@ -321,16 +321,30 @@ var gradeDistr = (function() {
         //     $('#checkboxes-div').append(checkbox);
         // }
 
-        //adjusts the div height for the checkbox area
-        // var checkboxHeight = parseInt($('#checkboxes-div input').css('height').replace(/\D+/, ''));
-        // $('#checkboxes-div').css('height', checkboxHeight * 15);
+        $('ui-slider-range ui-widget-header ui-corner-all').css("background", "darkgray");
+        
+        function updateColors(values) {
+            var colorstops = colors[0] + ", "; // start left with the first color
+            for (var i=0; i< values.length; i++) {
+                colorstops += colors[i] + " " + values[i] + "%,";
+                colorstops += colors[i+1] + " " + values[i] + "%,";
+            }
+            // end with the last color to the right
+            colorstops += colors[colors.length-1];
 
+            /* Safari 5.1, Chrome 10+ */
+            var css = '-webkit-linear-gradient(left,' + colorstops + ')';
+            sliderObj.css('background-image', css);
+        }
+        var handlers = [25, 75]
+        var colors = ["lightpink", "darkgray", "lightblue"];
+        updateColors(handlers);
 
         sliderObj.slider({
             range: true,
             min: 0,
             max: 100,
-            values: [ 25, 75 ],
+            values: handlers,
             slide: function( event, ui ) {
                 var min = 0;
                 var max = 100;
@@ -338,9 +352,6 @@ var gradeDistr = (function() {
                 var bottom = Math.abs(ui.values[0] - min);
                 var top = Math.abs(max - ui.values[1]);
                 $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + mid + "%, Top: " + top + "%");
-                // $('#topblock p').html('Top ' + top + '%');
-                // $('#middleblock p').html('Middle ' + mid + '%');
-                // $('#bottomblock p').html('Bottom ' + bottom + '%');
                 // var listOfQuizzes = selectedBoxes;
                 // var curAsgn = $('#asgn-nav').text();
                 // if ($.inArray(curAsgn, listOfQuizzes) == -1) {
@@ -348,6 +359,10 @@ var gradeDistr = (function() {
                 // }
                 
                 // controller.calcAverage(listOfQuizzes);
+                $('#topblock p').html('Top ' + top + '%');
+                $('#middleblock p').html('Middle ' + mid + '%');
+                $('#bottomblock p').html('Bottom ' + bottom + '%');
+                updateColors(ui.values);
                 controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top);
             }
         }).slider('pips', {
@@ -369,6 +384,12 @@ var gradeDistr = (function() {
         }
 
         displayBasicInfo("Quiz 21");
+
+        
+        console.log($('#slider-container .ui-widget-header'));
+        //.css({ 'border': '1px solid #aaaaaa', 'background': 'lightpink' });
+        // #slider-container #slider-max-value {float:right;margin-top:6px;}
+
 
         
         
@@ -501,10 +522,7 @@ var gradeDistr = (function() {
         drawInitialGraph();
 
         function updateGraph(data){
-            //assignment, quizzesOfInterest, lowPct, highPct) {
-            // controller.calcAverage(quizzesOfInterest);
-            // var data = controller.groupPeopleByAvr(assignment,lowPct,highPct); //need to ask question
-            // console.log('data: ', data);
+            
             var stack = d3.layout.stack();
             var stackedData = stack(data);
 
@@ -524,7 +542,7 @@ var gradeDistr = (function() {
 
 
             // Y AXIS GRID LINES
-            //chart.selectAll("line").remove();
+            
             if (chart.selectAll("line")[0].length > yScale.ticks(10).length){
                 chart.selectAll("line").data(yScale.ticks(10))
                     .exit()
@@ -588,7 +606,7 @@ var gradeDistr = (function() {
 
         }
 
-        // updateGraph("Quiz 21", ["Quiz 21", "Quiz 22"], 30, 70);
+        
 
         /* 
             
@@ -670,45 +688,6 @@ var gradeDistr = (function() {
                 controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
             }
         });
-
-        // var selectedBoxes = [];
-        // checkboxes.find('input[type=checkbox]').each(function() { 
-        //     if ($(this).prop('checked')) {
-        //         selectedBoxes.push($(this).val());
-        //     }
-        // });
-
-        // var allBoxes = checkboxes.find('input[type=checkbox]');
-        // function allUnselected(boxes) {
-        //     var nothingSelected = true;
-        //     boxes.each(function() {
-        //         if ($(this).prop('checked')) {
-        //             nothingSelected = false;
-        //         }
-        //     });
-        //     return nothingSelected;
-        // }
-        
-        // allBoxes.each(function() {
-        //     $(this).on('click', function() {
-                
-        //         if (allUnselected(allBoxes)) {
-        //             $('input[name="'+ $('#asgn-nav').text()+ '"]').prop('checked', true);
-        //             selectedBoxes.push($('#asgn-nav').text());
-        //         }
-
-        //         if (($.inArray($(this).val(), selectedBoxes) == -1)) {
-        //             selectedBoxes.push($(this).val());
-        //             selectedBoxes.sort();
-        //         } else {
-        //             var index = selectedBoxes.indexOf($(this).val());
-        //             selectedBoxes.splice(index, 1);
-        //         }
-        //         // console.log('selected boxes: ', selectedBoxes);
-        //         controller.calcAverage(selectedBoxes);
-        //         controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, 100-top);
-        //     });
-        // });
 
 
         model.on('changed', function(data) {
