@@ -377,7 +377,7 @@ var gradeDistr = (function() {
             .attr("dy", margin.bottom*0.85)
             .attr("font-weight", "bold")
             .attr("text-anchor", "middle")
-            .text("Grade (out of 10)");
+            .text("Grade (%)");
 
         ///////////////////
 
@@ -432,8 +432,8 @@ var gradeDistr = (function() {
                 .attr("y", chartHeight)
                 .attr("text-anchor", "center")
                 // .attr("dx", function(d){return xScale.rangeBand()/2;})
-                .attr("dy", margin.bottom*0.5)
-                .text(String);
+                .attr("dy", margin.bottom*0.4)
+                .text(function(d){return String(d*10);});
             
             //grabs all the layers and forms groups out of them
             var layerGroups = chart.selectAll(".layer").data(stackedData)
@@ -524,7 +524,7 @@ var gradeDistr = (function() {
                 .attr("text-anchor", "center")
                 // .attr("dx", function(d){return xScale.rangeBand()/2;})
                 .attr("dy", margin.bottom*0.5)
-                .text(String);
+                .text(function(d){return String(d*10);});
             
             //grabs all the layers and forms groups out of them
             var layerGroups = chart.selectAll(".layer").data(stackedData)
