@@ -274,8 +274,6 @@ var gradeDistr = (function() {
 
         //basic info
         var legend = $('<div id="legend"></div>');
-        var labelLegend = $('<label for="legend"><h4>Summary:</h4></label>');
-        var legendTable = $('<div id="legend-list"></div>')
         legend.css( {
             'background-color': '#fff',
             'border-radius': '10px',
@@ -285,12 +283,12 @@ var gradeDistr = (function() {
             'margin-top': '5px'
         });
 
-        var total = $('<div id="total"><div>Number of Students: </div><p style="margin-left: 15px;"></p></div>');
-        var average = $('<div id="average"><div>Average: </div><p style="margin-left: 15px;"></p></div>');
-        var sd = $('<div id="sd"><div>Standard Deviation: </div><p style="margin-left: 15px;"></p></div>');
+        var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
+        var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
+        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
+
         
-        legendTable.css( {'margin-left': '20px', 'margin-top': '10px'} );
-        legendTable.append(total, average, sd);
+        legend.append(totalLabel, averageLabel, sdLabel);
 
         
 
@@ -314,7 +312,6 @@ var gradeDistr = (function() {
 
         $('#column2').append(sliderDiv, legend); // legend, checkboxes
         $('#sliderbg').append(labelSlider, sliderObj);
-        $('#legend').append(labelLegend, legendTable);
         // $('#checkboxes-div').append(labelQuiz);
         // for (var key in quizzes) {
         //     var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
