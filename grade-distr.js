@@ -80,6 +80,34 @@ var gradeDistr = (function() {
         }
 
         /**
+        returns an array of [total number of people, average, ]
+        **/
+        function getBasicInfo(assignment) {
+            //calc total num of students who completed the assignment
+            var numPeople = 0;
+            var sum = 0;
+            for (var key in peopleData) {
+                if (assignment in peopleData[key]) {
+                    numPeople++;
+                    sum += peopleData[key][assignment]["grade"];
+                }
+            }
+            //calc average grade
+            var avr = sum/numPeople;
+
+            //calc std dev
+            var sqDiffSum = 0;
+            for (var key in peopleData) {
+                if (assignment in peopleData[key]) {
+                    sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment]["grade"])-avr,2);
+                }
+            }
+            var sd = Math.sqrt(sqDiffSum / sum);
+
+            return [numPeople, avr*10, sd*10];           
+        }
+
+        /**
         bottomPct, topPct in percentage(%).
         **/
         function groupPeopleByAvr(assignment, lowPct, highPct) {
@@ -161,7 +189,7 @@ var gradeDistr = (function() {
         }
         
 
-        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
     }
 
     function Controller(model){
@@ -179,6 +207,10 @@ var gradeDistr = (function() {
            return model.getQuizzesArray();
         }
 
+        function getBasicInfo(assignment) {
+            return model.getBasicInfo(assignment);
+        }
+
         function calcAverage(selectedQuizzes) {
             model.calcAverage(selectedQuizzes);
         }
@@ -187,7 +219,7 @@ var gradeDistr = (function() {
             model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
@@ -218,38 +250,6 @@ var gradeDistr = (function() {
 
         // COLUMN 2
 
-        var legend = $('<div id="legend"></div>');
-        var labelLegend = $('<label for="legend"><h4>Legend:</h4></label>');
-        var legendTable = $('<div id="legend-list"></div>')
-        legend.css( {
-            'background-color': '#fff',
-            'border-radius': '10px',
-            'width': '300px',
-            'height': '150px',
-            'padding': '5px',
-            'margin-top': '5px'
-        });
-
-        var topBlock = $('<div id="topblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: lightblue;"></div><p style="margin-left: 15px;"></p></div>');
-        var middleBlock = $('<div id="middleblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: darkgray;"></div><p style="margin-left: 15px;"></p></div>');
-        var bottomBlock = $('<div id="bottomblock"><div style="float: left; margin-right: 15px; width: 20px; height: 20px; background-color: lightpink;"></div><p style="margin-left: 15px;"></p></div>');
-        
-        legendTable.css( {'margin-left': '20px', 'margin-top': '10px'} );
-        legendTable.append(topBlock, middleBlock, bottomBlock);
-
-
-        var checkboxes = $('<div id="checkboxes-div"></div>');
-        var labelQuiz = $('<label for="ops"><h4>Averaged Over:</h4></label><br>');
-        checkboxes.css( {
-            'background-color': '#fff',
-            'border-radius': '10px',
-            'width': '300px',
-            'height': '200px',
-            'padding': '5px',
-            'margin-top': '5px'
-        });
-
-
         //slider
         var sliderDiv = $('<div id="sliderbg">');
         sliderDiv.css({ 
@@ -263,7 +263,7 @@ var gradeDistr = (function() {
         });
 
         var sliderObj = $('<div id="slider">');
-        var labelSlider = $('<p><label for="amount"><h4>Grade Range:</h4></label>\
+        var labelSlider = $('<p><h4>Grade Range:</h4>\
             <input id="amount" style="width: 250px;\
                     border: 0;\
                     background-color: #fff;\
@@ -272,9 +272,49 @@ var gradeDistr = (function() {
                     font-weight: bold;\
                     margin-bottom: -100px" /></p>');
 
-        $('#column2').append(sliderDiv); // legend, checkboxes
+        //basic info
+        var legend = $('<div id="legend"></div>');
+        var labelLegend = $('<label for="legend"><h4>Summary:</h4></label>');
+        var legendTable = $('<div id="legend-list"></div>')
+        legend.css( {
+            'background-color': '#fff',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '150px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+        var total = $('<div id="total"><div>Number of Students: </div><p style="margin-left: 15px;"></p></div>');
+        var average = $('<div id="average"><div>Average: </div><p style="margin-left: 15px;"></p></div>');
+        var sd = $('<div id="sd"><div>Standard Deviation: </div><p style="margin-left: 15px;"></p></div>');
+        
+        legendTable.css( {'margin-left': '20px', 'margin-top': '10px'} );
+        legendTable.append(total, average, sd);
+
+        
+
+        // // checkboxes
+
+        // var checkboxes = $('<div id="checkboxes-div"></div>');
+        // var labelQuiz = $('<label for="ops"><h4>Averaged Over:</h4></label><br>');
+        // checkboxes.css( {
+        //     'background-color': '#fff',
+        //     'border-radius': '10px',
+        //     'width': '300px',
+        //     'height': '200px',
+        //     'padding': '5px',
+        //     'margin-top': '5px'
+        // });
+
+        
+
+
+
+
+        $('#column2').append(sliderDiv, legend); // legend, checkboxes
         $('#sliderbg').append(labelSlider, sliderObj);
-        // $('#legend').append(labelLegend, legendTable);
+        $('#legend').append(labelLegend, legendTable);
         // $('#checkboxes-div').append(labelQuiz);
         // for (var key in quizzes) {
         //     var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
@@ -298,9 +338,9 @@ var gradeDistr = (function() {
                 var bottom = Math.abs(ui.values[0] - min);
                 var top = Math.abs(max - ui.values[1]);
                 $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + mid + "%, Top: " + top + "%");
-                $('#topblock p').html('Top ' + top + '%');
-                $('#middleblock p').html('Middle ' + mid + '%');
-                $('#bottomblock p').html('Bottom ' + bottom + '%');
+                // $('#topblock p').html('Top ' + top + '%');
+                // $('#middleblock p').html('Middle ' + mid + '%');
+                // $('#bottomblock p').html('Bottom ' + bottom + '%');
                 // var listOfQuizzes = selectedBoxes;
                 // var curAsgn = $('#asgn-nav').text();
                 // if ($.inArray(curAsgn, listOfQuizzes) == -1) {
@@ -319,9 +359,16 @@ var gradeDistr = (function() {
         var middle = Math.abs(sliderObj.slider("values", 1) - sliderObj.slider("values", 0));
         var top = Math.abs(100 - sliderObj.slider("values", 1));
         $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + middle + "%, Top: " + top + "%");
-        $('#topblock p').append('Top ' + top + '%');
-        $('#middleblock p').append('Middle ' + middle + '%');
-        $('#bottomblock p').append('Bottom ' + bottom + '%');
+        
+
+        function displayBasicInfo(assignment) {
+            var info = controller.getBasicInfo(assignment); 
+            $('#total p').text(info[0]);
+            $('#average p').text(info[1].toFixed(3));
+            $('#sd p').text(info[2].toFixed(3));
+        }
+
+        displayBasicInfo("Quiz 21");
 
         
         
@@ -587,8 +634,8 @@ var gradeDistr = (function() {
                 // });
 
                 // controller.calcAverage(quizzesOfInterest.sort());
+                displayBasicInfo(quizname);
                 controller.groupPeopleByAvr(quizname, bottom, 100-top);
-                
             });
         });
 
@@ -596,13 +643,14 @@ var gradeDistr = (function() {
             var quizzesArray = controller.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != 0){
-                // $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
+                $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 // var quizzesOfInterest = [];
                 // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
                 // selectedBoxes.each(function() {
                 //     quizzesOfInterest.push($(this).val());
                 // });
                 // controller.calcAverage(quizzesOfInterest);
+                displayBasicInfo(quizzesArray[index-1]);
                 controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
             }
         });
@@ -618,6 +666,7 @@ var gradeDistr = (function() {
                 //     quizzesOfInterest.push($(this).val());
                 // });
                 // controller.calcAverage(quizzesOfInterest);
+                displayBasicInfo(quizzesArray[index+1]);
                 controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
             }
         });
