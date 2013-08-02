@@ -470,12 +470,30 @@ var gradeDistr = (function() {
 
             // Y AXIS GRID LINES
             //chart.selectAll("line").remove();
-            chart.selectAll("line").data(yScale.ticks(10))
-                .transition()
-                .attr("x1", 0)
-                .attr("x2", chartWidth)
-                .attr("y1", yScale)
-                .attr("y2", yScale);
+            if (chart.selectAll("line")[0].length > yScale.ticks(10).length){
+                chart.selectAll("line").data(yScale.ticks(10))
+                    .exit()
+                    .remove();
+
+                chart.selectAll("line").data(yScale.ticks(10))
+                    .transition()
+                    .attr("x1", 0)
+                    .attr("x2", chartWidth)
+                    .attr("y1", yScale)
+                    .attr("y2", yScale)
+                }
+            else {
+                chart.selectAll("line").data(yScale.ticks(10))
+                    .enter().append("line");
+
+                chart.selectAll("line")
+                    .transition()
+                    .attr("x1", 0)
+                    .attr("x2", chartWidth)
+                    .attr("y1", yScale)
+                    .attr("y2", yScale)
+              
+            }
 
             //Y TICK MARKS
             chart.selectAll(".yscale-label").remove();
