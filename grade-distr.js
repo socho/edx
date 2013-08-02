@@ -71,6 +71,14 @@ var gradeDistr = (function() {
             
         }
 
+        function getQuizzesArray() {
+            var quizzesArray = [];
+            for (var quiz in quizzes){
+                quizzesArray.push(quiz);
+            }
+            return quizzesArray;
+        }
+
         /**
         bottomPct, topPct in percentage(%).
         **/
@@ -151,7 +159,7 @@ var gradeDistr = (function() {
         }
         
 
-        return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
     }
 
     function Controller(model){
@@ -165,6 +173,10 @@ var gradeDistr = (function() {
             model.getQuizData();
         }
 
+        function getQuizzesArray() {
+           return model.getQuizzesArray();
+        }
+
         function calcAverage(selectedQuizzes) {
             model.calcAverage(selectedQuizzes);
         }
@@ -173,7 +185,7 @@ var gradeDistr = (function() {
             model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {getPeopleData: getPeopleData, getQuizData: getQuizData, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
@@ -511,7 +523,6 @@ var gradeDistr = (function() {
         */
         
 
-        
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
                 //inNav = true;
@@ -526,6 +537,39 @@ var gradeDistr = (function() {
                 controller.groupPeopleByAvr(String($(this).attr('id')), bottom, 100-top);
                 // console.log($(this).text());
             });
+        });
+
+        $('.btn-l').on('click', function(){
+            var quizzesArray = controller.getQuizzesArray();
+            console.log("quizzesArray", quizzesArray);
+            var index = quizzesArray.indexOf($('#asgn-nav').text());
+            console.log(index);
+            if (index != 0){
+                $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
+                var quizzesOfInterest = [];
+                var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
+                selectedBoxes.each(function() {
+                    quizzesOfInterest.push($(this).val());
+                });
+                controller.calcAverage(quizzesOfInterest);
+                controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
+            }
+        });
+
+        $('.btn-r').on('click', function(){
+            var quizzesArray = controller.getQuizzesArray();
+            var index = quizzesArray.indexOf($('#asgn-nav').text());
+            console.log(index);
+            if (index != quizzesArray.length-1){
+                $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
+                var quizzesOfInterest = [];
+                var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
+                selectedBoxes.each(function() {
+                    quizzesOfInterest.push($(this).val());
+                });
+                controller.calcAverage(quizzesOfInterest);
+                controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
+            }
         });
 
         var selectedBoxes = [];
