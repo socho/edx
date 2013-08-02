@@ -294,13 +294,20 @@ var gradeDistr = (function() {
                 var min = 0;
                 var max = 100;
                 var mid = Math.abs(ui.values[1] - ui.values[0]);
-                $( "#amount" ).val( "Bottom: %" + Math.abs(ui.values[0] - min) + ", Mid: %" + mid + ", Top: %" + Math.abs(max - ui.values[1]));
-                $('#topblock p').html('Top ' + Math.abs(max - ui.values[1]) + '%');
+                var bottom = Math.abs(ui.values[0] - min);
+                var top = Math.abs(max - ui.values[1]);
+                $( "#amount" ).val( "Bottom: %" + bottom + ", Mid: %" + mid + ", Top: %" + top);
+                $('#topblock p').html('Top ' + top + '%');
                 $('#middleblock p').html('Middle ' + mid + '%');
-                $('#bottomblock p').html('Bottom ' + Math.abs(ui.values[0] - min) + '%');
-
+                $('#bottomblock p').html('Bottom ' + bottom + '%');
+                var listOfQuizzes = selectedBoxes;
+                var curAsgn = $('#asgn-nav').text();
+                if ($.inArray(curAsgn, listOfQuizzes) == -1) {
+                    listOfQuizzes.push(curAsgn);
+                }
                 
-            
+                controller.calcAverage(listOfQuizzes);
+                controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top);
             }
         }).slider('pips', {
              first: 'label',
@@ -375,6 +382,8 @@ var gradeDistr = (function() {
         ///////////////////
 
         function drawInitialGraph() { //assignment, quizzesOfInterest, lowPct, highPct, 
+            var curCheckBox = $('input[name="' + $('#asgn-nav').text() + '"]');
+            curCheckBox.prop('checked', true);
             controller.calcAverage(["Quiz 21"]);
             var data = model.groupPeopleByAvr("Quiz 21", bottom, 100-top); //need to ask question
             // console.log('data: ', data);
@@ -585,7 +594,6 @@ var gradeDistr = (function() {
         var selectedBoxes = [];
         checkboxes.find('input[type=checkbox]').each(function() {
             $(this).on('click', function() {
-                
                 if (($.inArray($(this).val(), selectedBoxes) == -1)) {
                     selectedBoxes.push($(this).val());
                     selectedBoxes.sort();
@@ -606,7 +614,7 @@ var gradeDistr = (function() {
             //updateGraph(data);
         });
 
-    
+
     }
 
   //setup main structure of app
