@@ -272,18 +272,18 @@ var gradeDistr = (function() {
                     font-weight: bold;\
                     margin-bottom: -100px" /></p>');
 
-        $('#column2').append(sliderDiv, legend, checkboxes);
+        $('#column2').append(sliderDiv); // legend, checkboxes
         $('#sliderbg').append(labelSlider, sliderObj);
-        $('#legend').append(labelLegend, legendTable);
-        $('#checkboxes-div').append(labelQuiz);
-        for (var key in quizzes) {
-            var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
-            $('#checkboxes-div').append(checkbox);
-        }
+        // $('#legend').append(labelLegend, legendTable);
+        // $('#checkboxes-div').append(labelQuiz);
+        // for (var key in quizzes) {
+        //     var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
+        //     $('#checkboxes-div').append(checkbox);
+        // }
 
         //adjusts the div height for the checkbox area
-        var checkboxHeight = parseInt($('#checkboxes-div input').css('height').replace(/\D+/, ''));
-        $('#checkboxes-div').css('height', checkboxHeight * 15);
+        // var checkboxHeight = parseInt($('#checkboxes-div input').css('height').replace(/\D+/, ''));
+        // $('#checkboxes-div').css('height', checkboxHeight * 15);
 
 
         sliderObj.slider({
@@ -301,13 +301,13 @@ var gradeDistr = (function() {
                 $('#topblock p').html('Top ' + top + '%');
                 $('#middleblock p').html('Middle ' + mid + '%');
                 $('#bottomblock p').html('Bottom ' + bottom + '%');
-                var listOfQuizzes = selectedBoxes;
-                var curAsgn = $('#asgn-nav').text();
-                if ($.inArray(curAsgn, listOfQuizzes) == -1) {
-                    listOfQuizzes.push(curAsgn);
-                }
+                // var listOfQuizzes = selectedBoxes;
+                // var curAsgn = $('#asgn-nav').text();
+                // if ($.inArray(curAsgn, listOfQuizzes) == -1) {
+                //     listOfQuizzes.push(curAsgn);
+                // }
                 
-                controller.calcAverage(listOfQuizzes);
+                // controller.calcAverage(listOfQuizzes);
                 controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top);
             }
         }).slider('pips', {
@@ -556,37 +556,37 @@ var gradeDistr = (function() {
                 var quizname = String($(this).attr('id'));
 
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-                var quizzesOfInterest = [];
-                var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                var nothingSelected = true;
+                // var quizzesOfInterest = [];
+                // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
+                // var nothingSelected = true;
 
-                //check if any boxes are selected    
-                $('#checkboxes-div input[type=checkbox]').each(function() {
-                    //change nothingSelected to false if something is checked
-                    if ($(this).prop('checked')) {
-                        console.log('got here');
-                        nothingSelected = false;
-                    }
-                });
+                // //check if any boxes are selected    
+                // $('#checkboxes-div input[type=checkbox]').each(function() {
+                //     //change nothingSelected to false if something is checked
+                //     if ($(this).prop('checked')) {
+                //         console.log('got here');
+                //         nothingSelected = false;
+                //     }
+                // });
 
-                // if nothing is selected, then add the quiz we're on to the list to be sent & select its box;
-                // reset nothingselected status
-                if (nothingSelected) {
-                    console.log('here');
-                    $('input[name="' + $('#asgn-nav').text() + '"]').prop('checked', true);
-                    quizzesOfInterest.push(quizname);
-                    nothingSelected = true;
-                } 
+                // // if nothing is selected, then add the quiz we're on to the list to be sent & select its box;
+                // // reset nothingselected status
+                // if (nothingSelected) {
+                //     console.log('here');
+                //     $('input[name="' + $('#asgn-nav').text() + '"]').prop('checked', true);
+                //     quizzesOfInterest.push(quizname);
+                //     nothingSelected = true;
+                // } 
                 
 
-                //goes through all the checkboxes and adds anything else that's been checked to the list
-                selectedBoxes.each(function() {
-                    if ($.inArray($(this).val(), quizzesOfInterest) == -1) {
-                        quizzesOfInterest.push($(this).val());
-                    }  
-                });
+                // //goes through all the checkboxes and adds anything else that's been checked to the list
+                // selectedBoxes.each(function() {
+                //     if ($.inArray($(this).val(), quizzesOfInterest) == -1) {
+                //         quizzesOfInterest.push($(this).val());
+                //     }  
+                // });
 
-                controller.calcAverage(quizzesOfInterest.sort());
+                // controller.calcAverage(quizzesOfInterest.sort());
                 controller.groupPeopleByAvr(quizname, bottom, 100-top);
                 
             });
@@ -596,13 +596,13 @@ var gradeDistr = (function() {
             var quizzesArray = controller.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != 0){
-                $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
-                var quizzesOfInterest = [];
-                var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                selectedBoxes.each(function() {
-                    quizzesOfInterest.push($(this).val());
-                });
-                controller.calcAverage(quizzesOfInterest);
+                // $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
+                // var quizzesOfInterest = [];
+                // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
+                // selectedBoxes.each(function() {
+                //     quizzesOfInterest.push($(this).val());
+                // });
+                // controller.calcAverage(quizzesOfInterest);
                 controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
             }
         });
@@ -612,54 +612,54 @@ var gradeDistr = (function() {
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
-                var quizzesOfInterest = [];
-                var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                selectedBoxes.each(function() {
-                    quizzesOfInterest.push($(this).val());
-                });
-                controller.calcAverage(quizzesOfInterest);
+                // var quizzesOfInterest = [];
+                // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
+                // selectedBoxes.each(function() {
+                //     quizzesOfInterest.push($(this).val());
+                // });
+                // controller.calcAverage(quizzesOfInterest);
                 controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
             }
         });
 
-        var selectedBoxes = [];
-        checkboxes.find('input[type=checkbox]').each(function() { 
-            if ($(this).prop('checked')) {
-                selectedBoxes.push($(this).val());
-            }
-        });
+        // var selectedBoxes = [];
+        // checkboxes.find('input[type=checkbox]').each(function() { 
+        //     if ($(this).prop('checked')) {
+        //         selectedBoxes.push($(this).val());
+        //     }
+        // });
 
-        var allBoxes = checkboxes.find('input[type=checkbox]');
-        function allUnselected(boxes) {
-            var nothingSelected = true;
-            boxes.each(function() {
-                if ($(this).prop('checked')) {
-                    nothingSelected = false;
-                }
-            });
-            return nothingSelected;
-        }
+        // var allBoxes = checkboxes.find('input[type=checkbox]');
+        // function allUnselected(boxes) {
+        //     var nothingSelected = true;
+        //     boxes.each(function() {
+        //         if ($(this).prop('checked')) {
+        //             nothingSelected = false;
+        //         }
+        //     });
+        //     return nothingSelected;
+        // }
         
-        allBoxes.each(function() {
-            $(this).on('click', function() {
+        // allBoxes.each(function() {
+        //     $(this).on('click', function() {
                 
-                if (allUnselected(allBoxes)) {
-                    $('input[name="'+ $('#asgn-nav').text()+ '"]').prop('checked', true);
-                    selectedBoxes.push($('#asgn-nav').text());
-                }
+        //         if (allUnselected(allBoxes)) {
+        //             $('input[name="'+ $('#asgn-nav').text()+ '"]').prop('checked', true);
+        //             selectedBoxes.push($('#asgn-nav').text());
+        //         }
 
-                if (($.inArray($(this).val(), selectedBoxes) == -1)) {
-                    selectedBoxes.push($(this).val());
-                    selectedBoxes.sort();
-                } else {
-                    var index = selectedBoxes.indexOf($(this).val());
-                    selectedBoxes.splice(index, 1);
-                }
-                // console.log('selected boxes: ', selectedBoxes);
-                controller.calcAverage(selectedBoxes);
-                controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, 100-top);
-            });
-        });
+        //         if (($.inArray($(this).val(), selectedBoxes) == -1)) {
+        //             selectedBoxes.push($(this).val());
+        //             selectedBoxes.sort();
+        //         } else {
+        //             var index = selectedBoxes.indexOf($(this).val());
+        //             selectedBoxes.splice(index, 1);
+        //         }
+        //         // console.log('selected boxes: ', selectedBoxes);
+        //         controller.calcAverage(selectedBoxes);
+        //         controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, 100-top);
+        //     });
+        // });
 
 
         model.on('changed', function(data) {
