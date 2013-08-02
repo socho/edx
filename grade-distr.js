@@ -140,7 +140,7 @@ var gradeDistr = (function() {
         }
 
         function calcAverage(quizzesOfInterest) {
-            console.log("what's getting sent: ", quizzesOfInterest);
+            console.log('getting sent', quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
                 personData["avr"] = 0;
@@ -540,10 +540,26 @@ var gradeDistr = (function() {
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
                 var quizzesOfInterest = [];
                 var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
+                var nothingSelected = true;
 
-                //select the box that matches the selected nav link; put in list
-                $(this).prop('checked', true);
-                quizzesOfInterest.push(quizname)
+                //check if any boxes are selected    
+                $('#checkboxes-div input[type=checkbox]').each(function() {
+                    //change nothingSelected to false if something is checked
+                    if ($(this).prop('checked')) {
+                        console.log('got here');
+                        nothingSelected = false;
+                    }
+                });
+
+                // if nothing is selected, then add the quiz we're on to the list to be sent & select its box;
+                // reset nothingselected status
+                if (nothingSelected) {
+                    console.log('here');
+                    $('input[name="' + $('#asgn-nav').text() + '"]').prop('checked', true);
+                    quizzesOfInterest.push(quizname);
+                    nothingSelected = true;
+                } 
+                
 
                 //goes through all the checkboxes and adds anything else that's been checked to the list
                 selectedBoxes.each(function() {
@@ -592,8 +608,31 @@ var gradeDistr = (function() {
         });
 
         var selectedBoxes = [];
-        checkboxes.find('input[type=checkbox]').each(function() {
+        checkboxes.find('input[type=checkbox]').each(function() { 
+            if ($(this).prop('checked')) {
+                selectedBoxes.push($(this).val());
+            }
+        });
+
+        var allBoxes = checkboxes.find('input[type=checkbox]');
+        function allUnselected(boxes) {
+            var nothingSelected = true;
+            boxes.each(function() {
+                if ($(this).prop('checked')) {
+                    nothingSelected = false;
+                }
+            });
+            return nothingSelected;
+        }
+        
+        allBoxes.each(function() {
             $(this).on('click', function() {
+                
+                if (allUnselected(allBoxes)) {
+                    $('input[name="'+ $('#asgn-nav').text()+ '"]').prop('checked', true);
+                    selectedBoxes.push($('#asgn-nav').text());
+                }
+
                 if (($.inArray($(this).val(), selectedBoxes) == -1)) {
                     selectedBoxes.push($(this).val());
                     selectedBoxes.sort();
