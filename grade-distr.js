@@ -376,6 +376,7 @@ var gradeDistr = (function() {
         $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + middle + "%, Top: " + top + "%");
         
 
+
         function displayBasicInfo(assignment) {
             var info = controller.getBasicInfo(assignment); 
             $('#total p').text(info[0]);
@@ -653,7 +654,7 @@ var gradeDistr = (function() {
 
                 // controller.calcAverage(quizzesOfInterest.sort());
                 displayBasicInfo(quizname);
-                controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                controller.groupPeopleByAvr($('#asgn-nav').text(), sliderObj.slider('values', 0), 100-sliderObj.slider('values', 1));
             });
         });
 
@@ -669,7 +670,7 @@ var gradeDistr = (function() {
                 // });
                 // controller.calcAverage(quizzesOfInterest);
                 displayBasicInfo(quizzesArray[index-1]);
-                controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
+                controller.groupPeopleByAvr($('#asgn-nav').text(), sliderObj.slider('values', 0), 100-sliderObj.slider('values', 1));
             }
         });
 
@@ -685,7 +686,7 @@ var gradeDistr = (function() {
                 // });
                 // controller.calcAverage(quizzesOfInterest);
                 displayBasicInfo(quizzesArray[index+1]);
-                controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
+                controller.groupPeopleByAvr($('#asgn-nav').text(), sliderObj.slider('values', 0), 100-sliderObj.slider('values', 1));
             }
         });
 
