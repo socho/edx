@@ -14,3 +14,13 @@
 .chart line {
 	stroke: lightgrey;
 }
+
+#legend p {
+	margin-left: 15px;
+}
+
+#total div,
+#average div,
+#sd div {
+	font-weight: bold;
+}
