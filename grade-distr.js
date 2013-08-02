@@ -140,6 +140,7 @@ var gradeDistr = (function() {
         }
 
         function calcAverage(quizzesOfInterest) {
+            console.log("what's getting sent: ", quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
                 personData["avr"] = 0;
@@ -275,8 +276,7 @@ var gradeDistr = (function() {
         $('#legend').append(labelLegend, legendTable);
         $('#checkboxes-div').append(labelQuiz);
         for (var key in quizzes) {
-            var noSpaceKey = key.replace(/\s+/g, '');
-            var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + noSpaceKey + '"> ' + key +  '<br>');
+            var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
             $('#checkboxes-div').append(checkbox);
         }
 
@@ -376,7 +376,7 @@ var gradeDistr = (function() {
 
         function drawInitialGraph() { //assignment, quizzesOfInterest, lowPct, highPct, 
             controller.calcAverage(["Quiz 21"]);
-            var data = model.groupPeopleByAvr("Quiz 21", 25, 75); //need to ask question
+            var data = model.groupPeopleByAvr("Quiz 21", bottom, 100-top); //need to ask question
             // console.log('data: ', data);
             var stack = d3.layout.stack();
             var stackedData = stack(data);
@@ -526,16 +526,26 @@ var gradeDistr = (function() {
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
                 //inNav = true;
-                $('#asgn-nav').html(String($(this).attr('id'))+"<span class='caret'></span>");
+                var quizname = String($(this).attr('id'));
+
+                $('#asgn-nav').html(quizname+"<span class='caret'></span>");
                 var quizzesOfInterest = [];
                 var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                console.log('selected: ', selectedBoxes);
+
+                //select the box that matches the selected nav link; put in list
+                $(this).prop('checked', true);
+                quizzesOfInterest.push(quizname)
+
+                //goes through all the checkboxes and adds anything else that's been checked to the list
                 selectedBoxes.each(function() {
-                    quizzesOfInterest.push($(this).val());
+                    if ($.inArray($(this).val(), quizzesOfInterest) == -1) {
+                        quizzesOfInterest.push($(this).val());
+                    }  
                 });
-                controller.calcAverage(quizzesOfInterest);
-                controller.groupPeopleByAvr(String($(this).attr('id')), bottom, 100-top);
-                // console.log($(this).text());
+
+                controller.calcAverage(quizzesOfInterest.sort());
+                controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                
             });
         });
 
