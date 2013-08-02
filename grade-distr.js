@@ -140,6 +140,7 @@ var gradeDistr = (function() {
         }
 
         function calcAverage(quizzesOfInterest) {
+            quizzesOfInterest = getQuizzesArray();
             console.log('getting sent', quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
