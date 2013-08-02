@@ -694,3 +694,14 @@ $(document).ready(function() {
     gradeDistr.setup($('.gradeDistr'));
 
 });
+
+
+
+/* ideas 
+    remove legend and average over sections
+    diagonal scatter plot (ex. the sequal plot of movies)
+    view of multiple quizzes
+    textual visualization, a matrix  where students are on thy y axis, quiz is the x axis
+        grade in each cell, and color based on the percentages
+        can zoom in and zoom out
+*/
