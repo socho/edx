@@ -667,7 +667,9 @@ var gradeDistr = (function() {
                 // });
                 // controller.calcAverage(quizzesOfInterest);
                 displayBasicInfo(quizzesArray[index-1]);
-                controller.groupPeopleByAvr($('#asgn-nav').text(), sliderObj.slider('values', 0), 100-sliderObj.slider('values', 1));
+                bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                top = Math.abs(100 - sliderObj.slider("values", 1));
+                controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
             }
         });
 
@@ -683,7 +685,9 @@ var gradeDistr = (function() {
                 // });
                 // controller.calcAverage(quizzesOfInterest);
                 displayBasicInfo(quizzesArray[index+1]);
-                controller.groupPeopleByAvr($('#asgn-nav').text(), sliderObj.slider('values', 0), 100-sliderObj.slider('values', 1));
+                bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                top = Math.abs(100 - sliderObj.slider("values", 1));
+                controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
             }
         });
 
@@ -704,14 +708,14 @@ var gradeDistr = (function() {
         var controller = Controller(model);
         view = View(div, model, controller);
         
-        exports.view = view; //delete later
+        // exports.view = view; //delete later
 
     }
    
     exports.setup = setup;
 
-    exports.model = Model; //delete later
-    exports.control = Controller; //delete later
+    // exports.model = Model; //delete later
+    // exports.control = Controller; //delete later
 
     return exports;
 
