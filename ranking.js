@@ -302,22 +302,6 @@ var rankingPlot = (function() {
                         .style("opacity", 0);   
                 });
 
-            // svg.selectAll("text")
-            //  .data(dataset)
-            //  .enter()
-            //  .append("text")
-            //  .text(function(d){
-            //      return d[0] + ", " + d[1];
-            //  })
-            //  .attr("x", function(d){
-            //      return xScale(d[0]);
-            //  })
-            //  .attr("y", function(d){
-            //      return yScale(d[1]);
-            //  })
-            //  .attr("font-size",11)
-            //  .attr("fill","red");
-
             svg.append("g")
                 .attr("class","axis")
                 .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
@@ -377,6 +361,19 @@ var rankingPlot = (function() {
                 displayBasicInfo(quizzesArray[index+1]);
                 updateGraph(quizzesArray[index+1]);
             }
+        });
+
+        var dropdown = $('.dropdown-menu');
+        for (var key in quizzes) {
+            var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
+            dropdown.append(link);
+        } 
+
+        dropdown.find('li').each(function() {
+            $(this).on('click', function() {
+                console.log("here! ",$(this).attr('id'));
+                updateGraph($(this).attr('id'));
+            });
         });
 
     }
