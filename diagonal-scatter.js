@@ -98,7 +98,7 @@ var diagScatter = (function() {
                     sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment]["grade"])-avr,2);
                 }
             }
-            var sd = Math.sqrt(sqDiffSum / sum);
+            var sd = Math.sqrt(sqDiffSum / numPeople);
 
             return [numPeople, avr, sd];           
         }
@@ -123,17 +123,25 @@ var diagScatter = (function() {
             }
         }
 
-        function calcAvrOfAvr() {
+        function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
                 sum += peopleData[person]["avr"];
                 numPeople += 1;
             }
-            console.log(sum/numPeople);
-            return sum / numPeople;
+            var avr = sum / numPeople;
+
+            //sd
+            var sqDiffSum = 0;
+            for (var person in peopleData) {
+                sqDiffSum += Math.pow(peopleData[person]["avr"]-avr,2);
+            }
+            var sd = Math.sqrt(sqDiffSum / numPeople);
+
+            return [avr, sd];            
         }
 
-        return {getPeopleData: getPeopleData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAvrOfAvr: calcAvrOfAvr, on: handler.on};
+        return {getPeopleData: getPeopleData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, getInfoOverAll: getInfoOverAll, on: handler.on};
     }
 
     function Controller(model){
@@ -187,7 +195,7 @@ var diagScatter = (function() {
         var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
         var outerHeight = 600;
 
-        var margin = { top: 20, right: 20, bottom: 40, left: 40 };
+        var margin = { top: 20, right: 20, bottom: 40, left: 50 };
 
         var chartWidth = outerWidth - margin.left - margin.right;
         var chartHeight = outerHeight - margin.top - margin.bottom;
@@ -207,28 +215,38 @@ var diagScatter = (function() {
             }
 
             var info = model.getBasicInfo(quizname);
-            var avrOfAvr = model.calcAvrOfAvr();
+            var infoOverall = model.getInfoOverAll();
+            var avrOverall = infoOverall[0];
+            var sdOverall = infoOverall[1];
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([avrOfAvr-d3.max(dataset, function(d){return Math.abs(avrOfAvr-d["avr"]);}),avrOfAvr+d3.max(dataset, function(d){return Math.abs(avrOfAvr-d["avr"]);})])
+                            .domain([avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}),avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})])
                             .range([margin.left,outerWidth-margin.right]);
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}),info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})])
                             .range([outerHeight-margin.bottom,margin.top]);
 
+            var xaxisData = [];
+            var yaxisData = [];
+            for (var i = -2; i <= 2; i++) {
+                xaxisData.push(avrOverall + i * sdOverall);
+                yaxisData.push(info[1] + i * info[2]);
+            }
             var xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient("bottom")
-                            .ticks(5);
+                            .tickValues(xaxisData);
+
             var yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
-                            .ticks(5);
+                            .tickValues(yaxisData);
 
             var svg = d3.select(".chart-container").append("svg")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 
+            //diagonal line
             svg.append("line")
                 .attr("class","diagonal")
                 .attr("x1", margin.left)
@@ -236,6 +254,7 @@ var diagScatter = (function() {
                 .attr("x2", outerWidth-margin.right)
                 .attr("y2", margin.top);
 
+            //dots
             svg.selectAll("circle")
                 .data(dataset)
                 .enter()
@@ -249,15 +268,40 @@ var diagScatter = (function() {
                 })
                 .attr("r", 2);
 
+            //xaxis
             svg.append("g")
                 .attr("class","axis")
                 .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
-                .call(xAxis)
+                .call(xAxis);
 
+            //yaxis
             svg.append("g")
                 .attr("class","axis")
                 .attr("transform", "translate("+margin.left+",0)")
-                .call(yAxis)
+                .call(yAxis);
+
+            //Y-AXIS LABEL
+            svg.append("text")
+                .attr("class", "yaxis-label")
+                .attr("x",0)
+                .attr("y", 0)
+                .attr("transform", function(d) {return "rotate(-90)" })
+                .attr("dx", -margin.top-chartHeight/2)
+                .attr("dy", margin.left*0.2)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Grade for "+quizname);
+
+            //X-AXIS LABEL
+            svg.append("text")
+                .attr("class", "xaxis-label")
+                // .attr("x",chartWidth/2)
+                .attr("x", outerWidth/2)
+                .attr("y", chartHeight+margin.top)
+                .attr("dy", margin.bottom*0.85)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Overall grade");
         }
         
 

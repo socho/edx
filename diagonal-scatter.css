@@ -18,3 +18,11 @@
 	stroke-width: 2px;
 	stroke-dasharray: 10,10;
 }
+
+.xaxis,
+.yaxis {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges
+
+}

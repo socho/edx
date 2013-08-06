@@ -102,7 +102,7 @@ var gradeDistr = (function() {
                     sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment]["grade"])-avr,2);
                 }
             }
-            var sd = Math.sqrt(sqDiffSum / sum);
+            var sd = Math.sqrt(sqDiffSum / numPeople);
 
             return [numPeople, avr*10, sd*10];           
         }
@@ -163,7 +163,7 @@ var gradeDistr = (function() {
                     newThreeArrays[index].push({"y":counter[i], "people": groupedPeople[i]});
                 }
             }
-            handler.trigger('changed', newThreeArrays);
+            handler.trigger('changed', [newThreeArrays, assignment]);
             return newThreeArrays;
         }
 
@@ -263,7 +263,7 @@ var gradeDistr = (function() {
         });
 
         var sliderObj = $('<div id="slider">');
-        var labelSlider = $('<p><h4>Grade Range:</h4>\
+        var labelSlider = $('<p><h4>Overall Percentile (%):</h4>\
             <input id="amount" style="width: 250px;\
                     border: 0;\
                     background-color: #fff;\
@@ -447,16 +447,6 @@ var gradeDistr = (function() {
             .attr("text-anchor", "middle")
             .text("Number of Students");
 
-        //X-AXIS LABEL
-        chart.append("text")
-            .attr("class", "xaxis-label")
-            .attr("x",chartWidth/2)
-            .attr("y", chartHeight)
-            .attr("dy", margin.bottom*0.85)
-            .attr("font-weight", "bold")
-            .attr("text-anchor", "middle")
-            .text("Grade (%)");
-
         ///////////////////
 
         function drawInitialGraph() { //assignment, quizzesOfInterest, lowPct, highPct, 
@@ -512,6 +502,16 @@ var gradeDistr = (function() {
                 // .attr("dx", function(d){return xScale.rangeBand()/2;})
                 .attr("dy", margin.bottom*0.4)
                 .text(function(d){return String(d*10);});
+
+            //X-AXIS LABEL
+            chart.append("text")
+                .attr("class", "xaxis-label")
+                .attr("x",chartWidth/2)
+                .attr("y", chartHeight)
+                .attr("dy", margin.bottom*0.85)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Grade for Quiz 21" + " (%)");
             
             //grabs all the layers and forms groups out of them
             var layerGroups = chart.selectAll(".layer").data(stackedData)
@@ -530,8 +530,9 @@ var gradeDistr = (function() {
 
         drawInitialGraph();
 
-        function updateGraph(data){
-            
+        function updateGraph(dataArray){
+            var data = dataArray[0];
+            var quizname = dataArray[1];
             var stack = d3.layout.stack();
             var stackedData = stack(data);
 
@@ -600,6 +601,17 @@ var gradeDistr = (function() {
                 // .attr("dx", function(d){return xScale.rangeBand()/2;})
                 .attr("dy", margin.bottom*0.5)
                 .text(function(d){return String(d*10);});
+
+            //X-AXIS LABEL
+            $('.xaxis-label').remove();
+            chart.append("text")
+                .attr("class", "xaxis-label")
+                .attr("x",chartWidth/2)
+                .attr("y", chartHeight)
+                .attr("dy", margin.bottom*0.85)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Grade for " + quizname + " (%)");
             
             //grabs all the layers and forms groups out of them
             var layerGroups = chart.selectAll(".layer").data(stackedData)
