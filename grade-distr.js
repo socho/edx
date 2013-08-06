@@ -306,12 +306,13 @@ var gradeDistr = (function() {
         // });
 
         
-
+        var lowerLabel = $('<div id="lowerLabel"></div>');
+        var upperLabel = $('<div id="upperLabel"></div>');
 
 
 
         $('#column2').append(sliderDiv, legend); // legend, checkboxes
-        $('#sliderbg').append(labelSlider, sliderObj);
+        $('#sliderbg').append(labelSlider, sliderObj,lowerLabel, upperLabel);
         // $('#checkboxes-div').append(labelQuiz);
         // for (var key in quizzes) {
         //     var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
@@ -319,6 +320,14 @@ var gradeDistr = (function() {
         // }
 
         $('ui-slider-range ui-widget-header ui-corner-all').css("background", "darkgray");
+
+        $("#lowerLabel").text(25);
+        $("#lowerLabel").css('top',"-10px");
+        $("#lowerLabel").css('left', String(0.01 * 25 * parseFloat($('#slider').css("width")) - 0.5 * parseFloat($("#lowerLabel").css("width")))+"px"); 
+        $("#upperLabel").text(75);
+        $("#upperLabel").css('top',"-10px");
+        $("#upperLabel").css('left', String(0.01 * 75 * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px"); 
+
         
         function updateColors(values) {
             var colorstops = colors[0] + ", "; // start left with the first color
@@ -333,6 +342,7 @@ var gradeDistr = (function() {
             var css = '-webkit-linear-gradient(left,' + colorstops + ')';
             sliderObj.css('background-image', css);
         }
+
         var handlers = [25, 75]
         var colors = ["lightpink", "darkgray", "lightblue"];
         updateColors(handlers);
@@ -345,10 +355,16 @@ var gradeDistr = (function() {
             slide: function( event, ui ) {
                 var min = 0;
                 var max = 100;
-                var mid = Math.abs(ui.values[1] - ui.values[0]);
                 var bottom = Math.abs(ui.values[0] - min);
+                var mid = Math.abs(ui.values[1]-ui.values[1]);
                 var top = Math.abs(max - ui.values[1]);
-                $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + mid + "%, Top: " + top + "%");
+                $("#lowerLabel").text(bottom);
+                $("#lowerLabel").css('top',"-10px");
+                $("#lowerLabel").css('left', String(0.01 * bottom * parseFloat($('#slider').css("width")) - 0.5 * parseFloat($("#lowerLabel").css("width")))+"px"); 
+                $("#upperLabel").text(max-top);
+                $("#upperLabel").css('top',"-10px");
+                $("#upperLabel").css('left', String(0.01 * (max-top) * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px"); 
+
                 // var listOfQuizzes = selectedBoxes;
                 // var curAsgn = $('#asgn-nav').text();
                 // if ($.inArray(curAsgn, listOfQuizzes) == -1) {
@@ -356,9 +372,6 @@ var gradeDistr = (function() {
                 // }
                 
                 // controller.calcAverage(listOfQuizzes);
-                $('#topblock p').html('Top ' + top + '%');
-                $('#middleblock p').html('Middle ' + mid + '%');
-                $('#bottomblock p').html('Bottom ' + bottom + '%');
                 updateColors(ui.values);
                 controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top);
             }
@@ -370,7 +383,6 @@ var gradeDistr = (function() {
         var bottom = Math.abs(sliderObj.slider("values", 0) - 0);
         var middle = Math.abs(sliderObj.slider("values", 1) - sliderObj.slider("values", 0));
         var top = Math.abs(100 - sliderObj.slider("values", 1));
-        $( "#amount" ).val( "Bottom: " + bottom + "%, Mid: " + middle + "%, Top: " + top + "%");
         
 
 
@@ -651,7 +663,10 @@ var gradeDistr = (function() {
 
                 // controller.calcAverage(quizzesOfInterest.sort());
                 displayBasicInfo(quizname);
-                controller.groupPeopleByAvr($('#asgn-nav').text(), sliderObj.slider('values', 0), 100-sliderObj.slider('values', 1));
+
+                bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                top = Math.abs(100 - sliderObj.slider("values", 1));
+                controller.groupPeopleByAvr(quizname, bottom, 100-top);
             });
         });
 

@@ -129,6 +129,7 @@ var diagScatter = (function() {
                 sum += peopleData[person]["avr"];
                 numPeople += 1;
             }
+            console.log(sum/numPeople);
             return sum / numPeople;
         }
 
@@ -170,6 +171,15 @@ var diagScatter = (function() {
         //     //updateGraph(data);
         // });
 
+       ////////
+       //NAVIGATION
+       ////////
+        var dropdown = $('.dropdown-menu');
+        for (var key in quizzes) {
+            var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
+            dropdown.append(link);
+        } 
+
 
         ////////
         //setup variables for Graph
@@ -184,75 +194,85 @@ var diagScatter = (function() {
 
 
         model.calcAverage();
-        var dataset = [];
-        var dataDict = model.getPeopleData();
-        for (var person in dataDict) {
-            if ("Quiz 25" in dataDict[person]){
-                dataset.push({"username": person ,"grade": dataDict[person]["Quiz 25"]["grade"], "avr": dataDict[person]["avr"]});
+        drawGraph("Quiz 21");
+
+
+        function drawGraph(quizname) {
+            var dataset = [];
+            var dataDict = model.getPeopleData();
+            for (var person in dataDict) {
+                if (quizname in dataDict[person]){
+                    dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                }
             }
+
+            var info = model.getBasicInfo(quizname);
+            var avrOfAvr = model.calcAvrOfAvr();
+
+            var xScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([avrOfAvr-d3.max(dataset, function(d){return Math.abs(avrOfAvr-d["avr"]);}),avrOfAvr+d3.max(dataset, function(d){return Math.abs(avrOfAvr-d["avr"]);})])
+                            .range([margin.left,outerWidth-margin.right]);
+            var yScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}),info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})])
+                            .range([outerHeight-margin.bottom,margin.top]);
+
+            var xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient("bottom")
+                            .ticks(5);
+            var yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left")
+                            .ticks(5);
+
+            var svg = d3.select(".chart-container").append("svg")
+                        .attr("width",outerWidth)
+                        .attr("height",outerHeight);
+
+            svg.append("line")
+                .attr("class","diagonal")
+                .attr("x1", margin.left)
+                .attr("y1", outerHeight-margin.bottom)
+                .attr("x2", outerWidth-margin.right)
+                .attr("y2", margin.top);
+
+            svg.selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("class","datapoints")
+                .attr("cx", function(d){
+                    return xScale(d["avr"]);
+                })
+                .attr("cy", function(d){
+                    return yScale(d["grade"]);
+                })
+                .attr("r", 2);
+
+            svg.append("g")
+                .attr("class","axis")
+                .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                .call(xAxis)
+
+            svg.append("g")
+                .attr("class","axis")
+                .attr("transform", "translate("+margin.left+",0)")
+                .call(yAxis)
         }
+        
 
-        var info = model.getBasicInfo("Quiz 25");
-        var avrOfAvr = model.calcAvrOfAvr();
-
-        var xScale = d3.scale.linear() //scale is a function!!!!!
-                        .domain([avrOfAvr-d3.max(dataset, function(d){return Math.abs(avrOfAvr-d["avr"]);}),avrOfAvr+d3.max(dataset, function(d){return Math.abs(avrOfAvr-d["avr"]);})])
-                        .range([margin.left,outerWidth-margin.right]);
-        var yScale = d3.scale.linear() //scale is a function!!!!!
-                        .domain([info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}),info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})])
-                        .range([outerHeight-margin.bottom,margin.top]);
-
-        var xAxis = d3.svg.axis()
-                        .scale(xScale)
-                        .orient("bottom")
-                        .ticks(5);
-        var yAxis = d3.svg.axis()
-                        .scale(yScale)
-                        .orient("left")
-                        .ticks(5);
-
-        var svg = d3.select(".chart-container").append("svg")
-                    .attr("width",outerWidth)
-                    .attr("height",outerHeight);
-
-        svg.selectAll("circle")
-            .data(dataset)
-            .enter()
-            .append("circle")
-            .attr("class","datapoints")
-            .attr("cx", function(d){
-                return xScale(d["avr"]);
-            })
-            .attr("cy", function(d){
-                return yScale(d["grade"]);
-            })
-            .attr("r", 2);
-
-        // svg.selectAll("text")
-        //  .data(dataset)
-        //  .enter()
-        //  .append("text")
-        //  .text(function(d){
-        //      return d[0] + ", " + d[1];
-        //  })
-        //  .attr("x", function(d){
-        //      return xScale(d[0]);
-        //  })
-        //  .attr("y", function(d){
-        //      return yScale(d[1]);
-        //  })
-        //  .attr("font-size",11)
-        //  .attr("fill","red");
-
-        svg.append("g")
-            .attr("class","axis")
-            .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
-            .call(xAxis)
-
-        svg.append("g")
-            .attr("class","axis")
-            .attr("transform", "translate("+margin.left+",0)")
-            .call(yAxis)
+        ///////
+        ///EVENT LISTENERS
+        ///////
+        dropdown.find('li').each(function() {
+            $(this).on('click', function() {
+                //inNav = true;
+                var quizname = String($(this).attr('id'));
+                $('#asgn-nav').html(quizname+"<span class='caret'></span>");
+                $('svg').remove();
+                drawGraph(quizname);
+            });
+        });
 
     }
 
