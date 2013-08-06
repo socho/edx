@@ -12,3 +12,14 @@
 	stroke: black;
 	shape-rendering: crispEdges
 }
+
+div.tooltip {
+	background-color: lightsteelblue;
+	position: absolute;
+	text-align: center;
+	width: auto;
+	height: auto;
+	font: 12px sans-serif;
+	border-radius: 5px;
+	padding: 2px;
+}

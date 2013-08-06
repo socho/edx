@@ -132,26 +132,19 @@ var rankingPlot = (function() {
             return sum / numPeople;
         }
 
-        function printInfo() {
-            for (var person in peopleData) {
-                var info = peopleData[person]["Quiz 25"];
-                var avg = peopleData[person].avr;
-                if (info != undefined) {
-                    console.log('Grade on Quiz 25: ', peopleData[person]["Quiz 25"].grade);
-                    console.log('Over all avg grade in class', avg);
-                }
-                
-            }
-        }
-
-        return {printInfo: printInfo, getPeopleData: getPeopleData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAvrOfAvr: calcAvrOfAvr, on: handler.on};
+        
+        return {getPeopleData: getPeopleData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAvrOfAvr: calcAvrOfAvr, on: handler.on};
     }
 
     function Controller(model){
+        function sentQuiz() {
+
+        }
+
         return {};
     }
 
-    function View(div, model, controller){
+    function View(div, model, controller) {
 
         div.append(
          '<div class="container">'
@@ -195,21 +188,7 @@ var rankingPlot = (function() {
         var chartHeight = outerHeight - margin.top - margin.bottom;
 
 
-        model.calcAverage();
-        var dataset = [];
-        var data = [];
-        var dataDict = model.getPeopleData();
-        for (var person in dataDict) {
-            if ("Quiz 25" in dataDict[person]){
-                dataset.push({"username": person ,"grade": dataDict[person]["Quiz 25"]["grade"], "avr": dataDict[person]["avr"]});
-            }
-        }
 
-        for (var person in dataset) {
-            data.push({ "grade": dataset[person].grade , "avg": dataset[person].avr })
-        
-            // data.push(String('(' + dataset[person].grade + ', ' + dataset[person].avr + ')'));
-        }
 
 
         function sortByRank(object, val2sort) {
@@ -231,12 +210,12 @@ var rankingPlot = (function() {
             }
             if (val2sort == "avr") { 
                 for (var i = 0; i < object.length; i++) {
-                    object[i]["avr-rank"] = i+1;
+                    object[i]["avr-rank"] = [i+1, object.length-i];
                 }
             }
             else {
                 for (var i = 0; i < object.length; i++) {
-                    object[i]["grade-rank"] = i+1;
+                    object[i]["grade-rank"] = [i+1, object.length-i];
                 }
             }
             
@@ -244,86 +223,169 @@ var rankingPlot = (function() {
 
         }
 
+        function updateGraph(quizname) {
+            d3.select("svg").remove();
+
+            model.calcAverage();
+            var dataset = [];
+            var data = [];
+            var dataDict = model.getPeopleData();
+            for (var person in dataDict) {
+                if (quizname in dataDict[person]){
+                    dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                }
+            }
+
+            var info = model.getBasicInfo(quizname);
+            var result = sortByRank(dataset, "avr"); //sorted by avg
+            var result2 = sortByRank(result, "grade"); //sorted by grade
+            console.log(result2);
+            console.log('num of students', info[0]);
+
+            var tooltip = d3.select("body").append("div")   
+                .attr("class", "tooltip")               
+                .style("opacity", 0);
+
+            var avrOfAvr = model.calcAvrOfAvr();
+
+            var xScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([info[0], 0])
+                            .range([margin.left,outerWidth-margin.right]);
+            var yScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([info[0], 0])
+                            .range([outerHeight-margin.bottom,margin.top]);
+
+            var xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient("bottom")
+                            .ticks(10);
+            var yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left")
+                            .ticks(10);
+
+            var svg = d3.select(".chart-container").append("svg")
+                        .attr("width",outerWidth)
+                        .attr("height",outerHeight);
+
+            svg.append("line")
+                .attr('x1', margin.left)
+                .attr('x2', outerWidth-margin.right)
+                .attr('y1', outerHeight-margin.bottom)
+                .attr('y2', margin.top)
+                .style("stroke", "red")
+                .style("stroke-dasharray", ("5, 5"));
+
+            svg.selectAll("circle")
+                .data(result2)
+                .enter()
+                .append("circle")
+                .attr("class","datapoints")
+                .attr("cx", function(d){
+                    return xScale(d["avr-rank"][1]);
+                })
+                .attr("cy", function(d){
+                    return yScale(d["grade-rank"][1]);
+                })
+                .attr("r", 2)
+                .on("mouseover", function(d) {      
+                    tooltip.transition()        
+                        .duration(100)      
+                        .style("opacity", .9);      
+                    tooltip.html(d["username"] + "<br/>Avg Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg: "  + d["avr"].toFixed(2) + "<br/>Grade: "  + parseFloat(d["grade"]))  
+                        .style("left", (d3.event.pageX) + "px")     
+                        .style("top", (d3.event.pageY - 28) + "px");    
+                })                  
+                .on("mouseout", function(d) {       
+                    tooltip.transition()        
+                        .duration(500)      
+                        .style("opacity", 0);   
+                });
+
+            // svg.selectAll("text")
+            //  .data(dataset)
+            //  .enter()
+            //  .append("text")
+            //  .text(function(d){
+            //      return d[0] + ", " + d[1];
+            //  })
+            //  .attr("x", function(d){
+            //      return xScale(d[0]);
+            //  })
+            //  .attr("y", function(d){
+            //      return yScale(d[1]);
+            //  })
+            //  .attr("font-size",11)
+            //  .attr("fill","red");
+
+            svg.append("g")
+                .attr("class","axis")
+                .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                .call(xAxis);
+
+            svg.append("g")
+                .attr("class","axis")
+                .attr("transform", "translate("+margin.left+",0)")
+                .call(yAxis);
+        }
         
-        var info = model.getBasicInfo("Quiz 25");
-        var result = sortByRank(dataset, "avr"); //sorted by avg
-        var result2 = sortByRank(result, "grade"); //sorted by grade
-        console.log(result2);
-        console.log('num of students', info[0]);
+        updateGraph($('#asgn-nav').text());
+
+        var legend = $('<div id="legend"></div>');
+        legend.css( {
+            'background-color': '#fff',
+            'border-radius': '10px',
+            'width': '300px',
+            'height': '150px',
+            'padding': '5px',
+            'margin-top': '5px'
+        });
+
+        var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
+        var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
+        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
 
         
-        var avrOfAvr = model.calcAvrOfAvr();
+        legend.append(totalLabel, averageLabel, sdLabel);
+        $('#column2').append(legend);
 
-        var xScale = d3.scale.linear() //scale is a function!!!!!
-                        .domain([0, info[0]])
-                        .range([margin.left,outerWidth-margin.right]);
-        var yScale = d3.scale.linear() //scale is a function!!!!!
-                        .domain([0, info[0]])
-                        .range([outerHeight-margin.bottom,margin.top]);
+        function displayBasicInfo(assignment) {
+            var info = model.getBasicInfo(assignment); 
+            $('#total p').text(info[0]);
+            $('#average p').text(info[1].toFixed(3));
+            $('#sd p').text(info[2].toFixed(3));
+        }
 
-        var xAxis = d3.svg.axis()
-                        .scale(xScale)
-                        .orient("bottom")
-                        .ticks(10);
-        var yAxis = d3.svg.axis()
-                        .scale(yScale)
-                        .orient("left")
-                        .ticks(10);
+        displayBasicInfo("Quiz 21");
 
-        var svg = d3.select(".chart-container").append("svg")
-                    .attr("width",outerWidth)
-                    .attr("height",outerHeight);
 
-        svg.selectAll("circle")
-            .data(result2)
-            .enter()
-            .append("circle")
-            .attr("class","datapoints")
-            .attr("cx", function(d){
-                return xScale(d["avr-rank"]);
-            })
-            .attr("cy", function(d){
-                return yScale(d["grade-rank"]);
-            })
-            .attr("r", 2);
+        $('.btn-l').on('click', function(){
+            var quizzesArray = model.getQuizzesArray();
+            var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if (index != 0){
+                $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
+                displayBasicInfo(quizzesArray[index-1]);
+                updateGraph(quizzesArray[index-1]);
+            }
+        });
 
-        // svg.selectAll("text")
-        //  .data(dataset)
-        //  .enter()
-        //  .append("text")
-        //  .text(function(d){
-        //      return d[0] + ", " + d[1];
-        //  })
-        //  .attr("x", function(d){
-        //      return xScale(d[0]);
-        //  })
-        //  .attr("y", function(d){
-        //      return yScale(d[1]);
-        //  })
-        //  .attr("font-size",11)
-        //  .attr("fill","red");
+        $('.btn-r').on('click', function(){
+            var quizzesArray = model.getQuizzesArray();
+            var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if (index != quizzesArray.length-1){
+                $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
+                displayBasicInfo(quizzesArray[index+1]);
+                updateGraph(quizzesArray[index+1]);
+            }
+        });
 
-        svg.append("g")
-            .attr("class","axis")
-            .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
-            .call(xAxis);
+    }
 
-        svg.append("g")
-            .attr("class","axis")
-            .attr("transform", "translate("+margin.left+",0)")
-            .call(yAxis);
-
-        svg.append("line")
-            .attr('x1', margin.left)
-            .attr('x2', outerWidth-margin.right)
-            .attr('y1', outerHeight-margin.bottom)
-            .attr('y2', margin.top)
-            .style("stroke", "red")
-            .style("stroke-dasharray", ("5, 5"));
+        
 
         //top students should be above the line and more towards the right 
         //if they did well on this specific exam
-    }
+    
 
   //setup main structure of app
     function setup(div) {
