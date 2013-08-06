@@ -379,6 +379,19 @@ var rankingPlot = (function() {
             }
         });
 
+        var dropdown = $('.dropdown-menu');
+        for (var key in quizzes) {
+            var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
+            dropdown.append(link);
+        } 
+
+        dropdown.find('li').each(function() {
+            $(this).on('click', function() {
+                console.log("here! ",$(this).attr('id'));
+                updateGraph($(this).attr('id'));
+            });
+        });
+
     }
 
         
