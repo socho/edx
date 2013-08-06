@@ -1,0 +1,14 @@
+.container {
+	margin-top: 30px;
+}
+
+.assignment-row {
+	text-align: center;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges
+}

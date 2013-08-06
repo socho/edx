@@ -385,6 +385,7 @@ var gradeDistr = (function() {
         var top = Math.abs(100 - sliderObj.slider("values", 1));
         
 
+
         function displayBasicInfo(assignment) {
             var info = controller.getBasicInfo(assignment); 
             $('#total p').text(info[0]);
@@ -674,6 +675,7 @@ var gradeDistr = (function() {
 
                 // controller.calcAverage(quizzesOfInterest.sort());
                 displayBasicInfo(quizname);
+
                 bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                 top = Math.abs(100 - sliderObj.slider("values", 1));
                 controller.groupPeopleByAvr(quizname, bottom, 100-top);
