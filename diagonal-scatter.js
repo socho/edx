@@ -220,23 +220,28 @@ var diagScatter = (function() {
             var sdOverall = infoOverall[1];
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}),avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})])
+                            .domain([10*(avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})),10*(avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}))])
                             .range([margin.left,outerWidth-margin.right]);
             var yScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}),info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})])
+                            //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
+                            .domain([10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})),10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))])
                             .range([outerHeight-margin.bottom,margin.top]);
 
             var xaxisData = [];
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
-                xaxisData.push(avrOverall + i * sdOverall);
-                yaxisData.push(info[1] + i * info[2]);
+                xaxisData.push(Math.max(Math.min((avrOverall + i * sdOverall)*10,100),0));
+                yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
+                //yaxisData.push(10*(info[1] + i * info[2]));
             }
+            console.log('xaxis', xaxisData);
+            console.log('yaxis', yaxisData);
+
             var xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient("bottom")
                             .tickValues(xaxisData);
-
+            xAxis.ticks(10);
             var yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
@@ -249,10 +254,25 @@ var diagScatter = (function() {
             //diagonal line
             svg.append("line")
                 .attr("class","diagonal")
-                .attr("x1", margin.left)
-                .attr("y1", outerHeight-margin.bottom)
-                .attr("x2", outerWidth-margin.right)
-                .attr("y2", margin.top);
+                .attr("x1", xScale((avrOverall-3*sdOverall)*10))
+                .attr("y1", yScale((info[1]-3*info[2])*10))
+                .attr("x2", xScale((avrOverall+3*sdOverall)*10))
+                .attr("y2", yScale((info[1]+3*info[2])*10));
+            console.log(xScale.domain());
+
+            //help text
+            var helptext = svg.append("g")
+                                .attr("class", "helptext")
+            helptext.append("text")
+                    .attr("x", xScale(xScale.domain()[1]))
+                    .attr("y", yScale(yScale.domain()[1]))
+                    //.attr("dx", 20)
+                    .text("better than usual")
+            helptext.append("text")
+                    .attr("x", xScale(xScale.domain()[1]))
+                    .attr("y", yScale(yScale.domain()[1]))
+                    //.attr("dy", 20)
+                    .text("worse than usual")
 
             //dots
             svg.selectAll("circle")
@@ -261,10 +281,10 @@ var diagScatter = (function() {
                 .append("circle")
                 .attr("class","datapoints")
                 .attr("cx", function(d){
-                    return xScale(d["avr"]);
+                    return xScale(10*d["avr"]);
                 })
                 .attr("cy", function(d){
-                    return yScale(d["grade"]);
+                    return yScale(10*d["grade"]);
                 })
                 .attr("r", 2);
 
