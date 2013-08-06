@@ -14,7 +14,7 @@
 }
 
 .diagonal {
-	stroke: lightgray;
+	stroke: black;
 	stroke-width: 2px;
 	stroke-dasharray: 10,10;
 }
@@ -22,11 +22,17 @@
 .xaxis,
 .yaxis {
 	fill: none;
-	stroke: black;
+	stroke: gray;
 	shape-rendering: crispEdges
 
 }
 
 .helptext {
 	text-anchor: middle;
+	fill: darkgray;
+}
+
+circle {
+	fill: teal;
+	stroke: teal;
 }

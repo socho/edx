@@ -206,6 +206,7 @@ var diagScatter = (function() {
 
 
         function drawGraph(quizname) {
+            $('svg').remove();
             var dataset = [];
             var dataDict = model.getPeopleData();
             for (var person in dataDict) {
@@ -227,6 +228,10 @@ var diagScatter = (function() {
                             .domain([10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})),10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))])
                             .range([outerHeight-margin.bottom,margin.top]);
 
+            var xtoyScale = d3.scale.linear()
+                                .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
+                                .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
+
             var xaxisData = [];
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
@@ -234,8 +239,6 @@ var diagScatter = (function() {
                 yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
                 //yaxisData.push(10*(info[1] + i * info[2]));
             }
-            console.log('xaxis', xaxisData);
-            console.log('yaxis', yaxisData);
 
             var xAxis = d3.svg.axis()
                             .scale(xScale)
@@ -252,27 +255,60 @@ var diagScatter = (function() {
                         .attr("height",outerHeight);
 
             //diagonal line
-            svg.append("line")
+            var diag = svg.append("line")
                 .attr("class","diagonal")
-                .attr("x1", xScale((avrOverall-3*sdOverall)*10))
-                .attr("y1", yScale((info[1]-3*info[2])*10))
-                .attr("x2", xScale((avrOverall+3*sdOverall)*10))
-                .attr("y2", yScale((info[1]+3*info[2])*10));
-            console.log(xScale.domain());
+                .attr("id", "diagonal");
+            var xmin = xScale.domain()[0];
+            var xmax = xScale.domain()[1];
+            var ymin = yScale.domain()[0];
+            var ymax = yScale.domain()[1];
+            if (xtoyScale(xmin) < ymin) {
+                diag.attr("x1", xScale(xtoyScale.invert(ymin)));
+                diag.attr("y1", yScale(ymin));
+            }
+            else {
+                diag.attr("x1", xScale(xmin));
+                diag.attr("y1", yScale(xtoyScale(xmin)));                
+            }
+            if (xtoyScale(xmax) < ymax) {
+                diag.attr("x2", xScale(xmax));
+                diag.attr("y2", yScale(xtoyScale(xmax)));
+            }
+            else {
+                diag.attr("x2", xScale(xtoyScale.invert(ymax)));
+                diag.attr("y2", yScale(ymax));                
+            }
 
             //help text
             var helptext = svg.append("g")
-                                .attr("class", "helptext")
+                                .attr("class", "helptext");
+            var x = $('.diagonal').attr("x2");
+            var y = $('.diagonal').attr("y2");
+
+            // helptext.append("text")
+            //         .append("textPath")
+
             helptext.append("text")
-                    .attr("x", xScale(xScale.domain()[1]))
-                    .attr("y", yScale(yScale.domain()[1]))
-                    //.attr("dx", 20)
-                    .text("better than usual")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dx", -chartWidth/10)
+                    .text("better than")
+                    .append("tspan")
+                    .text("usual")
+                    .attr("x",x)
+                    .attr("dx", -chartWidth/10)
+                    .attr("dy", 12);
             helptext.append("text")
-                    .attr("x", xScale(xScale.domain()[1]))
-                    .attr("y", yScale(yScale.domain()[1]))
-                    //.attr("dy", 20)
-                    .text("worse than usual")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dx", -0.5 * $('text').width())
+                    .attr("dy", 0.15*chartHeight)
+                    .text("worse than")
+                    .append("tspan")
+                    .text("usual")
+                    .attr("x", x)
+                    .attr("dx", -0.5 * $('text').width())
+                    .attr("dy", 12);
 
             //dots
             svg.selectAll("circle")
@@ -333,9 +369,28 @@ var diagScatter = (function() {
                 //inNav = true;
                 var quizname = String($(this).attr('id'));
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-                $('svg').remove();
                 drawGraph(quizname);
             });
+        });
+
+        $('.btn-l').on('click', function(){
+            var quizzesArray = model.getQuizzesArray();
+            var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if (index != 0){
+                $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
+                //displayBasicInfo(quizzesArray[index-1]);
+                drawGraph(quizzesArray[index-1]);
+            }
+        });
+
+        $('.btn-r').on('click', function(){
+            var quizzesArray = model.getQuizzesArray();
+            var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if (index != quizzesArray.length-1){
+                $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
+//                displayBasicInfo(quizzesArray[index+1]);
+            drawGraph(quizzesArray[index+1])
+            }
         });
 
     }
