@@ -26,3 +26,7 @@
 	shape-rendering: crispEdges
 
 }
+
+.helptext {
+	text-anchor: middle;
+}
