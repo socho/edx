@@ -24,3 +24,13 @@
 #sd div {
 	font-weight: bold;
 }
+
+#lowerLabel,
+#upperLabel {
+	position: relative;
+	float: left;
+	font-size: .8em;
+	color: #999;
+	text-align: center;
+	font-family: Verdana,Arial,sans-serif;
+}
