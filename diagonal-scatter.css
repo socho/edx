@@ -12,3 +12,9 @@
 	stroke: black;
 	shape-rendering: crispEdges
 }
+
+.diagonal {
+	stroke: lightgray;
+	stroke-width: 2px;
+	stroke-dasharray: 10,10;
+}
