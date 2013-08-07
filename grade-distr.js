@@ -904,6 +904,29 @@ var gradeDistr = (function() {
                 .attr("class","axis")
                 .attr("transform", "translate("+rank_margin.left+",0)")
                 .call(yAxis);
+
+            //X-AXIS LABEL
+            svg.append("text")
+                .attr("class", "xaxis-label")
+                // .attr("x",chartWidth/2)
+                .attr("x", avr_outerWidth/2)
+                .attr("y", avr_chartHeight+avr_margin.top)
+                .attr("dy", avr_margin.bottom*0.9)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Overall Rank");
+
+            //Y-AXIS LABEL
+            svg.append("text")
+                .attr("class", "yaxis-label")
+                .attr("x",0)
+                .attr("y", 0)
+                .attr("transform", function(d) {return "rotate(-90)" })
+                .attr("dx", -avr_margin.top-avr_chartHeight/2)
+                .attr("dy", avr_margin.left*0.2)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Rank for "+ quizname);
         }
 
         function updateAvrScatterPlot(quizname) {
