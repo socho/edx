@@ -15,9 +15,30 @@
 	stroke: lightgrey;
 }
 
+#legend {
+	background-color: #fff;
+	border-radius: 10px;
+	width: 300px;
+	height: 150px;
+	padding: 10px;
+	margin-top: 5px;
+}
+
 #legend p {
 	margin-left: 15px;
 }
+
+#sliderbg { 
+	background-color: #fff;
+	border-radius: 10px;
+	width: 300px;
+	height: 95px;
+	padding: 10px 15px 0px 7px;
+	margin-top: 5px;
+	margin-bottom: 40px;
+}
+
+
 
 #total div,
 #average div,
@@ -54,7 +75,7 @@ div.tooltip {
 }
 
 .diagonal {
-	stroke: black;
+	stroke: orange;
 	stroke-width: 2px;
 	stroke-dasharray: 10,10;
 }
@@ -66,8 +87,6 @@ div.tooltip {
 	shape-rendering: crispEdges
 
 }
-
-
 
 .helptext {
  	text-anchor: middle;
@@ -86,3 +105,4 @@ circle {
   	stoke: gray;
   	font-size: 8pt;
 }
+
