@@ -188,6 +188,9 @@ var diagScatter = (function() {
             dropdown.append(link);
         } 
 
+        var tooltip = d3.select("body").append("div")   
+            .attr("class", "tooltip")               
+            .style("opacity", 0);
 
         ////////
         //setup variables for Graph
@@ -195,7 +198,7 @@ var diagScatter = (function() {
         var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
         var outerHeight = 600;
 
-        var margin = { top: 20, right: 20, bottom: 40, left: 50 };
+        var margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
         var chartWidth = outerWidth - margin.left - margin.right;
         var chartHeight = outerHeight - margin.top - margin.bottom;
@@ -236,19 +239,48 @@ var diagScatter = (function() {
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
                 xaxisData.push(Math.max(Math.min((avrOverall + i * sdOverall)*10,100),0));
-                yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
-                //yaxisData.push(10*(info[1] + i * info[2]));
+                //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
+                yaxisData.push(10*(info[1] + i * info[2]));
             }
 
             var xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient("bottom")
-                            .tickValues(xaxisData);
-            xAxis.ticks(10);
+                            .tickValues(xaxisData)
+                            // .tickFormat(function(d,i){
+                            //     switch(i)
+                            //     {
+                            //     case 0:
+                            //         return parseInt(d) + " (avr-2*sd)";
+                            //     case 1:
+                            //         return parseInt(d) + " (avr-1*sd)";
+                            //     case 2:
+                            //         return parseInt(d) + " (avr)";
+                            //     case 3:
+                            //         return parseInt(d) + " (avr+1*sd)";
+                            //     case 4:
+                            //         return parseInt(d) + " (avr+2*sd)";
+                            //     }
+                            // });
             var yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
-                            .tickValues(yaxisData);
+                            .tickValues(yaxisData)
+                            // .tickFormat(function(d,i){
+                            //     switch(i)
+                            //     {
+                            //     case 0:
+                            //         return parseInt(d) + " (avr-2*sd)";
+                            //     case 1:
+                            //         return parseInt(d) + " (avr-1*sd)";
+                            //     case 2:
+                            //         return parseInt(d) + " (avr)";
+                            //     case 3:
+                            //         return parseInt(d) + " (avr+1*sd)";
+                            //     case 4:
+                            //         return parseInt(d) + " (avr+2*sd)";
+                            //     }
+                            // });
 
             var svg = d3.select(".chart-container").append("svg")
                         .attr("width",outerWidth)
@@ -322,7 +354,21 @@ var diagScatter = (function() {
                 .attr("cy", function(d){
                     return yScale(10*d["grade"]);
                 })
-                .attr("r", 2);
+                .attr("r", 3)
+                .on("mouseover", function(d) {
+                    console.log(d);   
+                    tooltip.transition()        
+                        .duration(100)      
+                        .style("opacity", .9);      
+                    tooltip.html(d["username"] + "<br/>Avg: "  + d["avr"].toFixed(1)*10 + "<br/>Grade: "  + d["grade"].toFixed(1)*10)  
+                        .style("left", (d3.event.pageX) + "px")     
+                        .style("top", (d3.event.pageY - 42) + "px");    
+                })                  
+                .on("mouseout", function(d) {       
+                    tooltip.transition()        
+                        .duration(500)      
+                        .style("opacity", 0);   
+                });
 
             //xaxis
             svg.append("g")
@@ -354,10 +400,32 @@ var diagScatter = (function() {
                 // .attr("x",chartWidth/2)
                 .attr("x", outerWidth/2)
                 .attr("y", chartHeight+margin.top)
-                .attr("dy", margin.bottom*0.85)
+                .attr("dy", margin.bottom*0.9)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Overall grade");
+            //x ticks description
+            var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
+            for (var i = 0; i < xaxisData.length; i++) {
+                svg.append("text")
+                    .attr("class", "ticks-desc")
+                    .attr("x", xScale(xaxisData[i]))
+                    .attr("y", chartHeight+margin.top)
+                    .attr("dy", $('.xaxis-label').height()*2)
+                    .attr("text-anchor", "middle")
+                    .text(desc[i]);
+                }
+            //y ticks description
+            for (var i = 0; i < yaxisData.length; i++) {
+                svg.append("text")
+                    .attr("class", "ticks-desc")
+                    .attr("x", margin.left)
+                    .attr("dx", -margin.left*0.4)
+                    .attr("y", yScale(yaxisData[i]))
+                    .attr("dy", $('.yaxis-label').height()+2)
+                    .attr("text-anchor", "middle")
+                    .text(desc[i]);
+                }
         }
         
 
