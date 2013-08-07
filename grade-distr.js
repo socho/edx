@@ -849,6 +849,85 @@ var gradeDistr = (function() {
                 .call(yAxis);
         }
 
+        function updateAvrScatterPlot(quizname) {
+            $('svg').remove();
+            model.calcAverage_nozeros();
+            var dataset = [];
+            var dataDict = model.getPeopleData();
+            for (var person in dataDict) {
+                if (quizname in dataDict[person]){
+                    dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                }
+            }
+
+            var tooltip = d3.select("body").append("div")   
+                .attr("class", "tooltip")               
+                .style("opacity", 0);
+
+            var info = model.getBasicInfo(quizname);
+            var infoOverall = model.getInfoOverAll();
+            var avrOverall = infoOverall[0];
+            var sdOverall = infoOverall[1];
+
+            console.log('avr', info[1],'sd',info[2])
+            var xScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([10*(avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})),10*(avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}))])
+                            .range([avr_margin.left,avr_outerWidth-avr_margin.right]);
+            var yScale = d3.scale.linear() //scale is a function!!!!!
+                            //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
+                            .domain([(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]*10);})),(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]*10);}))])
+                            .range([avr_outerHeight-avr_margin.bottom,avr_margin.top]);
+
+            var xtoyScale = d3.scale.linear()
+                                .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
+                                .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
+
+            console.log('ydomain', yScale.domain(), 'yrange', yScale.range());
+            var xaxisData = [];
+            var yaxisData = [];
+            for (var i = -2; i <= 2; i++) {
+                xaxisData.push(Math.max(Math.min((avrOverall + i * sdOverall)*10,100),0));
+                //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
+                yaxisData.push((info[1] + i * info[2]));
+            }
+
+            var xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient("bottom")
+                            .tickValues(xaxisData)
+            var yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left")
+                            .tickValues(yaxisData)
+
+            var svg = d3.select(".chart-container").append("svg")
+                        .attr("width",avr_outerWidth)
+                        .attr("height",avr_outerHeight);
+
+            //diagonal line
+            var diag = svg.append("line")
+                .attr("class","diagonal")
+                .attr("id", "diagonal");
+            var xmin = xScale.domain()[0];
+            var xmax = xScale.domain()[1];
+            var ymin = yScale.domain()[0];
+            var ymax = yScale.domain()[1];
+            if (xtoyScale(xmin) < ymin) {
+                diag.attr("x1", xScale(xtoyScale.invert(ymin)));
+                diag.attr("y1", yScale(ymin));
+            }
+            else {
+                diag.attr("x1", xScale(xmin));
+                diag.attr("y1", yScale(xtoyScale(xmin)));                
+            }
+            if (xtoyScale(xmax) < ymax) {
+                diag.attr("x2", xScale(xmax));
+                diag.attr("y2", yScale(xtoyScale(xmax)));
+            }
+            else {
+                diag.attr("x2", xScale(xtoyScale.invert(ymax)));
+                diag.attr("y2", yScale(ymax));                
+            }
 
 
         /* 

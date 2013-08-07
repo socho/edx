@@ -66,20 +66,3 @@ div.tooltip {
 	shape-rendering: crispEdges
 
 }
-
-.helptext {
-	text-anchor: middle;
-	fill: darkgray;
-}
-
-circle {
-	fill: teal;
-	stroke: teal;
-	stroke-width: 10px;
-	stroke-opacity: 0;
-}
-
-.ticks-desc {
-	stoke: gray;
-	font-size: 8pt;
-}
