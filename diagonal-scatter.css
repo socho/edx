@@ -35,4 +35,25 @@
 circle {
 	fill: teal;
 	stroke: teal;
+	stroke-width: 10px;
+	stroke-opacity: 0;
+}
+
+.ticks-desc {
+	stoke: gray;
+	font-size: 8pt;
+}
+
+div.tooltip {  
+
+	background-color: lightsteelblue;
+	position: absolute;
+	text-align: center;
+	width: auto;
+	height: auto;
+	font: 12px sans-serif;
+	border-radius: 5px;
+	padding: 2px;
+	border: 0px;      
+  	pointer-events: none;         
 }
