@@ -877,7 +877,7 @@ var gradeDistr = (function() {
                 .attr("cy", function(d){
                     return yScale(d["grade-rank"][1]);
                 })
-                .attr("r", 2)
+                .attr("r", 3)
                 .on("mouseover", function(d) {      
                     tooltip.transition()        
                         .duration(100)      
@@ -923,7 +923,6 @@ var gradeDistr = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
-            console.log('avr', info[1],'sd',info[2])
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([10*(avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})),10*(avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}))])
                             .range([avr_margin.left,avr_outerWidth-avr_margin.right]);
@@ -934,9 +933,8 @@ var gradeDistr = (function() {
 
             var xtoyScale = d3.scale.linear()
                                 .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
-                                .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
-
-            console.log('ydomain', yScale.domain(), 'yrange', yScale.range());
+                                .range([(info[1]-3*info[2]),(info[1]+3*info[2])]);
+            console.log('domain', xtoyScale.domain(), 'range', xtoyScale.range());
             var xaxisData = [];
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
@@ -966,6 +964,7 @@ var gradeDistr = (function() {
             var xmax = xScale.domain()[1];
             var ymin = yScale.domain()[0];
             var ymax = yScale.domain()[1];
+            console.log(xmin,xmax,ymin,ymax);
             if (xtoyScale(xmin) < ymin) {
                 diag.attr("x1", xScale(xtoyScale.invert(ymin)));
                 diag.attr("y1", yScale(ymin));
