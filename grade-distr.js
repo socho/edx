@@ -857,9 +857,12 @@ var gradeDistr = (function() {
                             .orient("left")
                             .ticks(10);
 
+
             var svg = d3.select(".chart-container").append("svg")
                         .attr("width",rank_outerWidth)
                         .attr("height",rank_outerHeight);
+
+
 
             svg.append("line")
                 .attr('x1', rank_margin.left)
@@ -880,20 +883,16 @@ var gradeDistr = (function() {
                 .attr("cy", function(d){
                     return yScale(d["grade-rank"][1]);
                 })
-                .attr("r", 3)
-                .on("mouseover", function(d) {      
-                    tooltip.transition()        
-                        .duration(100)      
-                        .style("opacity", .9);      
-                    tooltip.html(d["username"] + "<br/>Avg Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg: "  + d["avr"].toFixed(2) + "<br/>Grade: "  + parseFloat(d["grade"]))  
-                        .style("left", (d3.event.pageX) + "px")     
-                        .style("top", (d3.event.pageY - 28) + "px");    
-                })                  
-                .on("mouseout", function(d) {       
-                    tooltip.transition()        
-                        .duration(500)      
-                        .style("opacity", 0);   
-                });
+                .attr("r", 3);
+
+            $('svg circle').tipsy({ 
+                gravity: 's', 
+                html: true, 
+                title: function() {
+                    var d = this.__data__;
+                    return d["username"] + "<br/>Class Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For This Quiz: "  + parseFloat(d["grade"]); 
+                }
+            });
 
             svg.append("g")
                 .attr("class","axis")
@@ -1051,21 +1050,7 @@ var gradeDistr = (function() {
                 .attr("cy", function(d){
                     return yScale(10*d["grade"]);
                 })
-                .attr("r", 3)
-                .on("mouseover", function(d) {
-                    console.log(d);   
-                    tooltip.transition()        
-                        .duration(100)      
-                        .style("opacity", .9);      
-                    tooltip.html(d["username"] + "<br/>Avg: "  + d["avr"].toFixed(1)*10 + "<br/>Grade: "  + d["grade"].toFixed(1)*10)  
-                        .style("left", (d3.event.pageX) + "px")     
-                        .style("top", (d3.event.pageY - 42) + "px");    
-                })                  
-                .on("mouseout", function(d) {       
-                    tooltip.transition()        
-                        .duration(500)      
-                        .style("opacity", 0);   
-                });
+                .attr("r", 3);
 
             //xaxis
             svg.append("g")
@@ -1123,6 +1108,15 @@ var gradeDistr = (function() {
                     .attr("text-anchor", "middle")
                     .text(desc[i]);
                 }
+
+            $('svg circle').tipsy({ 
+                gravity: 's', 
+                html: true, 
+                title: function() {
+                    var d = this.__data__;
+                    return d["username"] + "<br/>Avg: "  + d["avr"].toFixed(1)*10 + "<br/>Grade: "  + d["grade"].toFixed(1)*10; 
+                }
+            });
         }
 
         /* 
