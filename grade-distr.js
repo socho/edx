@@ -859,7 +859,7 @@ var gradeDistr = (function() {
                 .attr('x2', rank_outerWidth-rank_margin.right)
                 .attr('y1', rank_outerHeight-rank_margin.bottom)
                 .attr('y2', rank_margin.top)
-                .style("stroke", "black")
+                .style("stroke", "orange")
                 .style("stroke-width", 2)
                 .style("stroke-dasharray", ("10, 10"));
 

@@ -75,7 +75,7 @@ div.tooltip {
 }
 
 .diagonal {
-	stroke: black;
+	stroke: orange;
 	stroke-width: 2px;
 	stroke-dasharray: 10,10;
 }
