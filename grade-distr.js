@@ -315,16 +315,7 @@ var gradeDistr = (function() {
 
         //slider
         var sliderDiv = $('<div id="sliderbg">');
-        sliderDiv.css({ 
-            'background-color': '#fff', 
-            'border-radius': '10px', 
-            'width': '300px', 
-            'height': '95px',
-            'padding': '0px 15px 0px 7px',
-            'margin-top': '5px',
-            'margin-bottom': '40px'
-        });
-
+ 
         var sliderObj = $('<div id="slider">');
         var labelSlider = $('<p><h4>Overall Percentile (%):</h4>\
             <input id="amount" style="width: 250px;\
@@ -337,14 +328,6 @@ var gradeDistr = (function() {
 
         //basic info
         var legend = $('<div id="legend"></div>');
-        legend.css( {
-            'background-color': '#fff',
-            'border-radius': '10px',
-            'width': '300px',
-            'height': '150px',
-            'padding': '5px',
-            'margin-top': '5px'
-        });
 
         var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
         var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
@@ -465,14 +448,15 @@ var gradeDistr = (function() {
 
 
         //MODE BUTTONS
-        var percentMode = true;
-        var rankMode = false;
-        var avgMode = false;
+        var modes = $('<ul class="nav nav-tabs"></ul>');
+        var leftButton = $('<li class="active"><a href="#">Percentiles</a></li>');
+        var middleButton = $('<li><a href="#">Ranking</a></li>');
+        var rightButton = $('<li><a href="#">Normalized</a></li>');
 
-        var modes = $('<div class="btn-group btn-group" id="mode-group"></div>');
-        var leftButton = $('<button type="button" class="btn btn-default">Percentiles</button>');
-        var middleButton = $('<button type="button" class="btn btn-default">Ranking</button>');
-        var rightButton = $('<button type="button" class="btn btn-default">Overall Average</button>');
+        // var modes = $('<div class="btn-group btn-group" id="mode-group"></div>');
+        // var leftButton = $('<button type="button" class="btn btn-default">Percentiles</button>');
+        // var middleButton = $('<button type="button" class="btn btn-default">Ranking</button>');
+        // var rightButton = $('<button type="button" class="btn btn-default">Overall Average</button>');
 
         modes.append(leftButton, middleButton, rightButton);
         modes.css('padding', 'auto auto');
@@ -481,6 +465,9 @@ var gradeDistr = (function() {
         var modeBools = [true, false, false];
 
         leftButton.on('click', function() {
+            leftButton.attr("class","active");
+            middleButton.attr("class","");
+            rightButton.attr("class","");
             modeBools[0] = true;
             modeBools[1] = false;
             modeBools[2] = false;
@@ -493,6 +480,9 @@ var gradeDistr = (function() {
         });
 
         middleButton.on('click', function() {
+            middleButton.attr("class","active");
+            leftButton.attr("class","");
+            rightButton.attr("class","");
             modeBools[0] = false;
             modeBools[1] = true;
             modeBools[2] = false;
@@ -504,6 +494,9 @@ var gradeDistr = (function() {
         });
 
         rightButton.on('click', function() {
+            rightButton.attr("class","active");
+            middleButton.attr("class","");
+            leftButton.attr("class","");
             modeBools[0] = false;
             modeBools[1] = false;
             modeBools[2] = true;
@@ -866,8 +859,9 @@ var gradeDistr = (function() {
                 .attr('x2', rank_outerWidth-rank_margin.right)
                 .attr('y1', rank_outerHeight-rank_margin.bottom)
                 .attr('y2', rank_margin.top)
-                .style("stroke", "red")
-                .style("stroke-dasharray", ("5, 5"));
+                .style("stroke", "black")
+                .style("stroke-width", 2)
+                .style("stroke-dasharray", ("10, 10"));
 
             svg.selectAll("circle")
                 .data(result2)
