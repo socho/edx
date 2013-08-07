@@ -129,7 +129,6 @@ var diagScatter = (function() {
                 sum += peopleData[person]["avr"];
                 numPeople += 1;
             }
-            console.log('sum',sum,'numpeople',numPeople);
             var avr = sum / numPeople;
 
             //sd
@@ -231,7 +230,7 @@ var diagScatter = (function() {
                             //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
                             .domain([10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})),10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))])
                             .range([outerHeight-margin.bottom,margin.top]);
-            console.log('xdom',xScale.domain(), 'xrange',xScale.range())
+
             var xtoyScale = d3.scale.linear()
                                 .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
                                 .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
@@ -248,10 +247,40 @@ var diagScatter = (function() {
                             .scale(xScale)
                             .orient("bottom")
                             .tickValues(xaxisData)
+                            // .tickFormat(function(d,i){
+                            //     switch(i)
+                            //     {
+                            //     case 0:
+                            //         return parseInt(d) + " (avr-2*sd)";
+                            //     case 1:
+                            //         return parseInt(d) + " (avr-1*sd)";
+                            //     case 2:
+                            //         return parseInt(d) + " (avr)";
+                            //     case 3:
+                            //         return parseInt(d) + " (avr+1*sd)";
+                            //     case 4:
+                            //         return parseInt(d) + " (avr+2*sd)";
+                            //     }
+                            // });
             var yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
                             .tickValues(yaxisData)
+                            // .tickFormat(function(d,i){
+                            //     switch(i)
+                            //     {
+                            //     case 0:
+                            //         return parseInt(d) + " (avr-2*sd)";
+                            //     case 1:
+                            //         return parseInt(d) + " (avr-1*sd)";
+                            //     case 2:
+                            //         return parseInt(d) + " (avr)";
+                            //     case 3:
+                            //         return parseInt(d) + " (avr+1*sd)";
+                            //     case 4:
+                            //         return parseInt(d) + " (avr+2*sd)";
+                            //     }
+                            // });
 
             var svg = d3.select(".chart-container").append("svg")
                         .attr("width",outerWidth)

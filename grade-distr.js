@@ -107,6 +107,25 @@ var gradeDistr = (function() {
             return [numPeople, avr*10, sd*10];           
         }
 
+        function getInfoOverAll() {
+            var sum = 0; var numPeople = 0;
+            for (var person in peopleData) {
+                console.log('person',person,'avr',peopleData[person]["avr"])
+                sum += peopleData[person]["avr"];
+                numPeople += 1;
+            }
+            console.log('sum',sum,'numpeople',numPeople);
+            var avr = sum / numPeople;
+
+            //sd
+            var sqDiffSum = 0;
+            for (var person in peopleData) {
+                sqDiffSum += Math.pow(peopleData[person]["avr"]-avr,2);
+            }
+            var sd = Math.sqrt(sqDiffSum / numPeople);
+            return [avr, sd];            
+        }
+
         /**
         bottomPct, topPct in percentage(%).
         **/
@@ -188,6 +207,26 @@ var gradeDistr = (function() {
             // console.log(peopleData["abundantchatter"]["avr"]);
         }
 
+        function calcAverage_nozeros() {
+            var quizzesOfInterest = getQuizzesArray();
+            console.log('getting sent', quizzesOfInterest);
+            for (var person in peopleData){
+                var personData = peopleData[person];
+                personData["avr"] = 0;
+                var sum = 0;
+                var numQuizzes = 0;
+                for (var i = 0; i < quizzesOfInterest.length; i++){
+                    var quizname = quizzesOfInterest[i];
+                    if (quizname in personData) {
+                        numQuizzes += 1;
+                        sum += parseFloat(personData[quizname]["grade"]);
+                    }
+                }
+                var avr = sum / numQuizzes;
+                personData["avr"] = avr;
+            }
+        }
+
         function calcAvrOfAvr() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
@@ -197,18 +236,26 @@ var gradeDistr = (function() {
             return sum / numPeople;
         }
 
-        function updateSPlot(quizname) {
-            handler.trigger('new mode', [peopleData, quizname]);
+        function updateRankScatterPlot(quizname) {
+            handler.trigger('rank mode', [peopleData, quizname]);
+        }
+
+        function updateAvrScatterPlot(quizname) {
+            handler.trigger('avr mode', quizname);
+
         }
         
 
-        return {updateSPlot: updateSPlot, calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
+        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
     }
 
     function Controller(model){
         
-        function updateSPlot(quizname) {
-            model.updateSPlot(quizname);
+        function updateAvrScatterPlot(quizname) {
+            model.updateAvrScatterPlot(quizname);
+        }
+        function updateRankScatterPlot(quizname) {
+            model.updateRankScatterPlot(quizname);
         }
 
         function getPeopleData() {
@@ -235,7 +282,7 @@ var gradeDistr = (function() {
             model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {updateSPlot: updateSPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
@@ -437,23 +484,20 @@ var gradeDistr = (function() {
             modeBools[0] = true;
             modeBools[1] = false;
             modeBools[2] = false;
-            sliderDiv.show();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
             // controller.groupPeopleByAvr(quizname, bottom, 100-top);
             displayBasicInfo(quizname);
             drawInitialGraph(quizname);
-
         });
 
         middleButton.on('click', function() {
             modeBools[0] = false;
             modeBools[1] = true;
             modeBools[2] = false;
-            sliderDiv.hide();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
-            controller.updateSPlot(quizname);
+            controller.updateRankScatterPlot(quizname);
             displayBasicInfo(quizname);
         });
 
@@ -461,7 +505,9 @@ var gradeDistr = (function() {
             modeBools[0] = false;
             modeBools[1] = false;
             modeBools[2] = true;
-            sliderDiv.hide();
+            var quizname = $('#asgn-nav').text();
+            displayBasicInfo(quizname);
+            controller.updateAvrScatterPlot(quizname);
         })
 
 
@@ -500,7 +546,15 @@ var gradeDistr = (function() {
         var rank_chartWidth = rank_outerWidth - rank_margin.left - rank_margin.right;
         var rank_chartHeight = rank_outerHeight - rank_margin.top - rank_margin.bottom;
 
-        
+        //variables for avr scatter
+        var avr_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
+        var avr_outerHeight = 600;
+
+        var avr_margin = { top: 20, right: 20, bottom: 60, left: 50 };
+
+        var avr_chartWidth = avr_outerWidth - avr_margin.left - avr_margin.right;
+        var avr_chartHeight = avr_outerHeight - avr_margin.top - avr_margin.bottom;
+
         // //INITIALIZE THE CHART
         // var chart = d3.select(".chart-container")
         //     .append("svg")  
@@ -725,7 +779,7 @@ var gradeDistr = (function() {
                 .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
         }
 
-        function updateScatterPlot(dataArray) {
+        function updateRankScatterPlot(dataArray) {
             var quizname = dataArray[1]; 
 
             function sortByRank(object, val2sort) {
@@ -823,7 +877,7 @@ var gradeDistr = (function() {
                 .attr("cy", function(d){
                     return yScale(d["grade-rank"][1]);
                 })
-                .attr("r", 2)
+                .attr("r", 3)
                 .on("mouseover", function(d) {      
                     tooltip.transition()        
                         .duration(100)      
@@ -869,7 +923,6 @@ var gradeDistr = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
-            console.log('avr', info[1],'sd',info[2])
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([10*(avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})),10*(avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}))])
                             .range([avr_margin.left,avr_outerWidth-avr_margin.right]);
@@ -880,9 +933,8 @@ var gradeDistr = (function() {
 
             var xtoyScale = d3.scale.linear()
                                 .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
-                                .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
-
-            console.log('ydomain', yScale.domain(), 'yrange', yScale.range());
+                                .range([(info[1]-3*info[2]),(info[1]+3*info[2])]);
+            console.log('domain', xtoyScale.domain(), 'range', xtoyScale.range());
             var xaxisData = [];
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
@@ -912,6 +964,7 @@ var gradeDistr = (function() {
             var xmax = xScale.domain()[1];
             var ymin = yScale.domain()[0];
             var ymax = yScale.domain()[1];
+            console.log(xmin,xmax,ymin,ymax);
             if (xtoyScale(xmin) < ymin) {
                 diag.attr("x1", xScale(xtoyScale.invert(ymin)));
                 diag.attr("y1", yScale(ymin));
@@ -929,6 +982,122 @@ var gradeDistr = (function() {
                 diag.attr("y2", yScale(ymax));                
             }
 
+            //help text
+            var helptext = svg.append("g")
+                                .attr("class", "helptext");
+            var x = $('.diagonal').attr("x2");
+            var y = $('.diagonal').attr("y2");
+
+            // helptext.append("text")
+            //         .append("textPath")
+
+            helptext.append("text")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dx", -avr_chartWidth/10)
+                    .text("better than")
+                    .append("tspan")
+                    .text("usual")
+                    .attr("x",x)
+                    .attr("dx", -avr_chartWidth/10)
+                    .attr("dy", 12);
+            helptext.append("text")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dx", -0.5 * $('text').width())
+                    .attr("dy", 0.15*avr_chartHeight)
+                    .text("worse than")
+                    .append("tspan")
+                    .text("usual")
+                    .attr("x", x)
+                    .attr("dx", -0.5 * $('text').width())
+                    .attr("dy", 12);
+
+            //dots
+            svg.selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("class","datapoints")
+                .attr("cx", function(d){
+                    return xScale(10*d["avr"]);
+                })
+                .attr("cy", function(d){
+                    return yScale(10*d["grade"]);
+                })
+                .attr("r", 3)
+                .on("mouseover", function(d) {
+                    console.log(d);   
+                    tooltip.transition()        
+                        .duration(100)      
+                        .style("opacity", .9);      
+                    tooltip.html(d["username"] + "<br/>Avg: "  + d["avr"].toFixed(1)*10 + "<br/>Grade: "  + d["grade"].toFixed(1)*10)  
+                        .style("left", (d3.event.pageX) + "px")     
+                        .style("top", (d3.event.pageY - 42) + "px");    
+                })                  
+                .on("mouseout", function(d) {       
+                    tooltip.transition()        
+                        .duration(500)      
+                        .style("opacity", 0);   
+                });
+
+            //xaxis
+            svg.append("g")
+                .attr("class","axis")
+                .attr("transform", "translate(0,"+(avr_outerHeight-avr_margin.bottom)+")")
+                .call(xAxis);
+
+            //yaxis
+            svg.append("g")
+                .attr("class","axis")
+                .attr("transform", "translate("+avr_margin.left+",0)")
+                .call(yAxis);
+
+            //Y-AXIS LABEL
+            svg.append("text")
+                .attr("class", "yaxis-label")
+                .attr("x",0)
+                .attr("y", 0)
+                .attr("transform", function(d) {return "rotate(-90)" })
+                .attr("dx", -avr_margin.top-avr_chartHeight/2)
+                .attr("dy", avr_margin.left*0.2)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Grade for "+quizname);
+
+            //X-AXIS LABEL
+            svg.append("text")
+                .attr("class", "xaxis-label")
+                // .attr("x",chartWidth/2)
+                .attr("x", avr_outerWidth/2)
+                .attr("y", avr_chartHeight+avr_margin.top)
+                .attr("dy", avr_margin.bottom*0.9)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Overall grade");
+            //x ticks description
+            var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
+            for (var i = 0; i < xaxisData.length; i++) {
+                svg.append("text")
+                    .attr("class", "ticks-desc")
+                    .attr("x", xScale(xaxisData[i]))
+                    .attr("y", avr_chartHeight+avr_margin.top)
+                    .attr("dy", $('.xaxis-label').height()*2)
+                    .attr("text-anchor", "middle")
+                    .text(desc[i]);
+                }
+            //y ticks description
+            for (var i = 0; i < yaxisData.length; i++) {
+                svg.append("text")
+                    .attr("class", "ticks-desc")
+                    .attr("x", avr_margin.left)
+                    .attr("dx", -avr_margin.left*0.4)
+                    .attr("y", yScale(yaxisData[i]))
+                    .attr("dy", $('.yaxis-label').height()+2)
+                    .attr("text-anchor", "middle")
+                    .text(desc[i]);
+                }
+        }
 
         /* 
             
@@ -952,10 +1121,10 @@ var gradeDistr = (function() {
                 }
                 else if (modeBools[1]) {
                     controller.calcAverage();
-                    controller.updateSPlot(quizname)
+                    controller.updateRankScatterPlot(quizname)
                 }
                 else if (modeBools[2]) {
-
+                    controller.updateAvrScatterPlot(quizname);
                 }
             });
         });
@@ -975,10 +1144,10 @@ var gradeDistr = (function() {
                 else if (modeBools[1]) {
                     console.log("!!!!!!!!!!!")
                     controller.calcAverage();
-                    controller.updateSPlot(quizname);
+                    controller.updateRankScatterPlot(quizname);
                 }
                 else if (modeBools[2]) {
-
+                    controller.updateAvrScatterPlot(quizname);
                 }
             }
         });
@@ -997,10 +1166,10 @@ var gradeDistr = (function() {
                 }
                 else if (modeBools[1]) {
                     controller.calcAverage();
-                    controller.updateSPlot(quizname);
+                    controller.updateRankScatterPlot(quizname);
                 }
                 else if (modeBools[2]){
-
+                    controller.updateAvrScatterPlot(quizname);
                 }
             }
         });
@@ -1012,10 +1181,13 @@ var gradeDistr = (function() {
             console.log('here')
         });
 
-        model.on('new mode', function(data) {
-            updateScatterPlot(data);
+        model.on('rank mode', function(data) {
+            updateRankScatterPlot(data);
         });
 
+        model.on('avr mode', function(quizname) {
+            updateAvrScatterPlot(quizname);
+        });
 
     }
 
