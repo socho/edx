@@ -6,27 +6,6 @@
 	text-align: center;
 }
 
-.axis path,
-.axis line {
-	fill: none;
-	stroke: black;
-	shape-rendering: crispEdges
-}
-
-.diagonal {
-	stroke: lightgray;
-	stroke-width: 2px;
-	stroke-dasharray: 10,10;
-}
-
-.xaxis,
-.yaxis {
-	fill: none;
-	stroke: black;
-	shape-rendering: crispEdges
-
-}
-
 .chart rect {
 	stroke: white;
 	shape-rendering: crispEdges;
@@ -67,3 +46,23 @@ div.tooltip {
 	padding: 2px;
 }
 
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges
+}
+
+.diagonal {
+	stroke: black;
+	stroke-width: 2px;
+	stroke-dasharray: 10,10;
+}
+
+.xaxis,
+.yaxis {
+	fill: none;
+	stroke: gray;
+	shape-rendering: crispEdges
+
+}
