@@ -34,3 +34,35 @@
 	text-align: center;
 	font-family: Verdana,Arial,sans-serif;
 }
+
+div.tooltip {
+	background-color: lightsteelblue;
+	position: absolute;
+	text-align: center;
+	width: auto;
+	height: auto;
+	font: 12px sans-serif;
+	border-radius: 5px;
+	padding: 2px;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges
+}
+
+.diagonal {
+	stroke: black;
+	stroke-width: 2px;
+	stroke-dasharray: 10,10;
+}
+
+.xaxis,
+.yaxis {
+	fill: none;
+	stroke: gray;
+	shape-rendering: crispEdges
+
+}

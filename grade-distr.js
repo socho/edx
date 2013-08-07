@@ -64,7 +64,7 @@ var gradeDistr = (function() {
         }
 
         function getPeopleData(){
-            
+            return peopleData;
         }
 
         function getQuizData(quizname) {
@@ -187,9 +187,18 @@ var gradeDistr = (function() {
             }
             // console.log(peopleData["abundantchatter"]["avr"]);
         }
+
+        function calcAvrOfAvr() {
+            var sum = 0; var numPeople = 0;
+            for (var person in peopleData) {
+                sum += peopleData[person]["avr"];
+                numPeople += 1;
+            }
+            return sum / numPeople;
+        }
         
 
-        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
+        return {calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
     }
 
     function Controller(model){
@@ -401,8 +410,43 @@ var gradeDistr = (function() {
         // #slider-container #slider-max-value {float:right;margin-top:6px;}
 
 
-        
-        
+        //MODE BUTTONS
+        var percentMode = true;
+        var rankMode = false;
+        var avgMode = false;
+
+        var modes = $('<div class="btn-group btn-group" id="mode-group"></div>');
+        var leftButton = $('<button type="button" class="btn btn-default">Percentiles</button>');
+        var middleButton = $('<button type="button" class="btn btn-default">Ranking</button>');
+        var rightButton = $('<button type="button" class="btn btn-default">Overall Average</button>');
+
+        modes.append(leftButton, middleButton, rightButton);
+        modes.css('padding', 'auto auto');
+        $('#column2').prepend(modes);
+
+        leftButton.on('click', function() {
+            percentMode = true;
+            rankMode = false;
+            avgMode = false;
+            console.log('modes: ', percentMode, rankMode, avgMode);
+        });
+
+        middleButton.on('click', function() {
+            percentMode = false;
+            rankMode = true;
+            avgMode = false;
+            console.log('modes: ', percentMode, rankMode, avgMode);
+        });
+
+        rightButton.on('click', function() {
+            percentMode = false;
+            rankMode = false;
+            avgMode = true;
+            console.log('modes: ', percentMode, rankMode, avgMode);
+        })
+
+
+
 
        //NAVIGATION
         var dropdown = $('.dropdown-menu');
@@ -532,100 +576,225 @@ var gradeDistr = (function() {
         drawInitialGraph();
 
         function updateGraph(dataArray){
-            var data = dataArray[0];
             var quizname = dataArray[1];
-            var stack = d3.layout.stack();
-            var stackedData = stack(data);
-
-            var yGroupMax = d3.max(stackedData, function(layer) { 
-                                return d3.max(layer, function(d) { return d.y; })
-                            });
-
-            var yStackMax = d3.max(stackedData, function(layer) { 
-                                return d3.max(layer, function(d) { return d.y + d.y0; })
-                            });
-
-            var xScale = d3.scale.ordinal()
-                .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
-
-            var yScale = d3.scale.linear()
-                .domain([0, yStackMax]).range([chartHeight, 0]);
-
-
-            // Y AXIS GRID LINES
             
-            if (chart.selectAll("line")[0].length > yScale.ticks(10).length){
-                chart.selectAll("line").data(yScale.ticks(10))
-                    .exit()
-                    .remove();
+            if(percentMode) {
+                var data = dataArray[0];
+                var stack = d3.layout.stack();
+                var stackedData = stack(data);
+                var yGroupMax = d3.max(stackedData, function(layer) { 
+                                    return d3.max(layer, function(d) { return d.y; })
+                                });
 
-                chart.selectAll("line").data(yScale.ticks(10))
-                    .transition()
-                    .attr("x1", 0)
-                    .attr("x2", chartWidth)
-                    .attr("y1", yScale)
-                    .attr("y2", yScale)
+                var yStackMax = d3.max(stackedData, function(layer) { 
+                                    return d3.max(layer, function(d) { return d.y + d.y0; })
+                                });
+
+                var xScale = d3.scale.ordinal()
+                    .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
+
+                var yScale = d3.scale.linear()
+                    .domain([0, yStackMax]).range([chartHeight, 0]);
+
+
+                // Y AXIS GRID LINES
+                
+                if (chart.selectAll("line")[0].length > yScale.ticks(10).length){
+                    chart.selectAll("line").data(yScale.ticks(10))
+                        .exit()
+                        .remove();
+
+                    chart.selectAll("line").data(yScale.ticks(10))
+                        .transition()
+                        .attr("x1", 0)
+                        .attr("x2", chartWidth)
+                        .attr("y1", yScale)
+                        .attr("y2", yScale)
+                    }
+                else {
+                    chart.selectAll("line").data(yScale.ticks(10))
+                        .enter().append("line");
+
+                    chart.selectAll("line")
+                        .transition()
+                        .attr("x1", 0)
+                        .attr("x2", chartWidth)
+                        .attr("y1", yScale)
+                        .attr("y2", yScale)
+                  
                 }
-            else {
-                chart.selectAll("line").data(yScale.ticks(10))
-                    .enter().append("line");
 
-                chart.selectAll("line")
-                    .transition()
-                    .attr("x1", 0)
-                    .attr("x2", chartWidth)
-                    .attr("y1", yScale)
-                    .attr("y2", yScale)
-              
+                //Y TICK MARKS
+                chart.selectAll(".yscale-label").remove();
+                chart.selectAll(".yscale-label").data(yScale.ticks(10))
+                    .enter().append("text")
+                    .attr("class", "yscale-label")
+                    .attr("x", 0)
+                    .attr("y", yScale)
+                    .attr("dx", -margin.left/8)
+                    .attr("text-anchor", "end")
+                    .attr("dy", "0.3em")
+                    .text(String);            
+
+                //X TICK MARKS
+                chart.selectAll(".xscale-label").remove();
+                chart.selectAll(".xscale-label").data(xScale.domain())
+                    .enter().append("text")
+                    .attr("class", "xscale-label")
+                    .attr("x", function(d){return xScale(d);})
+                    .attr("y", chartHeight)
+                    .attr("text-anchor", "center")
+                    // .attr("dx", function(d){return xScale.rangeBand()/2;})
+                    .attr("dy", margin.bottom*0.5)
+                    .text(function(d){return String(d*10);});
+
+                //X-AXIS LABEL
+                $('.xaxis-label').remove();
+                chart.append("text")
+                    .attr("class", "xaxis-label")
+                    .attr("x",chartWidth/2)
+                    .attr("y", chartHeight)
+                    .attr("dy", margin.bottom*0.85)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("Grade for " + quizname + " (%)");
+                
+                //grabs all the layers and forms groups out of them
+                var layerGroups = chart.selectAll(".layer").data(stackedData)
+                    .style("fill", function(d,i){return color_scale(i);});
+
+                //THE BARS (FOR STACKED BAR CHARTS)
+                var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
+                    .transition().duration(500)
+                    .attr("x", function(d, i) { return xScale(i); })
+                    .attr("y", function(d) { return yScale(d.y + d.y0) })
+                    .attr("width", xScale.rangeBand())
+                    .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
             }
 
-            //Y TICK MARKS
-            chart.selectAll(".yscale-label").remove();
-            chart.selectAll(".yscale-label").data(yScale.ticks(10))
-                .enter().append("text")
-                .attr("class", "yscale-label")
-                .attr("x", 0)
-                .attr("y", yScale)
-                .attr("dx", -margin.left/8)
-                .attr("text-anchor", "end")
-                .attr("dy", "0.3em")
-                .text(String);            
+            else if (rankMode) {
+                function sortByRank(object, val2sort) {
+                    console.log(object[0]);
+                    n = object.length;
+                    swapped = true;
+                    while (swapped) {
+                        swapped = false;
+                        for (var i = 1; i < n; i++) {
+                            if (object[i-1][val2sort] > object[i][val2sort]) {
+                                var temp = object[i];
+                                object[i] = object[i-1];
+                                object[i-1] = temp;
+                                swapped = true;
+                           }
+                        }
+                        n = n-1;
+                    }
+                    if (val2sort == "avr") { 
+                        for (var i = 0; i < object.length; i++) {
+                            object[i]["avr-rank"] = [i+1, object.length-i];
+                        }
+                    } else {
+                        for (var i = 0; i < object.length; i++) {
+                            object[i]["grade-rank"] = [i+1, object.length-i];
+                        }
+                    }return object;
 
-            //X TICK MARKS
-            chart.selectAll(".xscale-label").remove();
-            chart.selectAll(".xscale-label").data(xScale.domain())
-                .enter().append("text")
-                .attr("class", "xscale-label")
-                .attr("x", function(d){return xScale(d);})
-                .attr("y", chartHeight)
-                .attr("text-anchor", "center")
-                // .attr("dx", function(d){return xScale.rangeBand()/2;})
-                .attr("dy", margin.bottom*0.5)
-                .text(function(d){return String(d*10);});
+                }
 
-            //X-AXIS LABEL
-            $('.xaxis-label').remove();
-            chart.append("text")
-                .attr("class", "xaxis-label")
-                .attr("x",chartWidth/2)
-                .attr("y", chartHeight)
-                .attr("dy", margin.bottom*0.85)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Grade for " + quizname + " (%)");
-            
-            //grabs all the layers and forms groups out of them
-            var layerGroups = chart.selectAll(".layer").data(stackedData)
-                .style("fill", function(d,i){return color_scale(i);});
+                d3.select("svg").remove();
 
-            //THE BARS (FOR STACKED BAR CHARTS)
-            var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
-                .transition().duration(500)
-                .attr("x", function(d, i) { return xScale(i); })
-                .attr("y", function(d) { return yScale(d.y + d.y0) })
-                .attr("width", xScale.rangeBand())
-                .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+                controller.calcAverage();
+                var dataset = [];
+                var dataDict = model.getPeopleData();
+                console.log('datadict: ', dataDict);
 
+                for (var person in dataDict) {
+                    if (quizname in dataDict[person]){
+                        console.log('made it');
+                        dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                        
+                    }
+                }
+                
+                console.log('dataset: ', dataset);
+
+
+                var info = controller.getBasicInfo(quizname);
+                var result = sortByRank(dataset, "avr"); //sorted by avg
+                var result2 = sortByRank(result, "grade"); //sorted by grade
+                console.log(result2);
+                console.log('num of students', info[0]);
+
+                var tooltip = d3.select("body").append("div")   
+                    .attr("class", "tooltip")               
+                    .style("opacity", 0);
+
+                var avrOfAvr = model.calcAvrOfAvr();
+
+                var xScale = d3.scale.linear() //scale is a function!!!!!
+                                .domain([info[0], 0])
+                                .range([margin.left,outerWidth-margin.right]);
+                var yScale = d3.scale.linear() //scale is a function!!!!!
+                                .domain([info[0], 0])
+                                .range([outerHeight-margin.bottom,margin.top]);
+
+                var xAxis = d3.svg.axis()
+                                .scale(xScale)
+                                .orient("bottom")
+                                .ticks(10);
+                var yAxis = d3.svg.axis()
+                                .scale(yScale)
+                                .orient("left")
+                                .ticks(10);
+
+                var svg = d3.select(".chart-container").append("svg")
+                            .attr("width",outerWidth)
+                            .attr("height",outerHeight);
+
+                svg.append("line")
+                    .attr('x1', margin.left)
+                    .attr('x2', outerWidth-margin.right)
+                    .attr('y1', outerHeight-margin.bottom)
+                    .attr('y2', margin.top)
+                    .style("stroke", "red")
+                    .style("stroke-dasharray", ("5, 5"));
+
+                svg.selectAll("circle")
+                    .data(result2)
+                    .enter()
+                    .append("circle")
+                    .attr("class","datapoints")
+                    .attr("cx", function(d){
+                        return xScale(d["avr-rank"][1]);
+                    })
+                    .attr("cy", function(d){
+                        return yScale(d["grade-rank"][1]);
+                    })
+                    .attr("r", 2)
+                    .on("mouseover", function(d) {      
+                        tooltip.transition()        
+                            .duration(100)      
+                            .style("opacity", .9);      
+                        tooltip.html(d["username"] + "<br/>Avg Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg: "  + d["avr"].toFixed(2) + "<br/>Grade: "  + parseFloat(d["grade"]))  
+                            .style("left", (d3.event.pageX) + "px")     
+                            .style("top", (d3.event.pageY - 28) + "px");    
+                    })                  
+                    .on("mouseout", function(d) {       
+                        tooltip.transition()        
+                            .duration(500)      
+                            .style("opacity", 0);   
+                    });
+
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                    .call(xAxis);
+
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate("+margin.left+",0)")
+                    .call(yAxis);
+            }
         }
 
         
@@ -643,37 +812,6 @@ var gradeDistr = (function() {
                 var quizname = String($(this).attr('id'));
 
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-                // var quizzesOfInterest = [];
-                // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                // var nothingSelected = true;
-
-                // //check if any boxes are selected    
-                // $('#checkboxes-div input[type=checkbox]').each(function() {
-                //     //change nothingSelected to false if something is checked
-                //     if ($(this).prop('checked')) {
-                //         console.log('got here');
-                //         nothingSelected = false;
-                //     }
-                // });
-
-                // // if nothing is selected, then add the quiz we're on to the list to be sent & select its box;
-                // // reset nothingselected status
-                // if (nothingSelected) {
-                //     console.log('here');
-                //     $('input[name="' + $('#asgn-nav').text() + '"]').prop('checked', true);
-                //     quizzesOfInterest.push(quizname);
-                //     nothingSelected = true;
-                // } 
-                
-
-                // //goes through all the checkboxes and adds anything else that's been checked to the list
-                // selectedBoxes.each(function() {
-                //     if ($.inArray($(this).val(), quizzesOfInterest) == -1) {
-                //         quizzesOfInterest.push($(this).val());
-                //     }  
-                // });
-
-                // controller.calcAverage(quizzesOfInterest.sort());
                 displayBasicInfo(quizname);
 
                 bottom = Math.abs(sliderObj.slider("values", 0) - 0);
@@ -687,16 +825,16 @@ var gradeDistr = (function() {
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != 0){
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
-                // var quizzesOfInterest = [];
-                // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                // selectedBoxes.each(function() {
-                //     quizzesOfInterest.push($(this).val());
-                // });
-                // controller.calcAverage(quizzesOfInterest);
-                displayBasicInfo(quizzesArray[index-1]);
-                bottom = Math.abs(sliderObj.slider("values", 0) - 0);
-                top = Math.abs(100 - sliderObj.slider("values", 1));
-                controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
+                if (percentMode) { //if in percent mode
+                    displayBasicInfo(quizzesArray[index-1]);
+                    bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                    top = Math.abs(100 - sliderObj.slider("values", 1));
+                    controller.groupPeopleByAvr(quizzesArray[index-1], bottom, 100-top);
+                } else {
+                    console.log('went here');
+                    displayBasicInfo(quizzesArray[index-1]);
+                    updateGraph(quizzesArray[index-1]);
+                }
             }
         });
 
@@ -705,16 +843,16 @@ var gradeDistr = (function() {
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
-                // var quizzesOfInterest = [];
-                // var selectedBoxes = $('#checkboxes-div input[type=checkbox]:checked');
-                // selectedBoxes.each(function() {
-                //     quizzesOfInterest.push($(this).val());
-                // });
-                // controller.calcAverage(quizzesOfInterest);
-                displayBasicInfo(quizzesArray[index+1]);
-                bottom = Math.abs(sliderObj.slider("values", 0) - 0);
-                top = Math.abs(100 - sliderObj.slider("values", 1));
-                controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
+                if (percentMode) {
+                    displayBasicInfo(quizzesArray[index+1]);
+                    bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                    top = Math.abs(100 - sliderObj.slider("values", 1));
+                    controller.groupPeopleByAvr(quizzesArray[index+1], bottom, 100-top);
+                } else {
+                    console.log('went here');
+                    displayBasicInfo(quizzesArray[index+1]);
+                    updateGraph(quizzesArray[index+1]);
+                }
             }
         });
 
