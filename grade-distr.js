@@ -196,13 +196,20 @@ var gradeDistr = (function() {
             }
             return sum / numPeople;
         }
+
+        function updateSPlot(quizname) {
+            handler.trigger('new mode', [peopleData, quizname]);
+        }
         
 
-        return {calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
+        return {updateSPlot: updateSPlot, calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr, on: handler.on};
     }
 
     function Controller(model){
         
+        function updateSPlot(quizname) {
+            model.updateSPlot(quizname);
+        }
 
         function getPeopleData() {
             model.getPeopleData();
@@ -228,7 +235,7 @@ var gradeDistr = (function() {
             model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {updateSPlot: updateSPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
@@ -424,10 +431,17 @@ var gradeDistr = (function() {
         modes.css('padding', 'auto auto');
         $('#column2').prepend(modes);
 
+        var modeBools = [percentMode, rankMode, avgMode];
+
         leftButton.on('click', function() {
             percentMode = true;
             rankMode = false;
             avgMode = false;
+            var quizname = $('#asgn-nav').text();
+            controller.calcAverage();
+            controller.groupPeopleByAvr(quizname, bottom, 100-top);
+            displayBasicInfo(quizname);
+            drawInitialGraph(quizname);
             console.log('modes: ', percentMode, rankMode, avgMode);
         });
 
@@ -435,6 +449,10 @@ var gradeDistr = (function() {
             percentMode = false;
             rankMode = true;
             avgMode = false;
+            var quizname = $('#asgn-nav').text();
+            controller.calcAverage();
+            controller.updateSPlot(quizname);
+            displayBasicInfo(quizname);
             console.log('modes: ', percentMode, rankMode, avgMode);
         });
 
@@ -494,11 +512,43 @@ var gradeDistr = (function() {
 
         ///////////////////
 
-        function drawInitialGraph() { //assignment, quizzesOfInterest, lowPct, highPct, 
+        function drawInitialGraph(quizname) { //assignment, quizzesOfInterest, lowPct, highPct, 
             var curCheckBox = $('input[name="' + $('#asgn-nav').text() + '"]');
             curCheckBox.prop('checked', true);
-            controller.calcAverage(["Quiz 21"]);
-            var data = model.groupPeopleByAvr("Quiz 21", bottom, 100-top); //need to ask question
+            controller.calcAverage(quizname);
+            var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
+            var outerHeight = 600;
+
+            var margin = { top: 20, right: 20, bottom: 40, left: 40 };
+
+            var chartWidth = outerWidth - margin.left - margin.right;
+            var chartHeight = outerHeight - margin.top - margin.bottom;
+
+            var color_scale = d3.scale.ordinal().range(["lightpink", "darkgray", "lightblue"]);
+            
+            //INITIALIZE THE CHART
+            var chart = d3.select(".chart-container")
+                .append("svg")  
+                    .attr("class", "chart")
+                    .attr("height", outerHeight)
+                    .attr("width", outerWidth)
+                .append("g")
+                    .attr("class", "innerChart")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            //Y-AXIS LABEL
+            chart.append("text")
+                .attr("class", "yaxis-label")
+                .attr("x",0)
+                .attr("y", 0)
+                .attr("transform", function(d) {return "rotate(-90)" })
+                .attr("dx", -chartHeight/2)
+                .attr("dy", -margin.left*0.75)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Number of Students");
+
+            var data = model.groupPeopleByAvr(quizname, bottom, 100-top); //need to ask question
             // console.log('data: ', data);
             var stack = d3.layout.stack();
             var stackedData = stack(data);
@@ -556,7 +606,7 @@ var gradeDistr = (function() {
                 .attr("dy", margin.bottom*0.85)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
-                .text("Grade for Quiz 21" + " (%)");
+                .text("Grade for " + quizname + " (%)");
             
             //grabs all the layers and forms groups out of them
             var layerGroups = chart.selectAll(".layer").data(stackedData)
@@ -573,108 +623,109 @@ var gradeDistr = (function() {
                 .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
         }
 
-        drawInitialGraph();
+        drawInitialGraph($('#asgn-nav').text());
 
-        function updateGraph(dataArray){
+        function updateBarGraph(dataArray){
             var quizname = dataArray[1];
+            var data = dataArray[0];
+            var stack = d3.layout.stack();
+            var stackedData = stack(data);
+
+        
+            var yGroupMax = d3.max(stackedData, function(layer) { 
+                                return d3.max(layer, function(d) { return d.y; })
+                            });
+
+            var yStackMax = d3.max(stackedData, function(layer) { 
+                                return d3.max(layer, function(d) { return d.y + d.y0; })
+                            });
+
+            var xScale = d3.scale.ordinal()
+                .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
+
+            var yScale = d3.scale.linear()
+                .domain([0, yStackMax]).range([chartHeight, 0]);
+
+
+            // Y AXIS GRID LINES
             
-            if(percentMode) {
-                var data = dataArray[0];
-                var stack = d3.layout.stack();
-                var stackedData = stack(data);
-                var yGroupMax = d3.max(stackedData, function(layer) { 
-                                    return d3.max(layer, function(d) { return d.y; })
-                                });
+            if (chart.selectAll("line")[0].length > yScale.ticks(10).length){
+                chart.selectAll("line").data(yScale.ticks(10))
+                    .exit()
+                    .remove();
 
-                var yStackMax = d3.max(stackedData, function(layer) { 
-                                    return d3.max(layer, function(d) { return d.y + d.y0; })
-                                });
-
-                var xScale = d3.scale.ordinal()
-                    .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
-
-                var yScale = d3.scale.linear()
-                    .domain([0, yStackMax]).range([chartHeight, 0]);
-
-
-                // Y AXIS GRID LINES
-                
-                if (chart.selectAll("line")[0].length > yScale.ticks(10).length){
-                    chart.selectAll("line").data(yScale.ticks(10))
-                        .exit()
-                        .remove();
-
-                    chart.selectAll("line").data(yScale.ticks(10))
-                        .transition()
-                        .attr("x1", 0)
-                        .attr("x2", chartWidth)
-                        .attr("y1", yScale)
-                        .attr("y2", yScale)
-                    }
-                else {
-                    chart.selectAll("line").data(yScale.ticks(10))
-                        .enter().append("line");
-
-                    chart.selectAll("line")
-                        .transition()
-                        .attr("x1", 0)
-                        .attr("x2", chartWidth)
-                        .attr("y1", yScale)
-                        .attr("y2", yScale)
-                  
+                chart.selectAll("line").data(yScale.ticks(10))
+                    .transition()
+                    .attr("x1", 0)
+                    .attr("x2", chartWidth)
+                    .attr("y1", yScale)
+                    .attr("y2", yScale)
                 }
+            else {
+                chart.selectAll("line").data(yScale.ticks(10))
+                    .enter().append("line");
 
-                //Y TICK MARKS
-                chart.selectAll(".yscale-label").remove();
-                chart.selectAll(".yscale-label").data(yScale.ticks(10))
-                    .enter().append("text")
-                    .attr("class", "yscale-label")
-                    .attr("x", 0)
-                    .attr("y", yScale)
-                    .attr("dx", -margin.left/8)
-                    .attr("text-anchor", "end")
-                    .attr("dy", "0.3em")
-                    .text(String);            
-
-                //X TICK MARKS
-                chart.selectAll(".xscale-label").remove();
-                chart.selectAll(".xscale-label").data(xScale.domain())
-                    .enter().append("text")
-                    .attr("class", "xscale-label")
-                    .attr("x", function(d){return xScale(d);})
-                    .attr("y", chartHeight)
-                    .attr("text-anchor", "center")
-                    // .attr("dx", function(d){return xScale.rangeBand()/2;})
-                    .attr("dy", margin.bottom*0.5)
-                    .text(function(d){return String(d*10);});
-
-                //X-AXIS LABEL
-                $('.xaxis-label').remove();
-                chart.append("text")
-                    .attr("class", "xaxis-label")
-                    .attr("x",chartWidth/2)
-                    .attr("y", chartHeight)
-                    .attr("dy", margin.bottom*0.85)
-                    .attr("font-weight", "bold")
-                    .attr("text-anchor", "middle")
-                    .text("Grade for " + quizname + " (%)");
-                
-                //grabs all the layers and forms groups out of them
-                var layerGroups = chart.selectAll(".layer").data(stackedData)
-                    .style("fill", function(d,i){return color_scale(i);});
-
-                //THE BARS (FOR STACKED BAR CHARTS)
-                var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
-                    .transition().duration(500)
-                    .attr("x", function(d, i) { return xScale(i); })
-                    .attr("y", function(d) { return yScale(d.y + d.y0) })
-                    .attr("width", xScale.rangeBand())
-                    .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+                chart.selectAll("line")
+                    .transition()
+                    .attr("x1", 0)
+                    .attr("x2", chartWidth)
+                    .attr("y1", yScale)
+                    .attr("y2", yScale)
+              
             }
 
-            else if (rankMode) {
-                function sortByRank(object, val2sort) {
-                    console.log(object[0]);
+            //Y TICK MARKS
+            chart.selectAll(".yscale-label").remove();
+            chart.selectAll(".yscale-label").data(yScale.ticks(10))
+                .enter().append("text")
+                .attr("class", "yscale-label")
+                .attr("x", 0)
+                .attr("y", yScale)
+                .attr("dx", -margin.left/8)
+                .attr("text-anchor", "end")
+                .attr("dy", "0.3em")
+                .text(String);            
+
+            //X TICK MARKS
+            chart.selectAll(".xscale-label").remove();
+            chart.selectAll(".xscale-label").data(xScale.domain())
+                .enter().append("text")
+                .attr("class", "xscale-label")
+                .attr("x", function(d){return xScale(d);})
+                .attr("y", chartHeight)
+                .attr("text-anchor", "center")
+                // .attr("dx", function(d){return xScale.rangeBand()/2;})
+                .attr("dy", margin.bottom*0.5)
+                .text(function(d){return String(d*10);});
+
+            //X-AXIS LABEL
+            $('.xaxis-label').remove();
+            chart.append("text")
+                .attr("class", "xaxis-label")
+                .attr("x",chartWidth/2)
+                .attr("y", chartHeight)
+                .attr("dy", margin.bottom*0.85)
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "middle")
+                .text("Grade for " + quizname + " (%)");
+            
+            //grabs all the layers and forms groups out of them
+            var layerGroups = chart.selectAll(".layer").data(stackedData)
+                .style("fill", function(d,i){return color_scale(i);});
+
+            //THE BARS (FOR STACKED BAR CHARTS)
+            var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
+                .transition().duration(500)
+                .attr("x", function(d, i) { return xScale(i); })
+                .attr("y", function(d) { return yScale(d.y + d.y0) })
+                .attr("width", xScale.rangeBand())
+                .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+        }
+
+        function updateScatterPlot(dataArray) {
+            var quizname = dataArray[1]; 
+
+            function sortByRank(object, val2sort) {
                     n = object.length;
                     swapped = true;
                     while (swapped) {
@@ -703,9 +754,8 @@ var gradeDistr = (function() {
 
                 d3.select("svg").remove();
 
-                controller.calcAverage();
                 var dataset = [];
-                var dataDict = model.getPeopleData();
+                var dataDict = dataArray[0];
                 console.log('datadict: ', dataDict);
 
                 for (var person in dataDict) {
@@ -794,10 +844,7 @@ var gradeDistr = (function() {
                     .attr("class","axis")
                     .attr("transform", "translate("+margin.left+",0)")
                     .call(yAxis);
-            }
         }
-
-        
 
         /* 
             
@@ -833,7 +880,8 @@ var gradeDistr = (function() {
                 } else {
                     console.log('went here');
                     displayBasicInfo(quizzesArray[index-1]);
-                    updateGraph(quizzesArray[index-1]);
+                    controller.calcAverage();
+                    controller.updateSPlot(quizzesArray[index-1]);
                 }
             }
         });
@@ -843,7 +891,7 @@ var gradeDistr = (function() {
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
-                if (percentMode) {
+                if (percentMode) { //if in percent mode
                     displayBasicInfo(quizzesArray[index+1]);
                     bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                     top = Math.abs(100 - sliderObj.slider("values", 1));
@@ -851,7 +899,8 @@ var gradeDistr = (function() {
                 } else {
                     console.log('went here');
                     displayBasicInfo(quizzesArray[index+1]);
-                    updateGraph(quizzesArray[index+1]);
+                    controller.calcAverage();
+                    controller.updateSPlot(quizzesArray[index+1]);
                 }
             }
         });
@@ -859,8 +908,12 @@ var gradeDistr = (function() {
 
         model.on('changed', function(data) {
             // inNav = false;
-            updateGraph(data);
-            //updateGraph(data);
+            updateBarGraph(data);
+            //updateBarGraph(data);
+        });
+
+        model.on('new mode', function(data) {
+            updateScatterPlot(data);
         });
 
 
