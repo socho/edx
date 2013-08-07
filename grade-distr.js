@@ -484,6 +484,7 @@ var gradeDistr = (function() {
             modeBools[0] = true;
             modeBools[1] = false;
             modeBools[2] = false;
+            sliderDiv.show();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
             // controller.groupPeopleByAvr(quizname, bottom, 100-top);
@@ -495,6 +496,7 @@ var gradeDistr = (function() {
             modeBools[0] = false;
             modeBools[1] = true;
             modeBools[2] = false;
+            sliderDiv.hide();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
             controller.updateRankScatterPlot(quizname);
@@ -505,6 +507,7 @@ var gradeDistr = (function() {
             modeBools[0] = false;
             modeBools[1] = false;
             modeBools[2] = true;
+            sliderDiv.hide();
             var quizname = $('#asgn-nav').text();
             displayBasicInfo(quizname);
             controller.updateAvrScatterPlot(quizname);
