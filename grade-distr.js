@@ -858,13 +858,41 @@ var gradeDistr = (function() {
 
 
             svg.append("line")
+                .attr("class", "diagonal")
                 .attr('x1', rank_margin.left)
                 .attr('x2', rank_outerWidth-rank_margin.right)
                 .attr('y1', rank_outerHeight-rank_margin.bottom)
                 .attr('y2', rank_margin.top)
-                .style("stroke", "orange")
-                .style("stroke-width", 2)
-                .style("stroke-dasharray", ("10, 10"));
+
+            //help text
+            var helptext = svg.append("g")
+                                .attr("class", "helptext");
+            var x = $('.diagonal').attr("x2");
+            var y = $('.diagonal').attr("y2");
+
+            helptext.append("text")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dx", -rank_chartWidth/10)
+                    .attr("dy", 20)
+                    .text("better than")
+                    .append("tspan")
+                    .text("usual")
+                    .attr("x",x)
+                    .attr("dx", -rank_chartWidth/10)
+                    .attr("dy", 12);
+            helptext.append("text")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dx", -0.5 * $('text').width())
+                    .attr("dy", 0.15*rank_chartHeight)
+                    .text("worse than")
+                    .append("tspan")
+                    .text("usual")
+                    .attr("x", x)
+                    .attr("dx", -0.5 * $('text').width())
+                    .attr("dy", 12);
+
 
             svg.selectAll("circle")
                 .data(result2)
