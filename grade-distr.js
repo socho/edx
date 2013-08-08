@@ -620,7 +620,6 @@ var gradeDistr = (function() {
             var yScale = d3.scale.linear()
                 .domain([0, yStackMax]).range([bar_chartHeight, 0]);
 
-            console.log(chart);
             // Y AXIS GRID LINES
             chart.selectAll("line").data(yScale.ticks(10))
                 .enter().append("line")
@@ -789,7 +788,16 @@ var gradeDistr = (function() {
                                 object[i] = object[i-1];
                                 object[i-1] = temp;
                                 swapped = true;
-                           }
+                            }
+                            else if (object[i-1][val2sort] == object[i][val2sort]) {
+                                console.log("equal!");
+                                if (Math.random()>Math.random()) {
+                                    var temp = object[i];
+                                    object[i] = object[i-1];
+                                    object[i-1] = temp;
+                                    swapped = true;
+                                }
+                            }
                         }
                         n = n-1;
                     }
@@ -823,8 +831,8 @@ var gradeDistr = (function() {
 
 
             var info = controller.getBasicInfo(quizname);
-            var result = sortByRank(dataset, "avr"); //sorted by avg
-            var result2 = sortByRank(result, "grade"); //sorted by grade
+            var result = sortByRank(dataset, "grade"); //sorted by avg
+            var result2 = sortByRank(result, "avr"); //sorted by grade
             console.log(result2);
             console.log('num of students', info[0]);
 
@@ -972,11 +980,13 @@ var gradeDistr = (function() {
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([10*(avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})),10*(avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}))])
-                            .range([avr_margin.left,avr_outerWidth-avr_margin.right]);
+                            .range([avr_margin.left,avr_outerWidth-avr_margin.right])
+                            .clamp(true);
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
                             .domain([(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]*10);})),(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]*10);}))])
-                            .range([avr_outerHeight-avr_margin.bottom,avr_margin.top]);
+                            .range([avr_outerHeight-avr_margin.bottom,avr_margin.top])
+                            .clamp(true);
 
             var xtoyScale = d3.scale.linear()
                                 .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
@@ -1002,6 +1012,39 @@ var gradeDistr = (function() {
             var svg = d3.select(".chart-container").append("svg")
                         .attr("width",avr_outerWidth)
                         .attr("height",avr_outerHeight);
+
+            // // Y AXIS GRID LINES
+            // svg.selectAll("ygrid").data(yaxisData)
+            //     .enter().append("line")
+            //     .attr("class","ygrid")
+            //     .attr("x1", xScale.range()[0])
+            //     .attr("x2", xScale.range()[1])
+            //     .attr("y1", function(d){return yScale(d);})
+            //     .attr("y2", function(d){return yScale(d);});
+
+            // // X AXIS GRID LINES
+            // svg.selectAll("xgrid").data(xaxisData)
+            //     .enter().append("line")
+            //     .attr("class","xgrid")
+            //     .attr("x1", function(d){return xScale(d);})
+            //     .attr("x2", function(d){return xScale(d);})
+            //     .attr("y1", yScale.range()[0])
+            //     .attr("y2", yScale.range()[1]);
+
+            // // Border lines
+            // svg.append("line")
+            //     .attr("class","borderline")
+            //     .attr("x1", xScale.range()[1])
+            //     .attr("x2", xScale.range()[1])
+            //     .attr("y1", yScale.range()[0])
+            //     .attr("y2", yScale.range()[1]);
+
+            // svg.append("line")
+            //     .attr("class","borderline")
+            //     .attr("x1", xScale.range()[0])
+            //     .attr("x2", xScale.range()[1])
+            //     .attr("y1", yScale.range()[1])
+            //     .attr("y2", yScale.range()[1]);
 
             //diagonal line
             var diag = svg.append("line")
@@ -1067,10 +1110,10 @@ var gradeDistr = (function() {
                 .append("circle")
                 .attr("class","datapoints")
                 .attr("cx", function(d){
-                    return xScale(10*d["avr"]);
+                    return xScale(10*d["avr"]+Math.random()/2);
                 })
                 .attr("cy", function(d){
-                    return yScale(10*d["grade"]);
+                    return yScale(10*d["grade"]+Math.random()/2);
                 })
                 .attr("r", 3);
 
