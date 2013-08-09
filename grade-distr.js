@@ -439,7 +439,9 @@ var gradeDistr = (function() {
             sliderDiv.show();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
-            // controller.groupPeopleByAvr(quizname, bottom, 100-top);
+            bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+            top = Math.abs(100 - sliderObj.slider("values", 1));
+            controller.groupPeopleByAvr(quizname, bottom, 100-top);
             displayBasicInfo(quizname);
             drawInitialGraph(quizname);
         });
