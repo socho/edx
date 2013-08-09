@@ -920,7 +920,7 @@ var gradeDistr = (function() {
                 html: true, 
                 title: function() {
                     var d = this.__data__;
-                    return d["username"] + "<br/>Class Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For This Quiz: "  + parseFloat(d["grade"]); 
+                    return d["username"] + "<br/>Class Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
                 }
             });
 
@@ -1179,7 +1179,7 @@ var gradeDistr = (function() {
                 html: true, 
                 title: function() {
                     var d = this.__data__;
-                    return d["username"] + "<br/>Avg: "  + d["avr"].toFixed(1)*10 + "<br/>Grade: "  + d["grade"].toFixed(1)*10; 
+                    return d["username"] + "<br/> Grade in Class: "  + d["avr"].toFixed(1)*10 + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(1)*10; 
                 }
             });
         }
