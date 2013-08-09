@@ -335,23 +335,7 @@ var gradeDistr = (function() {
 
         
         legend.append(totalLabel, averageLabel, sdLabel);
-
-        
-
-        // // checkboxes
-
-        // var checkboxes = $('<div id="checkboxes-div"></div>');
-        // var labelQuiz = $('<label for="ops"><h4>Averaged Over:</h4></label><br>');
-        // checkboxes.css( {
-        //     'background-color': '#fff',
-        //     'border-radius': '10px',
-        //     'width': '300px',
-        //     'height': '200px',
-        //     'padding': '5px',
-        //     'margin-top': '5px'
-        // });
-
-        
+       
         var lowerLabel = $('<div id="lowerLabel"></div>');
         var upperLabel = $('<div id="upperLabel"></div>');
 
@@ -359,12 +343,6 @@ var gradeDistr = (function() {
 
         $('#column2').append(sliderDiv, legend); // legend, checkboxes
         $('#sliderbg').append(labelSlider, sliderObj,lowerLabel, upperLabel);
-        // $('#checkboxes-div').append(labelQuiz);
-        // for (var key in quizzes) {
-        //     var checkbox = $('<input style="margin-left: 20px; margin-bottom: 5px;" type="checkbox" value="' + key + '" name="' + key + '"> ' + key +  '<br>');
-        //     $('#checkboxes-div').append(checkbox);
-        // }
-
         $('ui-slider-range ui-widget-header ui-corner-all').css("background", "darkgray");
 
         $("#lowerLabel").text(25);
@@ -410,14 +388,6 @@ var gradeDistr = (function() {
                 $("#upperLabel").text(max-top);
                 $("#upperLabel").css('top',"-10px");
                 $("#upperLabel").css('left', String(0.01 * (max-top) * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px"); 
-
-                // var listOfQuizzes = selectedBoxes;
-                // var curAsgn = $('#asgn-nav').text();
-                // if ($.inArray(curAsgn, listOfQuizzes) == -1) {
-                //     listOfQuizzes.push(curAsgn);
-                // }
-                
-                // controller.calcAverage(listOfQuizzes);
                 updateColors(ui.values);
                 controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top);
             }
@@ -452,11 +422,6 @@ var gradeDistr = (function() {
         var leftButton = $('<li class="active"><a href="#">Percentiles</a></li>');
         var middleButton = $('<li><a href="#">Ranking</a></li>');
         var rightButton = $('<li><a href="#">Normalized</a></li>');
-
-        // var modes = $('<div class="btn-group btn-group" id="mode-group"></div>');
-        // var leftButton = $('<button type="button" class="btn btn-default">Percentiles</button>');
-        // var middleButton = $('<button type="button" class="btn btn-default">Ranking</button>');
-        // var rightButton = $('<button type="button" class="btn btn-default">Overall Average</button>');
 
         modes.append(leftButton, middleButton, rightButton);
         modes.css('padding', 'auto auto');
@@ -506,17 +471,12 @@ var gradeDistr = (function() {
             controller.updateAvrScatterPlot(quizname);
         })
 
-
-
-
        //NAVIGATION
         var dropdown = $('.dropdown-menu');
         for (var key in quizzes) {
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
-
-        
 
         ////////
         //setup variables for Graph
@@ -550,30 +510,6 @@ var gradeDistr = (function() {
 
         var avr_chartWidth = avr_outerWidth - avr_margin.left - avr_margin.right;
         var avr_chartHeight = avr_outerHeight - avr_margin.top - avr_margin.bottom;
-
-        // //INITIALIZE THE CHART
-        // var chart = d3.select(".chart-container")
-        //     .append("svg")  
-        //         .attr("class", "chart")
-        //         .attr("height", outerHeight)
-        //         .attr("width", outerWidth)
-        //     .append("g")
-        //         .attr("class", "innerChart")
-        //         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        // //Y-AXIS LABEL
-        // chart.append("text")
-        //     .attr("class", "yaxis-label")
-        //     .attr("x",0)
-        //     .attr("y", 0)
-        //     .attr("transform", function(d) {return "rotate(-90)" })
-        //     .attr("dx", -chartHeight/2)
-        //     .attr("dy", -margin.left*0.75)
-        //     .attr("font-weight", "bold")
-        //     .attr("text-anchor", "middle")
-        //     .text("Number of Students");
-
-        ///////////////////
 
         function drawInitialGraph(quizname) { //assignment, quizzesOfInterest, lowPct, highPct,             
             $('svg').remove();
@@ -920,7 +856,7 @@ var gradeDistr = (function() {
                 html: true, 
                 title: function() {
                     var d = this.__data__;
-                    return d["username"] + "<br/>Class Rank: "  + d["avr-rank"][1] + "<br/>Grade Rank: "  + d["grade-rank"][1] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
+                    return d["username"] + "<br/>Class Rank: "  + d["avr-rank"][1] + "<br/>Rank for " + quizname +": "  + d["grade-rank"][1] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
                 }
             });
 
@@ -978,20 +914,24 @@ var gradeDistr = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
+            var maxgradezscore = d3.max(dataset, function(d){return Math.abs(10*d["grade"]-info[1])/info[2];});
+            var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avr"]-avrOverall)/sdOverall;});
+            var maxzscore = Math.max(maxavrzscore, maxgradezscore);
+
+            console.log("maxz", maxzscore);
             var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([10*(avrOverall-d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);})),10*(avrOverall+d3.max(dataset, function(d){return Math.abs(avrOverall-d["avr"]);}))])
+                            .domain([10*(avrOverall-maxzscore*sdOverall),10*(avrOverall+maxzscore*sdOverall)])
                             .range([avr_margin.left,avr_outerWidth-avr_margin.right])
                             .clamp(true);
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
-                            .domain([(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]*10);})),(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]*10);}))])
+                            .domain([info[1]-maxzscore*info[2],info[1]+maxzscore*info[2]])
                             .range([avr_outerHeight-avr_margin.bottom,avr_margin.top])
                             .clamp(true);
 
             var xtoyScale = d3.scale.linear()
                                 .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
                                 .range([(info[1]-3*info[2]),(info[1]+3*info[2])]);
-            console.log('domain', xtoyScale.domain(), 'range', xtoyScale.range());
             var xaxisData = [];
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
@@ -1151,6 +1091,7 @@ var gradeDistr = (function() {
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Overall grade");
+
             //x ticks description
             var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
             for (var i = 0; i < xaxisData.length; i++) {
