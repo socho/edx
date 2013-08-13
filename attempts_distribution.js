@@ -108,9 +108,11 @@ var attempts = (function() {
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
-                sum += peopleData[person]["avr"];
+                sum += parseFloat(peopleData[person]["avr"]);
+                // console.log(person,'avr',peopleData[person]["avr"]);
                 numPeople += 1;
             }
+            // console.log('sum',sum,'numpeople',numPeople)
             var avr = sum / numPeople;
 
             //sd
@@ -119,7 +121,7 @@ var attempts = (function() {
                 sqDiffSum += Math.pow(peopleData[person]["avr"]-avr,2);
             }
             var sd = Math.sqrt(sqDiffSum / numPeople);
-            console.log(avr,sd);
+            // console.log(avr,sd);
             return [avr, sd];            
         }
 
@@ -197,7 +199,6 @@ var attempts = (function() {
                     dataset.push({"username": person ,"attempts": dataDict[person][quizname], "avrattempts": dataDict[person]["avr"]});
                 }
             }
-            console.log(dataset);
 
             var info = model.getBasicInfo(quizname);
             var infoOverall = model.getInfoOverAll();
@@ -332,7 +333,7 @@ var attempts = (function() {
                 })
                 .attr("r", 3)
                 .on("mouseover", function(d) {
-                    console.log(d);   
+                    // console.log(d);   
                     tooltip.transition()        
                         .duration(100)      
                         .style("opacity", .9);      

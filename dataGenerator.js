@@ -31,8 +31,9 @@ var makeFullData = function(numberStudents) {
     var names = generateNames(numberStudents);
     var data = {}
     for (var i=0;i<names.length;i++){
-        data[names[i]] = {}
-        for (var j=0;j<problemIDs.length;j++) {
+        data[names[i]] = {};
+        data[names[i]][problemIDs[0]]= generateNumAttempts();        
+        for (var j=1;j<problemIDs.length;j++) {
             if (Math.random()>0.2) {
                 data[names[i]][problemIDs[j]]= generateNumAttempts();
             }
