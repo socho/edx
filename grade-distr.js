@@ -1027,6 +1027,7 @@ var gradeDistr = (function() {
                     .attr("x", x)
                     .attr("y", y)
                     .attr("dx", -avr_chartWidth/10)
+                    .attr("dy", avr_chartHeight/30)
                     .text("better than")
                     .append("tspan")
                     .text("usual")

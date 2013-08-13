@@ -14,9 +14,22 @@
 }
 
 .diagonal {
-	stroke: black;
+	stroke: orange;
 	stroke-width: 2px;
 	stroke-dasharray: 10,10;
+}
+
+.guideline {
+	stroke: lightgray;
+}
+
+.guidelinelabel {
+	fill: lightgray;
+}
+
+.helptext {
+	fill: teal;
+	stroke: none;
 }
 
 .xaxis,
@@ -29,7 +42,7 @@
 
 .helptext {
 	text-anchor: middle;
-	fill: darkgray;
+	fill: teal;
 }
 
 circle {

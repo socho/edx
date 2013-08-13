@@ -45,34 +45,17 @@ var attempts = (function() {
     function Model(){
         var handler = UpdateHandler();
 
-        //define peopleData
-        var peopleData = {};
-        for (var quiz in quizzes){
-            var sheet = quizzes[quiz];
-            for (var i = 0; i < sheet.length; i++) {
-                var row = sheet[i];
-                var name = row["username"];
-                if (name in peopleData) {
-                    peopleData[name][quiz] = row;
-                }
-                else {
-                    peopleData[name]= {};
-                    peopleData[name][quiz] = row;
-                }
-            }
-        }   
+
+
+        var peopleData = makeFullData(200);
+        console.log(peopleData);
 
         function getPeopleData(){
             return peopleData;
         }
 
         function getQuizzesArray() {
-            var quizzesArray = [];
-            for (var quiz in quizzes){
-                console.log(quiz);
-                quizzesArray.push(quiz);
-            }
-            return quizzesArray;
+            return problemIDs;
         }
 
         /**
@@ -85,7 +68,7 @@ var attempts = (function() {
             for (var key in peopleData) {
                 if (assignment in peopleData[key]) {
                     numPeople++;
-                    sum += peopleData[key][assignment]["grade"];
+                    sum += peopleData[key][assignment];
                 }
             }
             //calc average grade
@@ -95,17 +78,16 @@ var attempts = (function() {
             var sqDiffSum = 0;
             for (var key in peopleData) {
                 if (assignment in peopleData[key]) {
-                    sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment]["grade"])-avr,2);
+                    sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment])-avr,2);
                 }
             }
             var sd = Math.sqrt(sqDiffSum / numPeople);
-
+            console.log(assignment,numPeople,avr,sd);
             return [numPeople, avr, sd];           
         }
 
         function calcAverage() {
             var quizzesOfInterest = getQuizzesArray();
-            console.log('getting sent', quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
                 personData["avr"] = 0;
@@ -115,7 +97,7 @@ var attempts = (function() {
                     var quizname = quizzesOfInterest[i];
                     if (quizname in personData) {
                         numQuizzes += 1;
-                        sum += parseFloat(personData[quizname]["grade"]);
+                        sum += parseFloat(personData[quizname]);
                     }
                 }
                 var avr = sum / numQuizzes;
@@ -137,7 +119,7 @@ var attempts = (function() {
                 sqDiffSum += Math.pow(peopleData[person]["avr"]-avr,2);
             }
             var sd = Math.sqrt(sqDiffSum / numPeople);
-
+            console.log(avr,sd);
             return [avr, sd];            
         }
 
@@ -156,7 +138,7 @@ var attempts = (function() {
         +   '<div class = "btn-group">'
         +       '<button type = "button" class="btn btn-default btn-l"><span class="glyphicon glyphicon-chevron-left"></span></button>'
         +       '<div class = "btn-group">'
-        +           '<button id="asgn-nav" type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Quiz 21<span class="caret"></span></button>'
+        +           '<button id="asgn-nav" type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Ex 1<span class="caret"></span></button>'
         +           '<ul class="dropdown-menu">'
         +           '</ul>'
         +       '</div>'
@@ -179,7 +161,8 @@ var attempts = (function() {
        //NAVIGATION
        ////////
         var dropdown = $('.dropdown-menu');
-        for (var key in quizzes) {
+        for (var i = 0; i < problemIDs.length; i++) {
+            var key = problemIDs[i]
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
@@ -201,7 +184,7 @@ var attempts = (function() {
 
 
         model.calcAverage();
-        drawGraph("Quiz 21");
+        drawGraph("Ex 1");
 
 
         function drawGraph(quizname) {
@@ -211,22 +194,25 @@ var attempts = (function() {
             for (var person in dataDict) {
                 if (quizname in dataDict[person]){
                     //pushes in the person's score on problem and attempts
-                    //dataset.push({"username": person ,"problemScore": dataDict[person][quizname]["problemScore"], "attempts": dataDict[person][quizname]["problemScore"]["attempts"]});
+                    dataset.push({"username": person ,"attempts": dataDict[person][quizname], "avrattempts": dataDict[person]["avr"]});
                 }
             }
+            console.log(dataset);
 
             var info = model.getBasicInfo(quizname);
             var infoOverall = model.getInfoOverAll();
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
-            var maxAttempts = 10;
+
+            var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
+            var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
+            var maxzscore = Math.max(maxavrzscore, maxgradezscore);
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([0, maxAttempts])
+                            .domain([avrOverall+maxzscore*sdOverall,avrOverall-maxzscore*sdOverall])
                             .range([margin.left,outerWidth-margin.right]);
             var yScale = d3.scale.linear() //scale is a function!!!!!
-                            //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
-                            .domain([0, maxAttempts])
+                            .domain([info[1]+maxzscore*info[2],info[1]-maxzscore*info[2]])
                             .range([outerHeight-margin.bottom,margin.top]);
 
             var xtoyScale = d3.scale.linear()
@@ -235,51 +221,29 @@ var attempts = (function() {
 
             var xaxisData = [];
             var yaxisData = [];
-            for (var i = -2; i <= 2; i++) {
-                xaxisData.push(Math.max(Math.min((avrOverall + i * sdOverall)*10,100),0));
-                //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
-                yaxisData.push(10*(info[1] + i * info[2]));
-            }
-            
+            // for (var i = -2; i <= 2; i++) {
+            //     xaxisData.push(avrOverall + i * sdOverall);
+            //     //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
+            //     yaxisData.push(info[1] + i * info[2]);
+            // }
+            // console.log(xaxisData,yaxisData);
+            for (var i = 1; i<xScale.domain()[0]; i++) {
+                xaxisData.push(i);
+            }            
+            for (var i = 1; i<yScale.domain()[0]; i++) {
+                yaxisData.push(i);
+            }            
          
             var xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient("bottom")
-                            .ticks(10)
-                            // .tickFormat(function(d,i){
-                            //     switch(i)
-                            //     {
-                            //     case 0:
-                            //         return parseInt(d) + " (avr-2*sd)";
-                            //     case 1:
-                            //         return parseInt(d) + " (avr-1*sd)";
-                            //     case 2:
-                            //         return parseInt(d) + " (avr)";
-                            //     case 3:
-                            //         return parseInt(d) + " (avr+1*sd)";
-                            //     case 4:
-                            //         return parseInt(d) + " (avr+2*sd)";
-                            //     }
-                            // });
+                            .tickValues(xaxisData)
+                            //.tickFormat(d3.format(".1f"))
             var yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
-                            .ticks(10)
-                            // .tickFormat(function(d,i){
-                            //     switch(i)
-                            //     {
-                            //     case 0:
-                            //         return parseInt(d) + " (avr-2*sd)";
-                            //     case 1:
-                            //         return parseInt(d) + " (avr-1*sd)";
-                            //     case 2:
-                            //         return parseInt(d) + " (avr)";
-                            //     case 3:
-                            //         return parseInt(d) + " (avr+1*sd)";
-                            //     case 4:
-                            //         return parseInt(d) + " (avr+2*sd)";
-                            //     }
-                            // });
+                            .tickValues(yaxisData)
+                            //.tickFormat(d3.format(".1f"))
 
             var svg = d3.select(".chart-container").append("svg")
                         .attr("width",outerWidth)
@@ -288,27 +252,42 @@ var attempts = (function() {
             //diagonal line
             var diag = svg.append("line")
                 .attr("class","diagonal")
-                .attr("id", "diagonal");
-            var xmin = xScale.domain()[0];
-            var xmax = xScale.domain()[1];
-            var ymin = yScale.domain()[0];
-            var ymax = yScale.domain()[1];
-            if (xtoyScale(xmin) < ymin) {
-                diag.attr("x1", xScale(xtoyScale.invert(ymin)));
-                diag.attr("y1", yScale(ymin));
-            }
-            else {
-                diag.attr("x1", xScale(xmin));
-                diag.attr("y1", yScale(xtoyScale(xmin)));                
-            }
-            if (xtoyScale(xmax) < ymax) {
-                diag.attr("x2", xScale(xmax));
-                diag.attr("y2", yScale(xtoyScale(xmax)));
-            }
-            else {
-                diag.attr("x2", xScale(xtoyScale.invert(ymax)));
-                diag.attr("y2", yScale(ymax));                
-            }
+                .attr("id", "diagonal")
+                .attr("x1",xScale.range()[0])
+                .attr("y1",yScale.range()[0])
+                .attr("x2",xScale.range()[1])
+                .attr("y2",yScale.range()[1]);
+
+            //avr guidelines
+            svg.append("line")
+                .attr("class","guideline")
+                .attr("x1",xScale.range()[0])
+                .attr("y1",yScale(info[1]))
+                .attr("x2",xScale.range()[1])
+                .attr("y2",yScale(info[1]))
+            svg.append("line")
+                .attr("class","guideline")
+                .attr("x1",xScale(avrOverall))
+                .attr("y1",yScale.range()[0])
+                .attr("x2",xScale(avrOverall))
+                .attr("y2",yScale.range()[1])
+
+            //avr guidelines label
+            svg.append("text")
+                .attr("class", "guidelinelabel")
+                .attr("x",xScale.range()[0])
+                .attr("y",yScale(info[1]))
+                .attr("dx", 5)
+                .attr("dy", -5)
+                .text("Avr of # attempts");
+
+            svg.append("text")
+                .attr("class", "guidelinelabel")
+                .attr("x",xScale(avrOverall))
+                .attr("y",yScale.range()[0])
+                .attr("dx",5)
+                .attr("dy", -5)
+                .text("Avr of overall")
 
             //help text
             var helptext = svg.append("g")
@@ -316,13 +295,11 @@ var attempts = (function() {
             var x = $('.diagonal').attr("x2");
             var y = $('.diagonal').attr("y2");
 
-            // helptext.append("text")
-            //         .append("textPath")
-
             helptext.append("text")
                     .attr("x", x)
                     .attr("y", y)
                     .attr("dx", -chartWidth/10)
+                    .attr("dy", chartHeight/30)
                     .text("better than")
                     .append("tspan")
                     .text("usual")
@@ -333,7 +310,7 @@ var attempts = (function() {
                     .attr("x", x)
                     .attr("y", y)
                     .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 0.15*chartHeight)
+                    .attr("dy", 0.16*chartHeight)
                     .text("worse than")
                     .append("tspan")
                     .text("usual")
@@ -348,10 +325,10 @@ var attempts = (function() {
                 .append("circle")
                 .attr("class","datapoints")
                 .attr("cx", function(d){
-                    return xScale(10*d["avr"]);
+                    return xScale(d["avrattempts"]);
                 })
                 .attr("cy", function(d){
-                    return yScale(10*d["grade"]);
+                    return yScale(d["attempts"]);
                 })
                 .attr("r", 3)
                 .on("mouseover", function(d) {
@@ -359,7 +336,7 @@ var attempts = (function() {
                     tooltip.transition()        
                         .duration(100)      
                         .style("opacity", .9);      
-                    tooltip.html(d["username"] + "<br/>Avg: "  + d["avr"].toFixed(1)*10 + "<br/>Grade: "  + d["grade"].toFixed(1)*10)  
+                    tooltip.html(d["username"] + "<br/>Avg # attempts: "  + d["avrattempts"].toFixed(1) + "<br/># Attempts: "  + d["attempts"].toFixed(1))  
                         .style("left", (d3.event.pageX) + "px")     
                         .style("top", (d3.event.pageY - 42) + "px");    
                 })                  
@@ -391,7 +368,7 @@ var attempts = (function() {
                 .attr("dy", margin.left*0.2)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
-                .text("Number of Attempts");
+                .text("# Attempts for "+quizname);
 
             //X-AXIS LABEL
             svg.append("text")
@@ -402,29 +379,30 @@ var attempts = (function() {
                 .attr("dy", margin.bottom*0.9)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
-                .text("Number of Attempts");
-            //x ticks description
-            var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
-            for (var i = 0; i < xaxisData.length; i++) {
-                svg.append("text")
-                    .attr("class", "ticks-desc")
-                    .attr("x", xScale(xaxisData[i]))
-                    .attr("y", chartHeight+margin.top)
-                    .attr("dy", $('.xaxis-label').height()*2)
-                    .attr("text-anchor", "middle")
-                    .text(desc[i]);
-                }
-            //y ticks description
-            for (var i = 0; i < yaxisData.length; i++) {
-                svg.append("text")
-                    .attr("class", "ticks-desc")
-                    .attr("x", margin.left)
-                    .attr("dx", -margin.left*0.4)
-                    .attr("y", yScale(yaxisData[i]))
-                    .attr("dy", $('.yaxis-label').height()+2)
-                    .attr("text-anchor", "middle")
-                    .text(desc[i]);
-                }
+                .text("Overall # Attempts");
+
+            // //x ticks description
+            // var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
+            // for (var i = 0; i < xaxisData.length; i++) {
+            //     svg.append("text")
+            //         .attr("class", "ticks-desc")
+            //         .attr("x", xScale(xaxisData[i]))
+            //         .attr("y", chartHeight+margin.top)
+            //         .attr("dy", $('.xaxis-label').height()*2)
+            //         .attr("text-anchor", "middle")
+            //         .text(desc[i]);
+            //     }
+            // //y ticks description
+            // for (var i = 0; i < yaxisData.length; i++) {
+            //     svg.append("text")
+            //         .attr("class", "ticks-desc")
+            //         .attr("x", margin.left)
+            //         .attr("dx", -margin.left*0.4)
+            //         .attr("y", yScale(yaxisData[i]))
+            //         .attr("dy", $('.yaxis-label').height()+2)
+            //         .attr("text-anchor", "middle")
+            //         .text(desc[i]);
+            //     }
         }
         
 

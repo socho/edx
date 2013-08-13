@@ -98,7 +98,8 @@ div.tooltip {
 
 .helptext {
  	text-anchor: middle;
- 	fill: darkgray;
+ 	fill: teal;
+ 	stroke: none;
 }
 
 circle {
