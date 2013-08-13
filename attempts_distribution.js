@@ -472,6 +472,14 @@ var attempts = (function() {
             }
         });
 
+        var modes = $('<ul class="nav nav-tabs"></ul>');
+        var leftButton = $('<li class="active"><a href="#">Scatter Plot View</a></li>');
+        var rightButton = $('<li><a href="#">Bar Graph View</a></li>');
+
+        modes.append(leftButton, rightButton);
+        modes.css('padding', 'auto auto');
+        $('#column2').prepend(modes, '<br>');
+
     }
 
   //setup main structure of app
