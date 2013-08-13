@@ -15,6 +15,14 @@
 	stroke: lightgrey;
 }
 
+.maxline {
+	stroke: lightgrey;
+}
+
+.maxlabel {
+	fill: lightgrey;
+}
+
 #legend {
 	background-color: #fff;
 	border-radius: 10px;

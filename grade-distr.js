@@ -1045,7 +1045,7 @@ var gradeDistr = (function() {
                     .attr("dx", -0.5 * $('text').width())
                     .attr("dy", 12);
 
-            //dots
+            //dots with jittering
             svg.selectAll("circle")
                 .data(dataset)
                 .enter()
@@ -1058,6 +1058,23 @@ var gradeDistr = (function() {
                     return yScale(10*d["grade"]+Math.random()/2);
                 })
                 .attr("r", 3);
+
+            //max line
+            svg.append("line")
+                .attr("class","maxline")
+                .attr("x1",xScale.range()[0])
+                .attr("y1",yScale(100+0.5))
+                .attr("x2",xScale.range()[1])
+                .attr("y2",yScale(100+0.5));
+
+            //max label
+            svg.append("text")
+                .attr("class", "maxlabel")
+                .attr("x",xScale.range()[0])
+                .attr("y",yScale(100+0.5))
+                .attr("dx",5)
+                .attr("dy",-5)
+                .text("max possible grade");
 
             //xaxis
             svg.append("g")
