@@ -405,7 +405,40 @@ var attempts = (function() {
             //         .text(desc[i]);
             //     }
         }
+
+        var legend = $('<div id="legend"></div>');
+
+        var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
+        var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
+        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
+
         
+        legend.append(totalLabel, averageLabel, sdLabel);
+       
+        var lowerLabel = $('<div id="lowerLabel"></div>');
+        var upperLabel = $('<div id="upperLabel"></div>');
+
+
+
+        $('#column2').append(legend); // legend, checkboxes
+        // $('#sliderbg').append(labelSlider, sliderObj,lowerLabel, upperLabel);
+        // $('ui-slider-range ui-widget-header ui-corner-all').css("background", "darkgray");
+
+        $("#lowerLabel").text(25);
+        $("#lowerLabel").css('top',"-10px");
+        $("#lowerLabel").css('left', String(0.01 * 25 * parseFloat($('#slider').css("width")) - 0.5 * parseFloat($("#lowerLabel").css("width")))+"px"); 
+        $("#upperLabel").text(75);
+        $("#upperLabel").css('top',"-10px");
+        $("#upperLabel").css('left', String(0.01 * 75 * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px");
+        
+        function displayBasicInfo(assignment) {
+            var info = model.getBasicInfo(assignment); 
+            $('#total p').text(info[0]);
+            $('#average p').text(info[1].toFixed(3));
+            $('#sd p').text(info[2].toFixed(3));
+        }
+
+        displayBasicInfo("Ex 1");
 
         ///////
         ///EVENT LISTENERS
@@ -424,7 +457,7 @@ var attempts = (function() {
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != 0){
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
-                //displayBasicInfo(quizzesArray[index-1]);
+                displayBasicInfo(quizzesArray[index-1]);
                 drawGraph(quizzesArray[index-1]);
             }
         });
@@ -434,8 +467,8 @@ var attempts = (function() {
             var index = quizzesArray.indexOf($('#asgn-nav').text());
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
-//                displayBasicInfo(quizzesArray[index+1]);
-            drawGraph(quizzesArray[index+1])
+                displayBasicInfo(quizzesArray[index+1]);
+                drawGraph(quizzesArray[index+1])
             }
         });
 
