@@ -480,6 +480,155 @@ var attempts = (function() {
         modes.css('padding', 'auto auto');
         $('#column2').prepend(modes, '<br>');
 
+        rightButton.on('click', changeToBar);
+
+        function changeToBar() {
+            $('svg').remove();
+            var dataset = [];
+            var dataDict = model.getPeopleData();
+            var counter = 0;
+            var quiz = $('#asgn-nav').text();
+            var attemptsarray = [0,0,0,0,0,0,0,0,0,0,0];
+            var maxattempt = 0;
+            for (var person in dataDict) {
+                
+                if (quiz in dataDict[person]){
+                    //pushes in the person's score on problem and attempts
+                    dataset.push({"username": person ,"attempts": dataDict[person][quiz], "avrattempts": dataDict[person]["avr"]});
+
+                }
+            }
+
+            for (var person in dataset) {
+                var attempt = dataset[person].attempts;
+                switch(attempt) {
+                    case 1:
+                        attemptsarray[0]++;
+                        break;
+                    case 2:
+                        attemptsarray[1]++;
+                        break;
+                    case 3:
+                        attemptsarray[2]++;
+                        break;
+                    case 4:
+                        attemptsarray[3]++;
+                        break;
+                    case 5:
+                        attemptsarray[4]++;
+                        break;
+                    case 6:
+                        attemptsarray[5]++;
+                        break;
+                    case 7:
+                        attemptsarray[6]++;
+                        break;
+                    case 8:
+                        attemptsarray[7]++;
+                        break;
+                    case 9:
+                        attemptsarray[8]++;
+                        break;
+                    case 10:
+                        attemptsarray[9]++;
+                        break;
+                    case 11:
+                        attemptsarray[10]++;
+                        break;
+                }
+                
+                
+            }
+            console.log('attempt array', attemptsarray);
+
+            var info = model.getBasicInfo(quiz);
+            var infoOverall = model.getInfoOverAll();
+            var avrOverall = infoOverall[0];
+            var sdOverall = infoOverall[1];
+
+            var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
+            var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
+            var maxzscore = Math.max(maxavrzscore, maxgradezscore);
+
+            // console.log(maxgradezscore, maxavrzscore, maxzscore);
+
+            var xScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([1, 11])
+                            .range([margin.left,outerWidth-margin.right]);
+            var yScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([0, Math.max(attemptsarray)])
+                            .range([outerHeight-margin.bottom,margin.top]);
+
+            var xtoyScale = d3.scale.linear()
+                                .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
+                                .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
+
+            // var xaxisData = [];
+            // var yaxisData = [];
+            // // for (var i = -2; i <= 2; i++) {
+            // //     xaxisData.push(avrOverall + i * sdOverall);
+            // //     //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
+            // //     yaxisData.push(info[1] + i * info[2]);
+            // // }
+            // // console.log(xaxisData,yaxisData);
+            // for (var i = 1; i<xScale.domain()[0]; i++) {
+            //     xaxisData.push(i);
+            // }            
+            // for (var i = 1; i<yScale.domain()[0]; i++) {
+            //     yaxisData.push(i);
+            // }            
+            
+            var barPadding = 1;
+            var xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient("bottom")
+                            .tickValues(11)
+                            //.tickFormat(d3.format(".1f"))
+            var yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left")
+                            .tickValues(11)
+                            //.tickFormat(d3.format(".1f"))
+
+            var svg = d3.select(".chart-container").append("svg")
+                        .attr("width",outerWidth)
+                        .attr("height",outerHeight);
+
+            svg.selectAll('rect')
+                .data(attemptsarray)
+                .enter()
+                .append("rect")
+                .attr("x", function(d,i) {
+                    return i* (outerWidth / attemptsarray.length);
+                })
+                .attr("y", function(d) {
+                    return outerHeight-(d*4); //because the svg's will be upside down; height-data value
+                })
+                .attr("width", outerWidth / attemptsarray.length - barPadding)
+                .attr("height", function(d) {
+                    return d*4;
+                })
+                .attr('fill', 'blue');
+
+            svg.selectAll("text")
+                .data(attemptsarray)
+                .enter()
+                .append("text")
+                .text(function(d) {
+                    return d;
+                })
+                .attr("x", function(d, i) {
+                    return i * (outerWidth / attemptsarray.length) + (outerWidth / attemptsarray.length - barPadding) / 2;
+                })
+                .attr("y", function(d) {
+                    return outerHeight - (d * 4) + 14;
+                })
+                .attr('font-family', 'sans-serif')
+                .attr('font-size', '11px')
+                .attr('fill', 'white')
+                .attr('text-anchor', 'middle');
+                }
+
     }
 
   //setup main structure of app
