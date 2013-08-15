@@ -245,10 +245,16 @@ var gradeDistr = (function() {
         }
         
         function drawAllBarGraphs() {
-            handler.trigger('view all');
+            handler.trigger('view all bar');
+        }
+        function drawAllRankScatterPlots() {
+            handler.trigger('view all rank scatter');
+        }
+        function drawAllAvrScatterPlots() {
+            handler.trigger('view all avr scatter');
         }
 
-        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, drawAllBarGraphs: drawAllBarGraphs, on: handler.on};
+        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, drawAllBarGraphs: drawAllBarGraphs, drawAllAvrScatterPlots: drawAllAvrScatterPlots, drawAllRankScatterPlots: drawAllRankScatterPlots, on: handler.on};
     }
 
     function Controller(model){
@@ -259,8 +265,17 @@ var gradeDistr = (function() {
         function updateAvrScatterPlot(quizname) {
             model.updateAvrScatterPlot(quizname);
         }
+
+        function drawAllAvrScatterPlots() {
+            model.drawAllAvrScatterPlots();
+        }
+
         function updateRankScatterPlot(quizname) {
             model.updateRankScatterPlot(quizname);
+        }
+
+        function drawAllRankScatterPlots() {
+            model.drawAllRankScatterPlots();
         }
 
         function getPeopleData() {
@@ -287,7 +302,7 @@ var gradeDistr = (function() {
             return model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {drawAllBarGraphs: drawAllBarGraphs, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {drawAllBarGraphs: drawAllBarGraphs, updateAvrScatterPlot: updateAvrScatterPlot, drawAllAvrScatterPlots: drawAllAvrScatterPlots, updateRankScatterPlot: updateRankScatterPlot, drawAllRankScatterPlots: drawAllRankScatterPlots, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
     }
 
     function View(div, model, controller){
@@ -309,7 +324,7 @@ var gradeDistr = (function() {
         +'<div class = "body-content">'
         +   '<div class = "row">'
         +       '<div class="col-lg-8" id="column1">'
-        +           '<div class="chart-container"></div>'
+        // +           '<div class="chart-container"></div>'
         +       '</div>'
         +       '<div class="col-lg-4" id="column2"></div>'
         +   '</div>'
@@ -446,7 +461,6 @@ var gradeDistr = (function() {
             modeBools[1] = false;
             modeBools[2] = false;
             sliderDiv.show();
-            $('#ViewAll').show();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
             bottom = Math.abs(sliderObj.slider("values", 0) - 0);
@@ -464,7 +478,6 @@ var gradeDistr = (function() {
             modeBools[1] = true;
             modeBools[2] = false;
             sliderDiv.hide();
-            $("#ViewAll").hide();
             $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
@@ -484,7 +497,6 @@ var gradeDistr = (function() {
             modeBools[1] = false;
             modeBools[2] = true;
             sliderDiv.hide();
-            $("#ViewAll").hide();
             $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
@@ -539,7 +551,7 @@ var gradeDistr = (function() {
         function drawInitialGraph(quizname) { //assignment, quizzesOfInterest, lowPct, highPct,             
             $('svg').remove();
             //INITIALIZE THE CHART
-            var chart = d3.select(".chart-container")
+            var chart = d3.select("#column1")
                 .append("svg")  
                     .attr("class", "chart")
                     .attr("height", bar_outerHeight)
@@ -732,7 +744,7 @@ var gradeDistr = (function() {
         }
 
         function drawAllBarGraphs(){
-            $('svg').remove();
+            $('#column1').children().remove();
             var quizzesArray = controller.getQuizzesArray();
 
             var numCols = 3;
@@ -774,8 +786,6 @@ var gradeDistr = (function() {
                     }
                 }
             }
-
-
 
             function makeIndivBarGraph(rowInd, colInd, maxY) {
                 var thisQuiz = quizzesArray[i*numCols+j];
@@ -858,87 +868,8 @@ var gradeDistr = (function() {
                     .attr("x", function(d, i) { return xScale(i); })
                     .attr("y", function(d) { return yScale(d.y + d.y0) })
                     .attr("width", xScale.rangeBand())
-                    .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
-               
+                    .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });               
             }
-
-
-
-            // controller.calcAverage(quizname);
-
-            // var data = model.groupPeopleByAvr(quizname, bottom, 100-top); //need to ask question
-            // // console.log('data: ', data);
-            // var stack = d3.layout.stack();
-            // var stackedData = stack(data);
-
-            // var yGroupMax = d3.max(stackedData, function(layer) { 
-            //                     return d3.max(layer, function(d) { return d.y; })
-            //                 });
-
-            // var yStackMax = d3.max(stackedData, function(layer) { 
-            //                     return d3.max(layer, function(d) { return d.y + d.y0; })
-            //                 });
-
-            // var xScale = d3.scale.ordinal()
-            //     .domain(d3.range(data[0].length)).rangeBands([0, bar_chartWidth]);
-
-            // var yScale = d3.scale.linear()
-            //     .domain([0, yStackMax]).range([bar_chartHeight, 0]);
-
-            // // Y AXIS GRID LINES
-            // chart.selectAll("line").data(yScale.ticks(10))
-            //     .enter().append("line")
-            //     .attr("x1", 0)
-            //     .attr("x2", bar_chartWidth)
-            //     .attr("y1", yScale)
-            //     .attr("y2", yScale);
-
-            // //Y TICK MARKS
-            // chart.selectAll(".yscale-label").data(yScale.ticks(10))
-            //     .enter().append("text")
-            //     .attr("class", "yscale-label")
-            //     .attr("x", 0)
-            //     .attr("y", yScale)
-            //     .attr("dx", -bar_margin.left/8)
-            //     .attr("text-anchor", "end")
-            //     .attr("dy", "0.3em")
-            //     .text(String);            
-
-            // //X TICK MARKS
-            // chart.selectAll(".xscale-label").data(xScale.domain())
-            //     .enter().append("text")
-            //     .attr("class", "xscale-label")
-            //     .attr("x", function(d){return xScale(d);})
-            //     .attr("y", bar_chartHeight)
-            //     .attr("text-anchor", "center")
-            //     // .attr("dx", function(d){return xScale.rangeBand()/2;})
-            //     .attr("dy", bar_margin.bottom*0.4)
-            //     .text(function(d){return String(d*10);});
-
-            // //X-AXIS LABEL
-            // chart.append("text")
-            //     .attr("class", "xaxis-label")
-            //     .attr("x",bar_chartWidth/2)
-            //     .attr("y", bar_chartHeight)
-            //     .attr("dy", bar_margin.bottom*0.85)
-            //     .attr("font-weight", "bold")
-            //     .attr("text-anchor", "middle")
-            //     .text("Grade for " + quizname + " (%)");
-            
-            // //grabs all the layers and forms groups out of them
-            // var layerGroups = chart.selectAll(".layer").data(stackedData)
-            //     .enter().append("g")
-            //     .attr("class", "layer")
-            //     .style("fill", function(d,i){return bar_color_scale(i);});
-
-            // //THE BARS (FOR STACKED BAR CHARTS)
-            // var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
-            //     .enter().append("rect")
-            //     .attr("x", function(d, i) { return xScale(i); })
-            //     .attr("y", function(d) { return yScale(d.y + d.y0) })
-            //     .attr("width", xScale.rangeBand())
-            //     .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
-
         }
 
         function updateRankScatterPlot(dataArray) {
@@ -1026,7 +957,7 @@ var gradeDistr = (function() {
                             .ticks(10);
 
 
-            var svg = d3.select(".chart-container").append("svg")
+            var svg = d3.select("#column1").append("svg")
                         .attr("width",rank_outerWidth)
                         .attr("height",rank_outerHeight);
 
@@ -1125,6 +1056,10 @@ var gradeDistr = (function() {
                 .text("Rank for "+ quizname);
         }
 
+        function drawAllRankScatterPlots() {
+
+        }
+
         function updateAvrScatterPlot(quizname) {
             $('svg').remove();
             model.calcAverage_nozeros();
@@ -1180,42 +1115,9 @@ var gradeDistr = (function() {
                             .orient("left")
                             .tickValues(yaxisData)
 
-            var svg = d3.select(".chart-container").append("svg")
+            var svg = d3.select("#column1").append("svg")
                         .attr("width",avr_outerWidth)
                         .attr("height",avr_outerHeight);
-
-            // // Y AXIS GRID LINES
-            // svg.selectAll("ygrid").data(yaxisData)
-            //     .enter().append("line")
-            //     .attr("class","ygrid")
-            //     .attr("x1", xScale.range()[0])
-            //     .attr("x2", xScale.range()[1])
-            //     .attr("y1", function(d){return yScale(d);})
-            //     .attr("y2", function(d){return yScale(d);});
-
-            // // X AXIS GRID LINES
-            // svg.selectAll("xgrid").data(xaxisData)
-            //     .enter().append("line")
-            //     .attr("class","xgrid")
-            //     .attr("x1", function(d){return xScale(d);})
-            //     .attr("x2", function(d){return xScale(d);})
-            //     .attr("y1", yScale.range()[0])
-            //     .attr("y2", yScale.range()[1]);
-
-            // // Border lines
-            // svg.append("line")
-            //     .attr("class","borderline")
-            //     .attr("x1", xScale.range()[1])
-            //     .attr("x2", xScale.range()[1])
-            //     .attr("y1", yScale.range()[0])
-            //     .attr("y2", yScale.range()[1]);
-
-            // svg.append("line")
-            //     .attr("class","borderline")
-            //     .attr("x1", xScale.range()[0])
-            //     .attr("x2", xScale.range()[1])
-            //     .attr("y1", yScale.range()[1])
-            //     .attr("y2", yScale.range()[1]);
 
             //diagonal line
             var diag = svg.append("line")
@@ -1374,6 +1276,9 @@ var gradeDistr = (function() {
             });
         }
 
+        function drawAllAvrScatterPlots() {
+
+        }
         /* 
             
                 EVENT LISTENERS
@@ -1412,7 +1317,15 @@ var gradeDistr = (function() {
                 else { //when clicks View All
                     $('.btn-l').attr("disabled", true);
                     $('.btn-r').attr("disabled", true);
-                    controller.drawAllBarGraphs();
+                    if (modeBools[0]){
+                        controller.drawAllBarGraphs();
+                    }
+                    else if (modeBools[1]){
+                        controller.drawAllRankScatterPlots();
+                    }
+                    else if (modeBools[2]){
+                        controller.drawAllAvrScatterPlots();
+                    }
                 }
             });
         });
@@ -1477,10 +1390,17 @@ var gradeDistr = (function() {
             updateAvrScatterPlot(quizname);
         });
 
-        model.on('view all', function() {
+        model.on('view all bar', function() {
             drawAllBarGraphs();
         });
 
+        model.on('view all rank scatter', function() {
+            drawAllRankScatterPlots();
+        });
+
+        model.on('view all avr scatter', function() {
+            drawAllAvrScatterPlots();
+        });
     }
 
   //setup main structure of app
