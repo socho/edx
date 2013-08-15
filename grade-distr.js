@@ -110,11 +110,11 @@ var gradeDistr = (function() {
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
-                console.log('person',person,'avr',peopleData[person]["avr"])
+                //console.log('person',person,'avr',peopleData[person]["avr"])
                 sum += peopleData[person]["avr"];
                 numPeople += 1;
             }
-            console.log('sum',sum,'numpeople',numPeople);
+            //console.log('sum',sum,'numpeople',numPeople);
             var avr = sum / numPeople;
 
             //sd
@@ -209,7 +209,7 @@ var gradeDistr = (function() {
 
         function calcAverage_nozeros() {
             var quizzesOfInterest = getQuizzesArray();
-            console.log('getting sent', quizzesOfInterest);
+            //console.log('getting sent', quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
                 personData["avr"] = 0;
@@ -240,8 +240,8 @@ var gradeDistr = (function() {
             handler.trigger('rank mode', [peopleData, quizname]);
         }
 
-        function updateAvrScatterPlot(quizname) {
-            handler.trigger('avr mode', quizname);
+        function updateAvrScatterPlot(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
+            handler.trigger('avr mode', [quizname,parentDiv,outerWidth,outerHeight,margin,isSmall]);
         }
         
         function drawAllBarGraphs() {
@@ -262,8 +262,8 @@ var gradeDistr = (function() {
             model.drawAllBarGraphs();
         }
         
-        function updateAvrScatterPlot(quizname) {
-            model.updateAvrScatterPlot(quizname);
+        function updateAvrScatterPlot(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
+            model.updateAvrScatterPlot(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall);
         }
 
         function drawAllAvrScatterPlots() {
@@ -503,7 +503,8 @@ var gradeDistr = (function() {
                 quizname = model.getQuizzesArray()[0];
             }            
             displayBasicInfo(quizname);
-            controller.updateAvrScatterPlot(quizname);
+
+            controller.updateAvrScatterPlot(quizname,'#column1',avr_outerWidth,avr_outerHeight,avr_margin,false);
             $('#asgn-nav').html(quizname+"<span class='caret'></span>");
         })
 
@@ -1050,8 +1051,12 @@ var gradeDistr = (function() {
 
         }
 
-        function updateAvrScatterPlot(quizname) {
-            $('svg').remove();
+        function updateAvrScatterPlot(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
+            var chartWidth = outerWidth - margin.left - margin.right;
+            var chartHeight = outerHeight - margin.top - margin.bottom;
+
+            if (!isSmall) {$('svg').remove();} //remove previous existing svg if drawing big plot
+
             model.calcAverage_nozeros();
             var dataset = [];
             var dataDict = model.getPeopleData();
@@ -1074,15 +1079,15 @@ var gradeDistr = (function() {
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avr"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
 
-            console.log("maxz", maxzscore);
+            //console.log("maxz", maxzscore);
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([10*(avrOverall-maxzscore*sdOverall),10*(avrOverall+maxzscore*sdOverall)])
-                            .range([avr_margin.left,avr_outerWidth-avr_margin.right])
+                            .range([margin.left,outerWidth-margin.right])
                             .clamp(true);
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
                             .domain([info[1]-maxzscore*info[2],info[1]+maxzscore*info[2]])
-                            .range([avr_outerHeight-avr_margin.bottom,avr_margin.top])
+                            .range([outerHeight-margin.bottom,margin.top])
                             .clamp(true);
 
             var xtoyScale = d3.scale.linear()
@@ -1100,14 +1105,15 @@ var gradeDistr = (function() {
                             .scale(xScale)
                             .orient("bottom")
                             .tickValues(xaxisData)
+
             var yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient("left")
                             .tickValues(yaxisData)
 
-            var svg = d3.select("#column1").append("svg")
-                        .attr("width",avr_outerWidth)
-                        .attr("height",avr_outerHeight);
+            var svg = d3.select(parentDiv).append("svg")
+                        .attr("width",outerWidth)
+                        .attr("height",outerHeight);
 
             //diagonal line
             var diag = svg.append("line")
@@ -1117,7 +1123,6 @@ var gradeDistr = (function() {
             var xmax = xScale.domain()[1];
             var ymin = yScale.domain()[0];
             var ymax = yScale.domain()[1];
-            console.log(xmin,xmax,ymin,ymax);
             if (xtoyScale(xmin) < ymin) {
                 diag.attr("x1", xScale(xtoyScale.invert(ymin)));
                 diag.attr("y1", yScale(ymin));
@@ -1135,37 +1140,37 @@ var gradeDistr = (function() {
                 diag.attr("y2", yScale(ymax));                
             }
 
-            //help text
-            var helptext = svg.append("g")
-                                .attr("class", "helptext");
-            var x = $('.diagonal').attr("x2");
-            var y = $('.diagonal').attr("y2");
+            //help text only when drawing big plot
+            if (!isSmall) {
+                //help text
+                var helptext = svg.append("g")
+                                    .attr("class", "helptext");
+                var x = $('.diagonal').attr("x2");
+                var y = $('.diagonal').attr("y2");
 
-            // helptext.append("text")
-            //         .append("textPath")
-
-            helptext.append("text")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dx", -avr_chartWidth/10)
-                    .attr("dy", avr_chartHeight/30)
-                    .text("better than")
-                    .append("tspan")
-                    .text("usual")
-                    .attr("x",x)
-                    .attr("dx", -avr_chartWidth/10)
+                helptext.append("text")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dx", -chartWidth/10)
+                        .attr("dy", chartHeight/30)
+                        .text("better than")
+                        .append("tspan")
+                        .text("usual")
+                        .attr("x",x)
+                        .attr("dx", -chartWidth/10)
+                        .attr("dy", 12);
+                helptext.append("text")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dx", -0.5 * $('text').width())
+                        .attr("dy", 0.15*chartHeight)
+                        .text("worse than")
+                        .append("tspan")
+                        .text("usual")
+                        .attr("x", x)
+                        .attr("dx", -0.5 * $('text').width())
                     .attr("dy", 12);
-            helptext.append("text")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 0.15*avr_chartHeight)
-                    .text("worse than")
-                    .append("tspan")
-                    .text("usual")
-                    .attr("x", x)
-                    .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 12);
+            }
 
             //dots with jittering
             svg.selectAll("circle")
@@ -1190,71 +1195,121 @@ var gradeDistr = (function() {
                 .attr("y2",yScale(100+0.5));
 
             //max label
-            svg.append("text")
-                .attr("class", "maxlabel")
+            var maxlabel = svg.append("text")
                 .attr("x",xScale.range()[0])
                 .attr("y",yScale(100+0.5))
                 .attr("dx",5)
                 .attr("dy",-5)
-                .text("max possible grade");
+                .text("max possible grade")
+            if (!isSmall) {
+                maxlabel.attr("class", "maxlabel")
+            }else {
+                maxlabel.attr("class","small-maxlabel")
+            }
 
-            //xaxis
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate(0,"+(avr_outerHeight-avr_margin.bottom)+")")
-                .call(xAxis);
+            //x and y axes for big plot
+            if (!isSmall) {
+                //xaxis
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                    .call(xAxis);
 
-            //yaxis
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate("+avr_margin.left+",0)")
-                .call(yAxis);
+                //yaxis
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate("+margin.left+",0)")
+                    .call(yAxis);
+            }
 
-            //Y-AXIS LABEL
-            svg.append("text")
-                .attr("class", "yaxis-label")
-                .attr("x",0)
-                .attr("y", 0)
-                .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -avr_margin.top-avr_chartHeight/2)
-                .attr("dy", avr_margin.left*0.2)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Grade for "+quizname);
+            //x and y axes for mini plots
+            else {
+                //xaxis
+                svg.append("g")
+                    .attr("class","small-axis")
+                    .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                    .call(xAxis);
 
-            //X-AXIS LABEL
-            svg.append("text")
-                .attr("class", "xaxis-label")
-                // .attr("x",chartWidth/2)
-                .attr("x", avr_outerWidth/2)
-                .attr("y", avr_chartHeight+avr_margin.top)
-                .attr("dy", avr_margin.bottom*0.9)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Overall grade");
+                //yaxis
+                svg.append("g")
+                    .attr("class","small-axis")
+                    .attr("transform", "translate("+margin.left+",0)")
+                    .call(yAxis);                
+            }
+
+            //x and y axes labels only when drawing big plot
+            if (!isSmall) {
+                //Y-AXIS LABEL
+                svg.append("text")
+                    .attr("class", "yaxis-label")
+                    .attr("x",0)
+                    .attr("y", 0)
+                    .attr("transform", function(d) {return "rotate(-90)" })
+                    .attr("dx", -margin.top-chartHeight/2)
+                    .attr("dy", margin.left*0.2)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("Grade for "+quizname);
+
+                //X-AXIS LABEL
+                svg.append("text")
+                    .attr("class", "xaxis-label")
+                    // .attr("x",chartWidth/2)
+                    .attr("x", outerWidth/2)
+                    .attr("y", chartHeight+margin.top)
+                    .attr("dy", margin.bottom*0.9)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("Overall grade");
+            }
 
             //x ticks description
             var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
             for (var i = 0; i < xaxisData.length; i++) {
-                svg.append("text")
-                    .attr("class", "ticks-desc")
+                var ticks_desc = svg.append("text")
                     .attr("x", xScale(xaxisData[i]))
-                    .attr("y", avr_chartHeight+avr_margin.top)
-                    .attr("dy", $('.xaxis-label').height()*2)
+                    .attr("y", chartHeight+margin.top)
                     .attr("text-anchor", "middle")
                     .text(desc[i]);
+                if (!isSmall) {
+                    ticks_desc.attr("class", "ticks-desc")
+                        .attr("dy", $('.axis text').height()*2);
                 }
+                else {
+                    ticks_desc.attr("class","small-ticks-desc")
+                        .attr("dy", $('.small-axis text').height()*2);
+                }
+            }
+
             //y ticks description
             for (var i = 0; i < yaxisData.length; i++) {
-                svg.append("text")
-                    .attr("class", "ticks-desc")
-                    .attr("x", avr_margin.left)
-                    .attr("dx", -avr_margin.left*0.4)
-                    .attr("y", yScale(yaxisData[i]))
-                    .attr("dy", $('.yaxis-label').height()+2)
-                    .attr("text-anchor", "middle")
-                    .text(desc[i]);
+                var ticks_desc = svg.append("text")
+                        .attr("class", "ticks-desc")
+                        .attr("x", margin.left)
+                        .attr("dx", -margin.left*0.4)
+                        .attr("y", yScale(yaxisData[i]))
+                        .attr("text-anchor", "middle")
+                        .text(desc[i]);
+                if (!isSmall) {
+                    ticks_desc.attr("class", "ticks-desc")
+                        .attr("dy", $('.axis text').height()+2);
                 }
+                else {
+                    ticks_desc.attr("class","small-ticks-desc")
+                        .attr("dy", $('.small-axis text').height()+2);
+                }
+            }
+
+            // Title for mini plots
+            if (isSmall) {
+                svg.append("text")
+                        .attr("class","title")
+                        .attr("x", outerWidth/2)
+                        .attr("y", 0)
+                        .attr("dy", $('.title').height()*.8)
+                        .text(quizname);
+            }
+
 
             $('svg circle').tipsy({ 
                 gravity: 's', 
@@ -1267,6 +1322,36 @@ var gradeDistr = (function() {
         }
 
         function drawAllAvrScatterPlots() {
+            $('#column1').children().remove();
+            var quizzesArray = controller.getQuizzesArray();
+
+            var numCols = 3;
+            var numRows = Math.ceil(quizzesArray.length/numCols);
+
+            for (var i = 0; i < numRows; i++) {
+                var thisrow = $("<div class='avr-scatter-row-"+i+"'></div>");
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        thisrow.append("<div class='col-lg-4 avr-scatter-col-"+j+"'></div>");
+                    }
+                }
+                $('#column1').append(thisrow);
+            }
+
+            for (var i = 0; i < numRows; i++) {
+                for (var j=0; j < numCols; j++) {
+                    console.log(i*numCols+j, quizzesArray.length);
+                    // if (i==0 && j==0) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        var quizname = quizzesArray[i*numCols+j]
+                        var parentDiv = ".avr-scatter-row-"+i+" .avr-scatter-col-"+j;
+                        var outerWidth = parseInt($('.avr-scatter-row-'+i+' .avr-scatter-col-'+j).css("width"));
+                        var outerHeight = $(document).height()/3;
+                        var margin = { top: 0, right: 5, bottom: 20, left: 25};
+                        updateAvrScatterPlot(quizname,parentDiv,outerWidth,outerHeight,margin,true);
+                    }
+                }
+            }
 
         }
         /* 
@@ -1278,7 +1363,6 @@ var gradeDistr = (function() {
 
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
-                console.log(1);
                 //inNav = true;
                 var quizname = String($(this).attr('id'));
 
@@ -1300,7 +1384,7 @@ var gradeDistr = (function() {
                             controller.updateRankScatterPlot(quizname)
                         }
                         else if (modeBools[2]) {
-                            controller.updateAvrScatterPlot(quizname);
+                            controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                         }
                     }
                 }
@@ -1338,7 +1422,7 @@ var gradeDistr = (function() {
                     controller.updateRankScatterPlot(quizname);
                 }
                 else if (modeBools[2]) {
-                    controller.updateAvrScatterPlot(quizname);
+                    controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                 }
             }
         });
@@ -1360,7 +1444,7 @@ var gradeDistr = (function() {
                     controller.updateRankScatterPlot(quizname);
                 }
                 else if (modeBools[2]){
-                    controller.updateAvrScatterPlot(quizname);
+                    controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                 }
             }
         });
@@ -1376,8 +1460,8 @@ var gradeDistr = (function() {
             updateRankScatterPlot(data);
         });
 
-        model.on('avr mode', function(quizname) {
-            updateAvrScatterPlot(quizname);
+        model.on('avr mode', function(data) {
+            updateAvrScatterPlot(data[0],data[1],data[2],data[3],data[4],data[5]);
         });
 
         model.on('view all bar', function() {

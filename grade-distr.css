@@ -27,6 +27,22 @@
 	fill: lightgrey;
 }
 
+.small-maxlabel {
+	fill: lightgrey;
+	font-size: 7pt;
+}
+
+.small-axis path,
+.small-axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges
+}
+
+.small-axis text{
+	font-size: 7pt;
+}
+
 #legend {
 	background-color: #fff;
 	border-radius: 10px;
@@ -120,6 +136,10 @@ circle {
 
 .ticks-desc {
   	font-size: 8pt;
+}
+
+.small-ticks-desc {
+	font-size: 5pt;
 }
 
 .ygrid,
