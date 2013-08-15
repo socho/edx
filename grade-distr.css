@@ -132,6 +132,12 @@ circle {
 	stroke: black;
 }
 
+
+.ui-slider-range, .ui-widget-header, .ui-corner-all {
+	background-image: none;
+	background-color: 'darkgray';
+}
+
 .indiv-yscale-label,
 .indiv-xscale-label {
 	font-size: 8px;

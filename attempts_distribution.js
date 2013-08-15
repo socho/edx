@@ -608,7 +608,7 @@ var attempts = (function() {
                 .attr("height", function(d) {
                     return d*4;
                 })
-                .attr('fill', 'blue');
+                .attr('fill', 'lightblue');
 
             svg.selectAll("text")
                 .data(attemptsarray)
