@@ -527,7 +527,7 @@ var gradeDistr = (function() {
 
         //variables for bar graph
         var bar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var bar_outerHeight = 600;
+        var bar_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
 
         var bar_margin = { top: 20, right: 20, bottom: 40, left: 40 };
 
@@ -538,7 +538,7 @@ var gradeDistr = (function() {
 
         //variables for rank graph
         var rank_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var rank_outerHeight = 600;
+        var rank_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
 
         var rank_margin = { top: 20, right: 20, bottom: 40, left: 40 };
 
@@ -547,7 +547,7 @@ var gradeDistr = (function() {
 
         //variables for avr scatter
         var avr_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var avr_outerHeight = 600;
+        var avr_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
 
         var avr_margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
