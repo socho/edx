@@ -6,6 +6,10 @@
 	text-align: center;
 }
 
+#column1 {
+	padding-top: 20px;
+}
+
 .chart rect {
 	stroke: white;
 	shape-rendering: crispEdges;
@@ -102,6 +106,10 @@ div.tooltip {
  	stroke: none;
 }
 
+.title {
+	text-anchor: middle;
+}
+
 circle {
 	radius: 3;
   	fill: teal;
@@ -124,8 +132,13 @@ circle {
 	stroke: black;
 }
 
+
 .ui-slider-range, .ui-widget-header, .ui-corner-all {
 	background-image: none;
 	background-color: 'darkgray';
 }
 
+.indiv-yscale-label,
+.indiv-xscale-label {
+	font-size: 8px;
+}

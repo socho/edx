@@ -182,7 +182,7 @@ var gradeDistr = (function() {
                     newThreeArrays[index].push({"y":counter[i], "people": groupedPeople[i]});
                 }
             }
-            handler.trigger('changed', [newThreeArrays, assignment]);
+            //handler.trigger('changed', [newThreeArrays, assignment]);
             return newThreeArrays;
         }
 
@@ -284,7 +284,7 @@ var gradeDistr = (function() {
         }
 
         function groupPeopleByAvr(assignment, lowPct, highPct) {
-            model.groupPeopleByAvr(assignment, lowPct, highPct);
+            return model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
         return {drawAllBarGraphs: drawAllBarGraphs, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
@@ -394,7 +394,11 @@ var gradeDistr = (function() {
                 $("#upperLabel").css('top',"-10px");
                 $("#upperLabel").css('left', String(0.01 * (max-top) * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px"); 
                 updateColors(ui.values);
-                controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top);
+                var currentQuiz = $('#asgn-nav').text();
+                if (currentQuiz != "ViewAll") {updateBarGraph([controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top),$('#asgn-nav').text()]);}
+                else { //when clicks View All
+                    drawAllBarGraphs();
+                }
             }
         }).slider('pips', {
              first: 'label',
@@ -442,7 +446,7 @@ var gradeDistr = (function() {
             modeBools[1] = false;
             modeBools[2] = false;
             sliderDiv.show();
-            $('.dropdown-menu').append("<li id='viewAll'><a>View All</a></li>");
+            $('#ViewAll').show();
             var quizname = $('#asgn-nav').text();
             controller.calcAverage();
             bottom = Math.abs(sliderObj.slider("values", 0) - 0);
@@ -460,11 +464,16 @@ var gradeDistr = (function() {
             modeBools[1] = true;
             modeBools[2] = false;
             sliderDiv.hide();
-            $("#viewAll").remove();
+            $("#ViewAll").hide();
+            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
+            if (quizname == "ViewAll") {
+                quizname = model.getQuizzesArray()[0];
+            }
             controller.calcAverage();
             controller.updateRankScatterPlot(quizname);
             displayBasicInfo(quizname);
+            $('#asgn-nav').html(quizname+"<span class='caret'></span>");
         });
 
         rightButton.on('click', function() {
@@ -475,10 +484,15 @@ var gradeDistr = (function() {
             modeBools[1] = false;
             modeBools[2] = true;
             sliderDiv.hide();
-            $("#viewAll").remove();
+            $("#ViewAll").hide();
+            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
+            if (quizname == "ViewAll") {
+                quizname = model.getQuizzesArray()[0];
+            }            
             displayBasicInfo(quizname);
             controller.updateAvrScatterPlot(quizname);
+            $('#asgn-nav').html(quizname+"<span class='caret'></span>");
         })
 
        //NAVIGATION
@@ -487,7 +501,7 @@ var gradeDistr = (function() {
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         }
-        dropdown.append("<li id='viewAll'><a>View All</a></li>");
+        dropdown.append("<li id='ViewAll'><a>View All</a></li>");
 
         ////////
         //setup variables for Graph
@@ -552,10 +566,6 @@ var gradeDistr = (function() {
             // console.log('data: ', data);
             var stack = d3.layout.stack();
             var stackedData = stack(data);
-
-            var yGroupMax = d3.max(stackedData, function(layer) { 
-                                return d3.max(layer, function(d) { return d.y; })
-                            });
 
             var yStackMax = d3.max(stackedData, function(layer) { 
                                 return d3.max(layer, function(d) { return d.y + d.y0; })
@@ -731,28 +741,125 @@ var gradeDistr = (function() {
             for (var i = 0; i < numRows; i++) {
                 var thisrow = $("<div class='bar-row-"+i+"'></div>");
                 for (var j=0; j < numCols; j++) {
-                    thisrow.append("<div class='col-lg-4 bar-col-"+j+"'></div>");
+                    if (i*numCols+j < quizzesArray.length) {
+                        thisrow.append("<div class='col-lg-4 bar-col-"+j+"'></div>");
+                    }
                 }
                 $('#column1').append(thisrow);
             }
 
+            var overallMaxYStack = 0;
             for (var i = 0; i < numRows; i++) {
                 for (var j=0; j < numCols; j++) {
-                    var thisQuiz = quizzesArray[i*numCols+j];
-                    var thisWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
-                    var thisSvg = makeIndivBarGraph(thisQuiz, thisWidth);
-                    $(".bar-row-"+i+" .bar-col-"+j).append(thisSvg);
+                    if (i*numCols+j < quizzesArray.length) {
+                        var thisQuiz = quizzesArray[i*numCols+j];
+                        controller.calcAverage(thisQuiz);
+                        bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                        top = Math.abs(100 - sliderObj.slider("values", 1));
+                        var data = model.groupPeopleByAvr(thisQuiz, bottom, 100-top); //need to ask question
+                        var stack = d3.layout.stack();
+                        var stackedData = stack(data);
+                        var yStackMax = d3.max(stackedData, function(layer) { 
+                                            return d3.max(layer, function(d) { return d.y + d.y0; })
+                                        });
+                        if (yStackMax > overallMaxYStack) {overallMaxYStack = yStackMax;}
+                    }
                 }
             }
 
-            function makeIndivBarGraph(thisQuiz, thisWidth) {
+            for (var i = 0; i < numRows; i++) {
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        makeIndivBarGraph(i,j,overallMaxYStack);
+                    }
+                }
+            }
+
+
+
+            function makeIndivBarGraph(rowInd, colInd, maxY) {
+                var thisQuiz = quizzesArray[i*numCols+j];
+                var thisWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
+
                 var indiv_bar_outerWidth = thisWidth;
                 var indiv_bar_outerHeight = $(document).height()/3;
-                var indiv_bar_margin = { top: 5, right: 5, bottom: 5, left: 5};
-                var indiv_bar_chartWidth = bar_outerWidth - bar_margin.left - bar_margin.right;
-                var indiv_bar_chartHeight = bar_outerHeight - bar_margin.top - bar_margin.bottom;
+                var indiv_bar_margin = { top: 10, right: 5, bottom: 10, left: 10};
+                var indiv_bar_chartWidth = indiv_bar_outerWidth - indiv_bar_margin.left - indiv_bar_margin.right;
+                var indiv_bar_chartHeight = indiv_bar_outerHeight - indiv_bar_margin.top - indiv_bar_margin.bottom;
                 var indiv_bar_color_scale = d3.scale.ordinal().range(["lightpink", "darkgray", "lightblue"]);
 
+                var thisChart = d3.select(".bar-row-"+i+" .bar-col-"+j)
+                                .append("svg")  
+                                    .attr("class", "chart")
+                                    .attr("height", indiv_bar_outerHeight)
+                                    .attr("width", indiv_bar_outerWidth)
+                                .append("g")
+                                    .attr("class", "innerChart")
+                                    .attr("transform", "translate(" + indiv_bar_margin.left + "," + indiv_bar_margin.top + ")");
+
+                controller.calcAverage(thisQuiz);
+
+                var data = model.groupPeopleByAvr(thisQuiz, bottom, 100-top); //need to ask question
+                var stack = d3.layout.stack();
+                var stackedData = stack(data);
+
+                var xScale = d3.scale.ordinal()
+                    .domain(d3.range(data[0].length)).rangeBands([0, indiv_bar_chartWidth]);
+
+                var yScale = d3.scale.linear()
+                    .domain([0, maxY]).range([indiv_bar_chartHeight, 0]);
+
+                // Title
+                thisChart.append("text")
+                        .attr("class","title")
+                        .attr("x", indiv_bar_chartWidth/2)
+                        .attr("y", indiv_bar_chartHeight*0.03)
+                        .text(thisQuiz);
+
+                // Y AXIS GRID LINES
+                thisChart.selectAll("line").data(yScale.ticks(10))
+                    .enter().append("line")
+                    .attr("x1", 0)
+                    .attr("x2", indiv_bar_chartWidth)
+                    .attr("y1", yScale)
+                    .attr("y2", yScale);
+
+                //Y TICK MARKS
+                thisChart.selectAll(".indiv-yscale-label").data(yScale.ticks(10))
+                    .enter().append("text")
+                    .attr("class", "indiv-yscale-label")
+                    .attr("x", 0)
+                    .attr("y", yScale)
+                    .attr("dx", -indiv_bar_margin.left/8)
+                    .attr("text-anchor", "end")
+                    .attr("dy", "0.3em")
+                    .text(String);            
+
+                //X TICK MARKS
+                thisChart.selectAll(".indiv-xscale-label").data(xScale.domain())
+                    .enter().append("text")
+                    .attr("class", "indiv-xscale-label")
+                    .attr("x", function(d){return xScale(d);})
+                    .attr("y", indiv_bar_chartHeight)
+                    .attr("text-anchor", "center")
+                    // .attr("dx", function(d){return xScale.rangeBand()/2;})
+                    .attr("dy", indiv_bar_margin.bottom*0.8)
+                    .text(function(d){return String(d*10);});
+                
+                //grabs all the layers and forms groups out of them
+                var layerGroups = thisChart.selectAll(".layer").data(stackedData)
+                    .enter().append("g")
+                    .attr("class", "layer")
+                    .style("fill", function(d,i){return bar_color_scale(i);});
+
+                //THE BARS (FOR STACKED BAR CHARTS)
+                var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
+                    .enter().append("rect")
+                    .attr("x", function(d, i) { return xScale(i); })
+                    .attr("y", function(d) { return yScale(d.y + d.y0) })
+                    .attr("width", xScale.rangeBand())
+                    .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+               
             }
 
 
@@ -1266,27 +1373,35 @@ var gradeDistr = (function() {
 
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
+                console.log(1);
                 //inNav = true;
                 var quizname = String($(this).attr('id'));
 
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-                if (quizname != "viewAll") {
+                if (quizname != "ViewAll") {
                     displayBasicInfo(quizname);
-                    console.log(modeBools);
-                    if (modeBools[0]) {
-                        bottom = Math.abs(sliderObj.slider("values", 0) - 0);
-                        top = Math.abs(100 - sliderObj.slider("values", 1));
-                        controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                    if ($('.btn-l').attr("disabled")=="disabled") {
+                        $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
+                        drawInitialGraph(quizname);
                     }
-                    else if (modeBools[1]) {
-                        controller.calcAverage();
-                        controller.updateRankScatterPlot(quizname)
-                    }
-                    else if (modeBools[2]) {
-                        controller.updateAvrScatterPlot(quizname);
+                    else {
+                        if (modeBools[0]) {
+                            bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                            top = Math.abs(100 - sliderObj.slider("values", 1));
+                            updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
+                        }
+                        else if (modeBools[1]) {
+                            controller.calcAverage();
+                            controller.updateRankScatterPlot(quizname)
+                        }
+                        else if (modeBools[2]) {
+                            controller.updateAvrScatterPlot(quizname);
+                        }
                     }
                 }
-                else {
+                else { //when clicks View All
+                    $('.btn-l').attr("disabled", true);
+                    $('.btn-r').attr("disabled", true);
                     controller.drawAllBarGraphs();
                 }
             });
@@ -1302,7 +1417,7 @@ var gradeDistr = (function() {
                 if (modeBools[0]) { //if in percent mode
                     bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                     top = Math.abs(100 - sliderObj.slider("values", 1));
-                    controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                    updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                 }
                 else if (modeBools[1]) {
                     console.log("!!!!!!!!!!!")
@@ -1325,7 +1440,7 @@ var gradeDistr = (function() {
                 if (modeBools[0]) { //if in percent mode
                     bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                     top = Math.abs(100 - sliderObj.slider("values", 1));
-                    controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                    updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                 }
                 else if (modeBools[1]) {
                     controller.calcAverage();
