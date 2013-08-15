@@ -10,7 +10,8 @@
 .axis line {
 	fill: none;
 	stroke: black;
-	shape-rendering: crispEdges
+	shape-rendering: crispEdges;
+	font-size: 0.3em;
 }
 
 .diagonal {
