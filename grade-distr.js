@@ -412,7 +412,7 @@ var gradeDistr = (function() {
                 var currentQuiz = $('#asgn-nav').text();
                 if (currentQuiz != "ViewAll") {updateBarGraph([controller.groupPeopleByAvr($('#asgn-nav').text(), bottom, max-top),$('#asgn-nav').text()]);}
                 else { //when clicks View All
-                    drawAllBarGraphs();
+                    controller.drawAllBarGraphs();
                 }
             }
         }).slider('pips', {
@@ -462,12 +462,17 @@ var gradeDistr = (function() {
             modeBools[2] = false;
             sliderDiv.show();
             var quizname = $('#asgn-nav').text();
-            controller.calcAverage();
-            bottom = Math.abs(sliderObj.slider("values", 0) - 0);
-            top = Math.abs(100 - sliderObj.slider("values", 1));
-            controller.groupPeopleByAvr(quizname, bottom, 100-top);
-            displayBasicInfo(quizname);
-            drawInitialGraph(quizname);
+            if (quizname == "ViewAll") {
+                controller.drawAllBarGraphs();
+            }
+            else {
+                controller.calcAverage();
+                bottom = Math.abs(sliderObj.slider("values", 0) - 0);
+                top = Math.abs(100 - sliderObj.slider("values", 1));
+                controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                displayBasicInfo(quizname);
+                drawInitialGraph(quizname, "#column1", bar_outerWidth, bar_outerHeight, bar_margin, 0, false);
+            }
         });
 
         middleButton.on('click', function() {
@@ -500,12 +505,12 @@ var gradeDistr = (function() {
             $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
-                quizname = model.getQuizzesArray()[0];
-            }            
-            displayBasicInfo(quizname);
-
-            controller.updateAvrScatterPlot(quizname,'#column1',avr_outerWidth,avr_outerHeight,avr_margin,false);
-            $('#asgn-nav').html(quizname+"<span class='caret'></span>");
+                controller.drawAllAvrScatterPlots();
+            }
+            else {         
+                displayBasicInfo(quizname);
+                controller.updateAvrScatterPlot(quizname,'#column1',avr_outerWidth,avr_outerHeight,avr_margin,false);
+            }
         })
 
        //NAVIGATION
@@ -549,29 +554,35 @@ var gradeDistr = (function() {
         var avr_chartWidth = avr_outerWidth - avr_margin.left - avr_margin.right;
         var avr_chartHeight = avr_outerHeight - avr_margin.top - avr_margin.bottom;
 
-        function drawInitialGraph(quizname) { //assignment, quizzesOfInterest, lowPct, highPct,             
-            $('svg').remove();
+        //"#column1", bar_outerWidth, bar_outerHeight, bar_margin
+        function drawInitialGraph(quizname, parentDiv, outerWidth, outerHeight, margin, maxY, isSmall) { //assignment, quizzesOfInterest, lowPct, highPct,             
+            var chartWidth = outerWidth - margin.left - margin.right;
+            var chartHeight = outerHeight - margin.top - margin.bottom;
+
+            if (!isSmall) {console.log("not small");$('svg').remove();}
             //INITIALIZE THE CHART
-            var chart = d3.select("#column1")
+            var chart = d3.select(parentDiv)
                 .append("svg")  
                     .attr("class", "chart")
-                    .attr("height", bar_outerHeight)
-                    .attr("width", bar_outerWidth)
+                    .attr("height", outerHeight)
+                    .attr("width", outerWidth)
                 .append("g")
                     .attr("class", "innerChart")
-                    .attr("transform", "translate(" + bar_margin.left + "," + bar_margin.top + ")");
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
             //Y-AXIS LABEL
-            chart.append("text")
+            if (!isSmall) {
+                chart.append("text")
                 .attr("class", "yaxis-label")
                 .attr("x",0)
                 .attr("y", 0)
                 .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -bar_chartHeight/2)
-                .attr("dy", -bar_margin.left*0.75)
+                .attr("dx", -chartHeight/2)
+                .attr("dy", -margin.left*0.75)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Number of Students");
+            }
 
             controller.calcAverage(quizname);
 
@@ -585,50 +596,61 @@ var gradeDistr = (function() {
                             });
 
             var xScale = d3.scale.ordinal()
-                .domain(d3.range(data[0].length)).rangeBands([0, bar_chartWidth]);
+                .domain(d3.range(data[0].length)).rangeBands([0, chartWidth]);
 
+            if (isSmall){yStackMax = maxY;}
             var yScale = d3.scale.linear()
-                .domain([0, yStackMax]).range([bar_chartHeight, 0]);
+                .domain([0, yStackMax]).range([chartHeight, 0]);
 
             // Y AXIS GRID LINES
             chart.selectAll("line").data(yScale.ticks(10))
                 .enter().append("line")
                 .attr("x1", 0)
-                .attr("x2", bar_chartWidth)
+                .attr("x2", chartWidth)
                 .attr("y1", yScale)
                 .attr("y2", yScale);
 
             //Y TICK MARKS
-            chart.selectAll(".yscale-label").data(yScale.ticks(10))
-                .enter().append("text")
-                .attr("class", "yscale-label")
-                .attr("x", 0)
-                .attr("y", yScale)
-                .attr("dx", -bar_margin.left/8)
-                .attr("text-anchor", "end")
-                .attr("dy", "0.3em")
-                .text(String);            
+            var yscale_label = chart.selectAll(".yscale-label").data(yScale.ticks(10))
+                                    .enter().append("text")
+                                    .attr("x", 0)
+                                    .attr("y", yScale)
+                                    .attr("dx", -margin.left/8)
+                                    .attr("text-anchor", "end")
+                                    .attr("dy", "0.3em")
+                                    .text(String);  
+            if (!isSmall) {
+                yscale_label.attr("class", "yscale-label")
+            }else {
+                yscale_label.attr("class", "small-yscale-label")
+            }       
 
             //X TICK MARKS
-            chart.selectAll(".xscale-label").data(xScale.domain())
-                .enter().append("text")
-                .attr("class", "xscale-label")
-                .attr("x", function(d){return xScale(d);})
-                .attr("y", bar_chartHeight)
-                .attr("text-anchor", "center")
-                // .attr("dx", function(d){return xScale.rangeBand()/2;})
-                .attr("dy", bar_margin.bottom*0.4)
-                .text(function(d){return String(d*10);});
+            var xscale_label = chart.selectAll(".xscale-label").data(xScale.domain())
+                                    .enter().append("text")
+                                    .attr("x", function(d){return xScale(d);})
+                                    .attr("y", chartHeight)
+                                    .attr("text-anchor", "center")
+                                    // .attr("dx", function(d){return xScale.rangeBand()/2;})
+                                    .attr("dy", margin.bottom*0.4)
+                                    .text(function(d){return String(d*10);});
+            if (!isSmall) {
+                xscale_label.attr("class", "xscale-label");
+            }else {
+                xscale_label.attr("class", "small-xscale-label");
+            }
 
             //X-AXIS LABEL
-            chart.append("text")
+            if (!isSmall) {
+                chart.append("text")
                 .attr("class", "xaxis-label")
-                .attr("x",bar_chartWidth/2)
-                .attr("y", bar_chartHeight)
-                .attr("dy", bar_margin.bottom*0.85)
+                .attr("x", chartWidth/2)
+                .attr("y", chartHeight)
+                .attr("dy", margin.bottom*0.85)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Grade for " + quizname + " (%)");
+            }
             
             //grabs all the layers and forms groups out of them
             var layerGroups = chart.selectAll(".layer").data(stackedData)
@@ -643,9 +665,19 @@ var gradeDistr = (function() {
                 .attr("y", function(d) { return yScale(d.y + d.y0) })
                 .attr("width", xScale.rangeBand())
                 .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });
+
+            // Title
+            if (isSmall){   
+                chart.append("text")
+                    .attr("class","title")
+                    .attr("x", chartWidth/2)
+                    .attr("y", chartHeight*0.03)
+                    .text(quizname);
+            }
+
         }
 
-        drawInitialGraph($('#asgn-nav').text());
+        drawInitialGraph($('#asgn-nav').text(),"#column1", bar_outerWidth, bar_outerHeight, bar_margin, 0, false);
 
         function updateBarGraph(dataArray){
             var quizname = dataArray[1];
@@ -783,93 +815,15 @@ var gradeDistr = (function() {
             for (var i = 0; i < numRows; i++) {
                 for (var j=0; j < numCols; j++) {
                     if (i*numCols+j < quizzesArray.length) {
-                        makeIndivBarGraph(i,j,overallMaxYStack);
+                        var quizname = quizzesArray[i*numCols+j];
+                        var parentDiv = ".bar-row-"+i+" .bar-col-"+j;
+                        var outerWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
+                        var outerHeight = $(document).height()/3;
+                        var margin = { top: 10, right: 5, bottom: 20, left: 10};
+                        console.log("drawinitialgraph");
+                        drawInitialGraph(quizname, parentDiv, outerWidth, outerHeight, margin, overallMaxYStack, true);
                     }
                 }
-            }
-
-            function makeIndivBarGraph(rowInd, colInd, maxY) {
-                var thisQuiz = quizzesArray[i*numCols+j];
-                var thisWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
-
-                var indiv_bar_outerWidth = thisWidth;
-                var indiv_bar_outerHeight = $(document).height()/3;
-                var indiv_bar_margin = { top: 10, right: 5, bottom: 10, left: 10};
-                var indiv_bar_chartWidth = indiv_bar_outerWidth - indiv_bar_margin.left - indiv_bar_margin.right;
-                var indiv_bar_chartHeight = indiv_bar_outerHeight - indiv_bar_margin.top - indiv_bar_margin.bottom;
-                var indiv_bar_color_scale = d3.scale.ordinal().range(["lightpink", "darkgray", "lightblue"]);
-
-                var thisChart = d3.select(".bar-row-"+i+" .bar-col-"+j)
-                                .append("svg")  
-                                    .attr("class", "chart")
-                                    .attr("height", indiv_bar_outerHeight)
-                                    .attr("width", indiv_bar_outerWidth)
-                                .append("g")
-                                    .attr("class", "innerChart")
-                                    .attr("transform", "translate(" + indiv_bar_margin.left + "," + indiv_bar_margin.top + ")");
-
-                controller.calcAverage(thisQuiz);
-
-                var data = model.groupPeopleByAvr(thisQuiz, bottom, 100-top); //need to ask question
-                var stack = d3.layout.stack();
-                var stackedData = stack(data);
-
-                var xScale = d3.scale.ordinal()
-                    .domain(d3.range(data[0].length)).rangeBands([0, indiv_bar_chartWidth]);
-
-                var yScale = d3.scale.linear()
-                    .domain([0, maxY]).range([indiv_bar_chartHeight, 0]);
-
-                // Title
-                thisChart.append("text")
-                        .attr("class","title")
-                        .attr("x", indiv_bar_chartWidth/2)
-                        .attr("y", indiv_bar_chartHeight*0.03)
-                        .text(thisQuiz);
-
-                // Y AXIS GRID LINES
-                thisChart.selectAll("line").data(yScale.ticks(10))
-                    .enter().append("line")
-                    .attr("x1", 0)
-                    .attr("x2", indiv_bar_chartWidth)
-                    .attr("y1", yScale)
-                    .attr("y2", yScale);
-
-                //Y TICK MARKS
-                thisChart.selectAll(".indiv-yscale-label").data(yScale.ticks(10))
-                    .enter().append("text")
-                    .attr("class", "indiv-yscale-label")
-                    .attr("x", 0)
-                    .attr("y", yScale)
-                    .attr("dx", -indiv_bar_margin.left/8)
-                    .attr("text-anchor", "end")
-                    .attr("dy", "0.3em")
-                    .text(String);            
-
-                //X TICK MARKS
-                thisChart.selectAll(".indiv-xscale-label").data(xScale.domain())
-                    .enter().append("text")
-                    .attr("class", "indiv-xscale-label")
-                    .attr("x", function(d){return xScale(d);})
-                    .attr("y", indiv_bar_chartHeight)
-                    .attr("text-anchor", "center")
-                    // .attr("dx", function(d){return xScale.rangeBand()/2;})
-                    .attr("dy", indiv_bar_margin.bottom*0.8)
-                    .text(function(d){return String(d*10);});
-                
-                //grabs all the layers and forms groups out of them
-                var layerGroups = thisChart.selectAll(".layer").data(stackedData)
-                    .enter().append("g")
-                    .attr("class", "layer")
-                    .style("fill", function(d,i){return bar_color_scale(i);});
-
-                //THE BARS (FOR STACKED BAR CHARTS)
-                var rects = layerGroups.selectAll("rect").data(function(d) { return d; })
-                    .enter().append("rect")
-                    .attr("x", function(d, i) { return xScale(i); })
-                    .attr("y", function(d) { return yScale(d.y + d.y0) })
-                    .attr("width", xScale.rangeBand())
-                    .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y) });               
             }
         }
 
@@ -1369,23 +1323,29 @@ var gradeDistr = (function() {
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
                 if (quizname != "ViewAll") {
                     displayBasicInfo(quizname);
-                    if ($('.btn-l').attr("disabled")=="disabled") {
-                        $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
-                        drawInitialGraph(quizname);
-                    }
-                    else {
-                        if (modeBools[0]) {
+                    if (modeBools[0]) {
+                        if ($('.btn-l').attr("disabled")=="disabled") {
+                            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
+                            drawInitialGraph(quizname, "#column1", bar_outerWidth, bar_outerHeight, bar_margin, 0, false);
+                        }
+                        else {
                             bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                             top = Math.abs(100 - sliderObj.slider("values", 1));
                             updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                         }
-                        else if (modeBools[1]) {
-                            controller.calcAverage();
-                            controller.updateRankScatterPlot(quizname)
+                    }
+                    else if (modeBools[1]) {
+                        if ($('.btn-l').attr("disabled")=="disabled") {
+                            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
                         }
-                        else if (modeBools[2]) {
-                            controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
+                        controller.calcAverage();
+                        controller.updateRankScatterPlot(quizname)
+                    }
+                    else if (modeBools[2]) {
+                        if ($('.btn-l').attr("disabled")=="disabled") {
+                            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
                         }
+                        controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                     }
                 }
                 else { //when clicks View All

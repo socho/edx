@@ -154,11 +154,11 @@ circle {
 
 
 .ui-slider-range, .ui-widget-header, .ui-corner-all {
-	background-image: none;
+	background: none;
 	background-color: 'darkgray';
 }
 
-.indiv-yscale-label,
-.indiv-xscale-label {
+.small-yscale-label,
+.small-xscale-label {
 	font-size: 8px;
 }
