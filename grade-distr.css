@@ -124,3 +124,8 @@ circle {
 	stroke: black;
 }
 
+.ui-slider-range, .ui-widget-header, .ui-corner-all {
+	background-image: none;
+	background-color: 'darkgray';
+}
+

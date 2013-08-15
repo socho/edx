@@ -837,42 +837,32 @@ var gradeDistr = (function() {
         function updateRankScatterPlot(dataArray) {
             var quizname = dataArray[1]; 
 
-            function sortByRank(object, val2sort) {
-                    n = object.length;
-                    swapped = true;
-                    while (swapped) {
-                        swapped = false;
-                        for (var i = 1; i < n; i++) {
-                            if (object[i-1][val2sort] > object[i][val2sort]) {
-                                var temp = object[i];
-                                object[i] = object[i-1];
-                                object[i-1] = temp;
-                                swapped = true;
-                            }
-                            else if (object[i-1][val2sort] == object[i][val2sort]) {
-                                console.log("equal!");
-                                if (Math.random()>Math.random()) {
-                                    var temp = object[i];
-                                    object[i] = object[i-1];
-                                    object[i-1] = temp;
-                                    swapped = true;
-                                }
-                            }
-                        }
-                        n = n-1;
-                    }
-                    if (val2sort == "avr") { 
-                        for (var i = 0; i < object.length; i++) {
-                            object[i]["avr-rank"] = [i+1, object.length-i];
-                        }
-                    } else {
-                        for (var i = 0; i < object.length; i++) {
-                            object[i]["grade-rank"] = [i+1, object.length-i];
-                        }
-                    }return object;
+            function sortByRank(object) {
+                var sorted = [];
+                var sorted2 = [];
+                var result = [];
+                for (var obj in object) {
+                    // console.log('user', obj);
+                    sorted.push([object[obj].username, [object[obj].avr, object[obj].grade]]);
+                    sorted2.push([object[obj].username, object[obj].avr]);
+                }
+                sorted.sort(function(a,b) {return a[1][1]-b[1][1]});
+                sorted2.sort(function(a,b) {return a[1]-b[1]});
 
+                for (var i = 0; i < sorted.length; i++) {
+                    result.push({"username": sorted[i][0], "avr": sorted[i][1][0], "grade": sorted[i][1][1], "graderank": sorted.length-i});
                 }
 
+                result.sort(function(a,b) {return a["avr"]-b["avr"]});
+
+                for (var index in result) {
+                    result[index]["avrrank"] = result.length-index;
+                    console.log(result[index].username + (result[index].graderank, result[index].avrrank));
+                }
+                
+                return result;
+            }
+            
             d3.select("svg").remove();
 
             var dataset = [];
@@ -881,9 +871,9 @@ var gradeDistr = (function() {
 
             for (var person in dataDict) {
                 if (quizname in dataDict[person]){
-                    console.log('made it');
-                    dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
-                    
+                console.log('made it');
+                dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                
                 }
             }
             
@@ -891,8 +881,8 @@ var gradeDistr = (function() {
 
 
             var info = controller.getBasicInfo(quizname);
-            var result = sortByRank(dataset, "grade"); //sorted by avg
-            var result2 = sortByRank(result, "avr"); //sorted by grade
+            // var result = sortByRank(dataset, "avr"); //sorted by avg
+            var result2 = sortByRank(dataset); //sorted by grade
             console.log(result2);
             console.log('num of students', info[0]);
 
@@ -968,10 +958,10 @@ var gradeDistr = (function() {
                 .append("circle")
                 .attr("class","datapoints")
                 .attr("cx", function(d){
-                    return xScale(d["avr-rank"][1]);
+                    return xScale(d["avrrank"]);
                 })
                 .attr("cy", function(d){
-                    return yScale(d["grade-rank"][1]);
+                    return yScale(d["graderank"]);
                 })
                 .attr("r", 3);
 
@@ -980,7 +970,7 @@ var gradeDistr = (function() {
                 html: true, 
                 title: function() {
                     var d = this.__data__;
-                    return d["username"] + "<br/>Class Rank: "  + d["avr-rank"][1] + "<br/>Rank for " + quizname +": "  + d["grade-rank"][1] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
+                    return d["username"] + "<br/>Rank for " + quizname +": "  + d["graderank"] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
                 }
             });
 
