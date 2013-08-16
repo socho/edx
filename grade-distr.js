@@ -115,11 +115,9 @@ var gradeDistr = (function() {
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
-                //console.log('person',person,'avr',peopleData[person]["avr"])
                 sum += peopleData[person]["avr"];
                 numPeople += 1;
             }
-            //console.log('sum',sum,'numpeople',numPeople);
             var avr = sum / numPeople;
 
             //sd
@@ -153,10 +151,7 @@ var gradeDistr = (function() {
             function orderByAvrAscending(a,b) {
                 return a["avr"] - b["avr"];
             }
-            peopleArray.sort(orderByAvrAscending); //sort
-            // for (var i = 0; i < peopleArray.length; i++) {
-            //     console.log(peopleArray[i]["avr"]);
-            // }
+            peopleArray.sort(orderByAvrAscending);
 
             var totalNumPeople = peopleArray.length;
             for (var i = 0; i < totalNumPeople; i++){
@@ -195,13 +190,12 @@ var gradeDistr = (function() {
         }
 
         /**
-        Function that calculates each student's average grade,
-        averaged over the quizzes in quizzesOfInterest.
-        This case, always average over all the quizzes.
+        Function that calculates each student's average grade, and store it as each student's "avr" attribute;
+        the average grade is averaged over the quizzes in quizzesOfInterest (in this case, all the quizzes).
+        If a student didn't take the quiz, give him a zero and calculate average.
         **/
         function calcAverage(quizzesOfInterest) {
             quizzesOfInterest = getQuizzesArray();
-            console.log('getting sent', quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
                 personData["avr"] = 0;
@@ -217,12 +211,14 @@ var gradeDistr = (function() {
                     personData["avr"] = avr;
                 }
             }
-            // console.log(peopleData["abundantchatter"]["avr"]);
         }
 
+        /**
+        Function that calculates each student's average grade, and store it as each student's "avr" attribute;
+        the average grade is averaged over only the quizzes the students took.
+        **/
         function calcAverage_nozeros() {
             var quizzesOfInterest = getQuizzesArray();
-            //console.log('getting sent', quizzesOfInterest);
             for (var person in peopleData){
                 var personData = peopleData[person];
                 personData["avr"] = 0;
@@ -238,15 +234,6 @@ var gradeDistr = (function() {
                 var avr = sum / numQuizzes;
                 personData["avr"] = avr;
             }
-        }
-
-        function calcAvrOfAvr() {
-            var sum = 0; var numPeople = 0;
-            for (var person in peopleData) {
-                sum += peopleData[person]["avr"];
-                numPeople += 1;
-            }
-            return sum / numPeople;
         }
 
         function updateRankScatterPlot(quizname) {
@@ -267,7 +254,7 @@ var gradeDistr = (function() {
             handler.trigger('view all avr scatter');
         }
 
-        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, calcAvrOfAvr: calcAvrOfAvr, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, drawAllBarGraphs: drawAllBarGraphs, drawAllAvrScatterPlots: drawAllAvrScatterPlots, drawAllRankScatterPlots: drawAllRankScatterPlots, on: handler.on};
+        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, drawAllBarGraphs: drawAllBarGraphs, drawAllAvrScatterPlots: drawAllAvrScatterPlots, drawAllRankScatterPlots: drawAllRankScatterPlots, on: handler.on};
     }
 
     function Controller(model){
@@ -350,14 +337,6 @@ var gradeDistr = (function() {
         var sliderDiv = $('<div id="sliderbg">');
  
         var sliderObj = $('<div id="slider">');
-        var labelSlider = $('<p><h4>Overall Percentile (%):</h4>\
-            <input id="amount" style="width: 250px;\
-                    border: 0;\
-                    background-color: #fff;\
-                    color: #f6931f;\
-                    font-size: 12px;\
-                    font-weight: bold;\
-                    margin-bottom: -100px" /></p>');
 
         //basic info
         var legend = $('<div id="legend"></div>');
@@ -375,7 +354,7 @@ var gradeDistr = (function() {
 
 
         $('#column2').append(sliderDiv, legend); // legend, checkboxes
-        $('#sliderbg').append(labelSlider, sliderObj,lowerLabel, upperLabel);
+        $('#sliderbg').append(sliderObj,lowerLabel, upperLabel);
         $('ui-slider-range ui-widget-header ui-corner-all').css("background", "darkgray");
 
         $("#lowerLabel").text(25);
@@ -835,7 +814,6 @@ var gradeDistr = (function() {
                         var outerWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
                         var outerHeight = $(document).height()/3;
                         var margin = { top: 10, right: 5, bottom: 20, left: 10};
-                        console.log("drawinitialgraph");
                         drawInitialGraph(quizname, parentDiv, outerWidth, outerHeight, margin, overallMaxYStack, true);
                     }
                 }
@@ -859,7 +837,6 @@ var gradeDistr = (function() {
                 var sorted2 = [];
                 var result = [];
                 for (var obj in object) {
-                    // console.log('user', obj);
                     sorted.push([object[obj].username, [object[obj].avr, object[obj].grade]]);
                     sorted2.push([object[obj].username, object[obj].avr]);
                 }
@@ -874,7 +851,6 @@ var gradeDistr = (function() {
 
                 for (var index in result) {
                     result[index]["avrrank"] = result.length-index;
-                    console.log(result[index].username + (result[index].graderank, result[index].avrrank));
                 }
                 
                 return result;
@@ -884,30 +860,23 @@ var gradeDistr = (function() {
 
             var dataset = [];
             var dataDict = dataArray[0];
-            console.log('datadict: ', dataDict);
 
             for (var person in dataDict) {
                 if (quizname in dataDict[person]){
-                console.log('made it');
                 dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
                 
                 }
             }
             
-            console.log('dataset: ', dataset);
 
 
             var info = controller.getBasicInfo(quizname);
             // var result = sortByRank(dataset, "avr"); //sorted by avg
             var result2 = sortByRank(dataset); //sorted by grade
-            console.log(result2);
-            console.log('num of students', info[0]);
 
             var tooltip = d3.select("body").append("div")   
                 .attr("class", "tooltip")               
                 .style("opacity", 0);
-
-            var avrOfAvr = model.calcAvrOfAvr();
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([info[0], 0])
@@ -1060,7 +1029,6 @@ var gradeDistr = (function() {
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avr"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
 
-            //console.log("maxz", maxzscore);
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([10*(avrOverall-maxzscore*sdOverall),10*(avrOverall+maxzscore*sdOverall)])
                             .range([margin.left,outerWidth-margin.right])
@@ -1322,8 +1290,6 @@ var gradeDistr = (function() {
 
             for (var i = 0; i < numRows; i++) {
                 for (var j=0; j < numCols; j++) {
-                    console.log(i*numCols+j, quizzesArray.length);
-                    // if (i==0 && j==0) {
                     if (i*numCols+j < quizzesArray.length) {
                         var quizname = quizzesArray[i*numCols+j]
                         var parentDiv = ".avr-scatter-row-"+i+" .avr-scatter-col-"+j;
@@ -1412,7 +1378,6 @@ var gradeDistr = (function() {
                     updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                 }
                 else if (modeBools[1]) {
-                    console.log("!!!!!!!!!!!")
                     controller.calcAverage();
                     controller.updateRankScatterPlot(quizname);
                 }
@@ -1448,7 +1413,6 @@ var gradeDistr = (function() {
         model.on('changed', function(data) {
             // inNav = false;
             updateBarGraph(data);
-            console.log('here')
         });
 
         model.on('rank mode', function(data) {
