@@ -80,7 +80,8 @@ var gradeDistr = (function() {
         }
 
         /**
-        returns an array of [total number of people, average, ]
+        Function that takes in the assignment name and
+        returns an array of the assignment's [total number of people, average, st. dev.]
         **/
         function getBasicInfo(assignment) {
             //calc total num of students who completed the assignment
@@ -107,6 +108,10 @@ var gradeDistr = (function() {
             return [numPeople, avr*10, sd*10];           
         }
 
+        /**
+        Function that returns an array of
+        [mean of all students' "avr" attribute, sd of all students' "avr" attributes]
+        **/
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
@@ -127,7 +132,10 @@ var gradeDistr = (function() {
         }
 
         /**
+        Function that returns data needed for d3 stacked bar graph.
+        assignment the assignment name in String.
         bottomPct, topPct in percentage(%).
+        returns an array of three arrays that represent each layer of the stacked bar graph.
         **/
         function groupPeopleByAvr(assignment, lowPct, highPct) {
             var peopleArray = [];
@@ -186,6 +194,11 @@ var gradeDistr = (function() {
             return newThreeArrays;
         }
 
+        /**
+        Function that calculates each student's average grade,
+        averaged over the quizzes in quizzesOfInterest.
+        This case, always average over all the quizzes.
+        **/
         function calcAverage(quizzesOfInterest) {
             quizzesOfInterest = getQuizzesArray();
             console.log('getting sent', quizzesOfInterest);
@@ -551,15 +564,15 @@ var gradeDistr = (function() {
 
         var avr_margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
-        var avr_chartWidth = avr_outerWidth - avr_margin.left - avr_margin.right;
-        var avr_chartHeight = avr_outerHeight - avr_margin.top - avr_margin.bottom;
-
         //"#column1", bar_outerWidth, bar_outerHeight, bar_margin
         function drawInitialGraph(quizname, parentDiv, outerWidth, outerHeight, margin, maxY, isSmall) { //assignment, quizzesOfInterest, lowPct, highPct,             
             var chartWidth = outerWidth - margin.left - margin.right;
             var chartHeight = outerHeight - margin.top - margin.bottom;
-
-            if (!isSmall) {console.log("not small");$('svg').remove();}
+            
+            if (!isSmall) {
+                $('#column1').children().remove();
+                $('#legend').show();
+            }
             //INITIALIZE THE CHART
             var chart = d3.select(parentDiv)
                 .append("svg")  
@@ -777,6 +790,7 @@ var gradeDistr = (function() {
         }
 
         function drawAllBarGraphs(){
+            $('#legend').hide();
             $('#column1').children().remove();
             var quizzesArray = controller.getQuizzesArray();
 
@@ -793,6 +807,7 @@ var gradeDistr = (function() {
                 $('#column1').append(thisrow);
             }
 
+            //calculate absolute max y value of all plots
             var overallMaxYStack = 0;
             for (var i = 0; i < numRows; i++) {
                 for (var j=0; j < numCols; j++) {
@@ -812,6 +827,7 @@ var gradeDistr = (function() {
                 }
             }
 
+            //iterate through each grid div and append a bar graph to each
             for (var i = 0; i < numRows; i++) {
                 for (var j=0; j < numCols; j++) {
                     if (i*numCols+j < quizzesArray.length) {
@@ -825,9 +841,18 @@ var gradeDistr = (function() {
                     }
                 }
             }
+            //x and y axes labels
+            var allbars_xaxislabel = d3.select('#column1').append("div")
+                            .attr("class", "viewall-xaxislabel")
+                            .text("Grade for Each Quiz (%)");   
+            // allbars_xaxislabel.attr();        
+            d3.select('#column1').append("div")
+                            .attr("class", "viewall-yaxislabel")
+                            .text("Number of Students");            
         }
 
         function updateRankScatterPlot(dataArray) {
+            $('#legend').show();
             var quizname = dataArray[1]; 
 
             function sortByRank(object) {
@@ -981,9 +1006,9 @@ var gradeDistr = (function() {
             svg.append("text")
                 .attr("class", "xaxis-label")
                 // .attr("x",chartWidth/2)
-                .attr("x", avr_outerWidth/2)
-                .attr("y", avr_chartHeight+avr_margin.top)
-                .attr("dy", avr_margin.bottom*0.9)
+                .attr("x", rank_outerWidth/2)
+                .attr("y", rank_chartHeight+avr_margin.top)
+                .attr("dy", rank_margin.bottom*0.9)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Overall Rank");
@@ -994,8 +1019,8 @@ var gradeDistr = (function() {
                 .attr("x",0)
                 .attr("y", 0)
                 .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -avr_margin.top-avr_chartHeight/2)
-                .attr("dy", avr_margin.left*0.2)
+                .attr("dx", -rank_margin.top-rank_chartHeight/2)
+                .attr("dy", rank_margin.left*0.2)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Rank for "+ quizname);
@@ -1009,7 +1034,10 @@ var gradeDistr = (function() {
             var chartWidth = outerWidth - margin.left - margin.right;
             var chartHeight = outerHeight - margin.top - margin.bottom;
 
-            if (!isSmall) {$('svg').remove();} //remove previous existing svg if drawing big plot
+            if (!isSmall) {
+                $('#column1').children().remove();
+                $('#legend').show();
+            } //remove previous existing svg if drawing big plot
 
             model.calcAverage_nozeros();
             var dataset = [];
@@ -1258,9 +1286,9 @@ var gradeDistr = (function() {
             if (isSmall) {
                 svg.append("text")
                         .attr("class","title")
-                        .attr("x", outerWidth/2)
+                        .attr("x", "50%")
                         .attr("y", 0)
-                        .attr("dy", $('.title').height()*.8)
+                        .attr("dy", 12)
                         .text(quizname);
             }
 
@@ -1276,6 +1304,7 @@ var gradeDistr = (function() {
         }
 
         function drawAllAvrScatterPlots() {
+            $('#legend').hide();
             $('#column1').children().remove();
             var quizzesArray = controller.getQuizzesArray();
 
@@ -1306,7 +1335,14 @@ var gradeDistr = (function() {
                     }
                 }
             }
-
+            //x and y axes labels
+            var allbars_xaxislabel = d3.select('#column1').append("div")
+                            .attr("class", "viewall-xaxislabel")
+                            .text("Overall Grade");   
+            // allbars_xaxislabel.attr();        
+            d3.select('#column1').append("div")
+                            .attr("class", "viewall-yaxislabel")
+                            .text("Grade for Each Quiz");            
         }
         /* 
             

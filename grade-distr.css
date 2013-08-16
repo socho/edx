@@ -43,6 +43,25 @@
 	font-size: 7pt;
 }
 
+.viewall-xaxislabel {
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	font-weight: bold;
+}
+
+.viewall-yaxislabel {
+	position: absolute;
+	left:-8%;
+	top: 50%;
+	font-weight: bold;
+	transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg); 
+    -webkit-transform: rotate(-90deg); 
+    -o-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+}
+
 #legend {
 	background-color: #fff;
 	border-radius: 10px;
