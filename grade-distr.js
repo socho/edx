@@ -496,7 +496,6 @@ var gradeDistr = (function() {
             modeBools[1] = true;
             modeBools[2] = false;
             sliderDiv.hide();
-            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
                 quizname = model.getQuizzesArray()[0];
@@ -515,12 +514,12 @@ var gradeDistr = (function() {
             modeBools[1] = false;
             modeBools[2] = true;
             sliderDiv.hide();
-            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
                 controller.drawAllAvrScatterPlots();
             }
             else {         
+                $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
                 displayBasicInfo(quizname);
                 controller.updateAvrScatterPlot(quizname,'#column1',avr_outerWidth,avr_outerHeight,avr_margin,false);
             }
