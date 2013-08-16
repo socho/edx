@@ -574,6 +574,10 @@ var attempts = (function() {
 
             // console.log(maxgradezscore, maxavrzscore, maxzscore);
 
+            var xscale = d3.scale.ordinal()
+                            .domain([1,2,3,4,5,6,7,8,9,10,11])
+                            .rangeRoundBands([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right],0.1, 0.02);
+
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([0, attemptsarray.length])
                             .range([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right]);
@@ -591,9 +595,8 @@ var attempts = (function() {
 
 
             var xAxis = d3.svg.axis()
-                            .scale(xScale)
-                            .orient("bottom")
-                            .ticks(11)
+                            .scale(xscale)
+                            .orient("bottom");
             var yAxis = d3.svg.axis()
                             .scale(yscaleticks)
                             .orient("left")
@@ -613,7 +616,7 @@ var attempts = (function() {
                 .attr("y", function(d) {
                     return attemptsbar_margin.top+attemptsbar_chartHeight-(yScale(d)); //because the svg's will be upside down; height-data value
                 })
-                .attr("width", attemptsbar_chartWidth / attemptsarray.length - barPadding)
+                .attr("width",attemptsbar_chartWidth / attemptsarray.length - barPadding)
                 .attr("height", function(d) {
                     return yScale(d)
                 })
@@ -627,20 +630,6 @@ var attempts = (function() {
                     return d; 
                 }
             });
-
-            // svg.selectAll("text")
-            //     .data(attemptsarray)
-            //     .enter()
-            //     .append("text")
-            //     .text(function(d) {
-            //         return d;
-            //     })
-            //     .attr("x", function(d, i) {
-            //         return i * (attemptsbar_chartWidth / attemptsarray.length) + (attemptsbar_chartWidth / attemptsarray.length - barPadding) / 2;
-            //     })
-            //     .attr("y", function(d) {
-            //         return attemptsbar_margin.top + attemptsbar_chartHeight - yScale(d) + 14;
-            //     })
                 
 
                 //Y-AXIS LABEL
@@ -680,6 +669,13 @@ var attempts = (function() {
                 .attr("transform", "translate("+(attemptsbar_margin.left+10)+",0)")
                 .call(yAxis);
 
+
+            var ticks = $('.axis');
+            var tickss = ticks.find('g');
+            console.log('num of ticks: ', tickss[11]);
+            for (var i = 1; i < 10; i++) {
+                tickss[i].attr("transform", 'translate(30,0)');
+            }
 
         }
 
