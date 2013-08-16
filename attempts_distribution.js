@@ -578,9 +578,9 @@ var attempts = (function() {
                             .domain([1,2,3,4,5,6,7,8,9,10,11])
                             .rangeRoundBands([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right],0.1, 0.02);
 
-            // var xScale = d3.scale.linear() //scale is a function!!!!!
-            //                 .domain([0, attemptsarray.length])
-            //                 .range([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right]);
+            var xScale = d3.scale.linear() //scale is a function!!!!!
+                            .domain([0, attemptsarray.length])
+                            .range([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right]);
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([0, Math.max.apply(Math,attemptsarray)])
                             .range([attemptsbar_margin.top,attemptsbar_outerHeight-attemptsbar_margin.bottom]);
