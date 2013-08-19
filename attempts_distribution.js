@@ -590,7 +590,7 @@ var attempts = (function() {
             var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
             var attemptsbar_outerHeight = 600;
 
-            var attemptsbar_margin = { top: -10, right: 20, bottom: 50, left: 30 };
+            var attemptsbar_margin = { top: 20, right: 20, bottom: 50, left: 50 };
 
             var attemptsbar_chartWidth = attemptsbar_outerWidth - attemptsbar_margin.left - attemptsbar_margin.right;
             var attemptsbar_chartHeight = attemptsbar_outerHeight - attemptsbar_margin.top - attemptsbar_margin.bottom;
@@ -601,37 +601,19 @@ var attempts = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
-            var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
-            var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
-            var maxzscore = Math.max(maxavrzscore, maxgradezscore);
-
-            // console.log(maxgradezscore, maxavrzscore, maxzscore);
-
-            var xscale = d3.scale.ordinal()
+            var xScale = d3.scale.ordinal()
                             .domain([1,2,3,4,5,6,7,8,9,10,11])
-                            .rangeRoundBands([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right],0.1, 0.02);
+                            .rangeRoundBands([attemptsbar_margin.left,attemptsbar_outerWidth-attemptsbar_margin.right],0.05);
 
-            var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([0, attemptsarray.length])
-                            .range([attemptsbar_margin.left+10,attemptsbar_outerWidth-attemptsbar_margin.right]);
-            var yScale = d3.scale.linear() //scale is a function!!!!!
+            var yScale = d3.scale.linear()
                             .domain([0, Math.max.apply(Math,attemptsarray)])
-                            .range([attemptsbar_margin.top,attemptsbar_outerHeight-attemptsbar_margin.bottom]);
-            console.log(Math.max.apply(Math,attemptsarray));
-            
-
-            var yscaleticks = d3.scale.linear() //scale is a function!!!!!
-                                .domain([Math.max.apply(Math,attemptsarray),0])
-                                .range([attemptsbar_margin.top+15,attemptsbar_outerHeight-attemptsbar_margin.bottom]);           
-            var barPadding = 2;
-
-
+                            .range([attemptsbar_outerHeight - attemptsbar_margin.bottom, attemptsbar_margin.top]);
 
             var xAxis = d3.svg.axis()
-                            .scale(xscale)
+                            .scale(xScale)
                             .orient("bottom");
             var yAxis = d3.svg.axis()
-                            .scale(yscaleticks)
+                            .scale(yScale)
                             .orient("left")
                             .ticks(5);
 
@@ -639,37 +621,29 @@ var attempts = (function() {
                         .attr("width",attemptsbar_outerWidth)
                         .attr("height",attemptsbar_outerHeight);
 
-             //HORIZ GRID LINES
-
-            function make_y_axis_grid() {        
-                return d3.svg.axis()
-                    .scale(yscaleticks)
-                    .orient("left")
-                    .ticks(5)
-            }
+            // Y AXIS GRID LINES
+            svg.selectAll("line").data(yScale.ticks(5))
+                .enter().append("line")
+                .attr("class", "horizontal_line")
+                .attr("x1", attemptsbar_margin.left)
+                .attr("x2", attemptsbar_chartWidth + attemptsbar_margin.left)
+                .attr("y1", yScale)
+                .attr("y2", yScale);
           
-            svg.append("g")         
-                .attr("class", "grid")
-                .attr("transform", "translate("+(attemptsbar_margin.left+10)+",0)")
-                .call(make_y_axis_grid()
-                    .tickSize(-attemptsbar_chartWidth, 0, 0)
-                    .tickFormat("")
-
-                );
 
             svg.selectAll('rect')
                 .data(attemptsarray)
                 .enter()
                 .append("rect")
                 .attr("x", function(d,i) {
-                    return xScale(i);
+                    return xScale(i+1);
                 })
                 .attr("y", function(d) {
-                    return attemptsbar_margin.top+attemptsbar_chartHeight-(yScale(d)); //because the svg's will be upside down; height-data value
+                    return yScale(d); //because the svg's will be upside down; height-data value
                 })
-                .attr("width",attemptsbar_chartWidth / attemptsarray.length - barPadding)
+                .attr("width", xScale.rangeBand())
                 .attr("height", function(d) {
-                    return yScale(d);
+                    return attemptsbar_chartHeight + attemptsbar_margin.top - yScale(d);
                 })
                 .attr('fill', 'lightblue');
 
@@ -682,32 +656,28 @@ var attempts = (function() {
                 }
             });
                 
-
-
-                //Y-AXIS LABEL
+            //Y-AXIS LABEL
             svg.append("text")
                 .attr("class", "yaxis-label")
                 .attr("x",0)
                 .attr("y", 0)
                 .attr("transform", function(d) {return "rotate(-90)" })
                 .attr("dx", -attemptsbar_margin.top-chartHeight/2)
-                .attr("dy", margin.left*0.2)
+                .attr("dy", attemptsbar_margin.left*0.2)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
-                .text("# Number of Students");
-
-
+                .text("Number of Students");
 
             //X-AXIS LABEL
             svg.append("text")
                 .attr("class", "xaxis-label")
                 // .attr("x",chartWidth/2)
-                .attr("x", chartWidth/2)
-                .attr("y", chartHeight+attemptsbar_margin.top)
-                .attr("dy", attemptsbar_margin.bottom+10)
+                .attr("x", attemptsbar_chartWidth/2)
+                .attr("y", attemptsbar_chartHeight+attemptsbar_margin.top)
+                .attr("dy", attemptsbar_margin.bottom*.75)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
-                .text("# Number of Attempts");
+                .text("Number of Attempts");
 
             //xaxis
             svg.append("g")
@@ -718,10 +688,8 @@ var attempts = (function() {
             //yaxis
             svg.append("g")
                 .attr("class","axis")
-                .attr("transform", "translate("+(attemptsbar_margin.left+10)+",0)")
+                .attr("transform", "translate("+(attemptsbar_margin.left)+",0)")
                 .call(yAxis);
-
-
 
         }
 
