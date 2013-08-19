@@ -590,7 +590,7 @@ var attempts = (function() {
             var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
             var attemptsbar_outerHeight = 600;
 
-            var attemptsbar_margin = { top: -10, right: 20, bottom: 50, left: 30 };
+            var attemptsbar_margin = { top: 0, right: 20, bottom: 50, left: 30 };
 
             var attemptsbar_chartWidth = attemptsbar_outerWidth - attemptsbar_margin.left - attemptsbar_margin.right;
             var attemptsbar_chartHeight = attemptsbar_outerHeight - attemptsbar_margin.top - attemptsbar_margin.bottom;
@@ -622,7 +622,7 @@ var attempts = (function() {
 
             var yscaleticks = d3.scale.linear() //scale is a function!!!!!
                                 .domain([Math.max.apply(Math,attemptsarray),0])
-                                .range([attemptsbar_margin.top+15,attemptsbar_outerHeight-attemptsbar_margin.bottom]);           
+                                .range([attemptsbar_margin.top,attemptsbar_outerHeight-attemptsbar_margin.bottom]);           
             var barPadding = 2;
 
 

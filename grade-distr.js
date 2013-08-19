@@ -236,9 +236,9 @@ var gradeDistr = (function() {
             }
         }
 
-        function updateRankScatterPlot(quizname) {
-            handler.trigger('rank mode', [peopleData, quizname]);
-        }
+        // function updateRankScatterPlot(quizname) {
+        //     handler.trigger('rank mode', [peopleData, quizname]);
+        // }
 
         function updateAvrScatterPlot(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
             handler.trigger('avr mode', [quizname,parentDiv,outerWidth,outerHeight,margin,isSmall]);
@@ -254,7 +254,8 @@ var gradeDistr = (function() {
             handler.trigger('view all avr scatter');
         }
 
-        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, updateRankScatterPlot: updateRankScatterPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, drawAllBarGraphs: drawAllBarGraphs, drawAllAvrScatterPlots: drawAllAvrScatterPlots, drawAllRankScatterPlots: drawAllRankScatterPlots, on: handler.on};
+        return {getInfoOverAll: getInfoOverAll, updateAvrScatterPlot: updateAvrScatterPlot, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, calcAverage_nozeros: calcAverage_nozeros, groupPeopleByAvr: groupPeopleByAvr, drawAllBarGraphs: drawAllBarGraphs, drawAllAvrScatterPlots: drawAllAvrScatterPlots, drawAllRankScatterPlots: drawAllRankScatterPlots, on: handler.on};
+        //updateRankScatterPlot: updateRankScatterPlot
     }
 
     function Controller(model){
@@ -270,9 +271,9 @@ var gradeDistr = (function() {
             model.drawAllAvrScatterPlots();
         }
 
-        function updateRankScatterPlot(quizname) {
-            model.updateRankScatterPlot(quizname);
-        }
+        // function updateRankScatterPlot(quizname) {
+        //     model.updateRankScatterPlot(quizname);
+        // }
 
         function drawAllRankScatterPlots() {
             model.drawAllRankScatterPlots();
@@ -302,7 +303,8 @@ var gradeDistr = (function() {
             return model.groupPeopleByAvr(assignment, lowPct, highPct);
         }
         
-        return {drawAllBarGraphs: drawAllBarGraphs, updateAvrScatterPlot: updateAvrScatterPlot, drawAllAvrScatterPlots: drawAllAvrScatterPlots, updateRankScatterPlot: updateRankScatterPlot, drawAllRankScatterPlots: drawAllRankScatterPlots, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        return {drawAllBarGraphs: drawAllBarGraphs, updateAvrScatterPlot: updateAvrScatterPlot, drawAllAvrScatterPlots: drawAllAvrScatterPlots, drawAllRankScatterPlots: drawAllRankScatterPlots, getPeopleData: getPeopleData, getQuizData: getQuizData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, groupPeopleByAvr: groupPeopleByAvr};
+        //updateRankScatterPlot: updateRankScatterPlot,
     }
 
     function View(div, model, controller){
@@ -436,10 +438,10 @@ var gradeDistr = (function() {
         //MODE BUTTONS
         var modes = $('<ul class="nav nav-tabs"></ul>');
         var leftButton = $('<li class="active"><a href="#">Percentiles</a></li>');
-        var middleButton = $('<li><a href="#">Ranking</a></li>');
+        // var middleButton = $('<li><a href="#">Ranking</a></li>');
         var rightButton = $('<li><a href="#">Normalized</a></li>');
 
-        modes.append(leftButton, middleButton, rightButton);
+        modes.append(leftButton, rightButton); //middleButton, 
         modes.css('padding', 'auto auto');
         $('#column2').prepend(modes);
 
@@ -447,7 +449,7 @@ var gradeDistr = (function() {
 
         leftButton.on('click', function() {
             leftButton.attr("class","active");
-            middleButton.attr("class","");
+            // middleButton.attr("class","");
             rightButton.attr("class","");
             modeBools[0] = true;
             modeBools[1] = false;
@@ -467,27 +469,27 @@ var gradeDistr = (function() {
             }
         });
 
-        middleButton.on('click', function() {
-            middleButton.attr("class","active");
-            leftButton.attr("class","");
-            rightButton.attr("class","");
-            modeBools[0] = false;
-            modeBools[1] = true;
-            modeBools[2] = false;
-            sliderDiv.hide();
-            var quizname = $('#asgn-nav').text();
-            if (quizname == "ViewAll") {
-                quizname = model.getQuizzesArray()[0];
-            }
-            controller.calcAverage();
-            controller.updateRankScatterPlot(quizname);
-            displayBasicInfo(quizname);
-            $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-        });
+        // middleButton.on('click', function() {
+        //     middleButton.attr("class","active");
+        //     leftButton.attr("class","");
+        //     rightButton.attr("class","");
+        //     modeBools[0] = false;
+        //     modeBools[1] = true;
+        //     modeBools[2] = false;
+        //     sliderDiv.hide();
+        //     var quizname = $('#asgn-nav').text();
+        //     if (quizname == "ViewAll") {
+        //         quizname = model.getQuizzesArray()[0];
+        //     }
+        //     controller.calcAverage();
+        //     controller.updateRankScatterPlot(quizname);
+        //     displayBasicInfo(quizname);
+        //     $('#asgn-nav').html(quizname+"<span class='caret'></span>");
+        // });
 
         rightButton.on('click', function() {
             rightButton.attr("class","active");
-            middleButton.attr("class","");
+            // middleButton.attr("class","");
             leftButton.attr("class","");
             modeBools[0] = false;
             modeBools[1] = false;
@@ -828,175 +830,175 @@ var gradeDistr = (function() {
                             .text("Number of Students");            
         }
 
-        function updateRankScatterPlot(dataArray) {
-            $('#legend').show();
-            var quizname = dataArray[1]; 
+        // function updateRankScatterPlot(dataArray) {
+        //     $('#legend').show();
+        //     var quizname = dataArray[1]; 
 
-            function sortByRank(object) {
-                var sorted = [];
-                var sorted2 = [];
-                var result = [];
-                for (var obj in object) {
-                    sorted.push([object[obj].username, [object[obj].avr, object[obj].grade]]);
-                    sorted2.push([object[obj].username, object[obj].avr]);
-                }
-                sorted.sort(function(a,b) {return a[1][1]-b[1][1]});
-                sorted2.sort(function(a,b) {return a[1]-b[1]});
+        //     function sortByRank(object) {
+        //         var sorted = [];
+        //         var sorted2 = [];
+        //         var result = [];
+        //         for (var obj in object) {
+        //             sorted.push([object[obj].username, [object[obj].avr, object[obj].grade]]);
+        //             sorted2.push([object[obj].username, object[obj].avr]);
+        //         }
+        //         sorted.sort(function(a,b) {return a[1][1]-b[1][1]});
+        //         sorted2.sort(function(a,b) {return a[1]-b[1]});
 
-                for (var i = 0; i < sorted.length; i++) {
-                    result.push({"username": sorted[i][0], "avr": sorted[i][1][0], "grade": sorted[i][1][1], "graderank": sorted.length-i});
-                }
+        //         for (var i = 0; i < sorted.length; i++) {
+        //             result.push({"username": sorted[i][0], "avr": sorted[i][1][0], "grade": sorted[i][1][1], "graderank": sorted.length-i});
+        //         }
 
-                result.sort(function(a,b) {return a["avr"]-b["avr"]});
+        //         result.sort(function(a,b) {return a["avr"]-b["avr"]});
 
-                for (var index in result) {
-                    result[index]["avrrank"] = result.length-index;
-                }
+        //         for (var index in result) {
+        //             result[index]["avrrank"] = result.length-index;
+        //         }
                 
-                return result;
-            }
+        //         return result;
+        //     }
             
-            d3.select("svg").remove();
+        //     d3.select("svg").remove();
 
-            var dataset = [];
-            var dataDict = dataArray[0];
+        //     var dataset = [];
+        //     var dataDict = dataArray[0];
 
-            for (var person in dataDict) {
-                if (quizname in dataDict[person]){
-                dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+        //     for (var person in dataDict) {
+        //         if (quizname in dataDict[person]){
+        //         dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
                 
-                }
-            }
+        //         }
+        //     }
             
 
 
-            var info = controller.getBasicInfo(quizname);
-            // var result = sortByRank(dataset, "avr"); //sorted by avg
-            var result2 = sortByRank(dataset); //sorted by grade
+        //     var info = controller.getBasicInfo(quizname);
+        //     // var result = sortByRank(dataset, "avr"); //sorted by avg
+        //     var result2 = sortByRank(dataset); //sorted by grade
 
-            var tooltip = d3.select("body").append("div")   
-                .attr("class", "tooltip")               
-                .style("opacity", 0);
+        //     var tooltip = d3.select("body").append("div")   
+        //         .attr("class", "tooltip")               
+        //         .style("opacity", 0);
 
-            var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([info[0], 0])
-                            .range([rank_margin.left,rank_outerWidth-rank_margin.right]);
-            var yScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([info[0], 0])
-                            .range([rank_outerHeight-rank_margin.bottom,rank_margin.top]);
+        //     var xScale = d3.scale.linear() //scale is a function!!!!!
+        //                     .domain([info[0], 0])
+        //                     .range([rank_margin.left,rank_outerWidth-rank_margin.right]);
+        //     var yScale = d3.scale.linear() //scale is a function!!!!!
+        //                     .domain([info[0], 0])
+        //                     .range([rank_outerHeight-rank_margin.bottom,rank_margin.top]);
 
-            var xAxis = d3.svg.axis()
-                            .scale(xScale)
-                            .orient("bottom")
-                            .ticks(10);
-            var yAxis = d3.svg.axis()
-                            .scale(yScale)
-                            .orient("left")
-                            .ticks(10);
-
-
-            var svg = d3.select("#column1").append("svg")
-                        .attr("width",rank_outerWidth)
-                        .attr("height",rank_outerHeight);
+        //     var xAxis = d3.svg.axis()
+        //                     .scale(xScale)
+        //                     .orient("bottom")
+        //                     .ticks(10);
+        //     var yAxis = d3.svg.axis()
+        //                     .scale(yScale)
+        //                     .orient("left")
+        //                     .ticks(10);
 
 
-
-            svg.append("line")
-                .attr("class", "diagonal")
-                .attr('x1', rank_margin.left)
-                .attr('x2', rank_outerWidth-rank_margin.right)
-                .attr('y1', rank_outerHeight-rank_margin.bottom)
-                .attr('y2', rank_margin.top)
-
-            //help text
-            var helptext = svg.append("g")
-                                .attr("class", "helptext");
-            var x = $('.diagonal').attr("x2");
-            var y = $('.diagonal').attr("y2");
-
-            helptext.append("text")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dx", -rank_chartWidth/10)
-                    .attr("dy", 20)
-                    .text("better than")
-                    .append("tspan")
-                    .text("usual")
-                    .attr("x",x)
-                    .attr("dx", -rank_chartWidth/10)
-                    .attr("dy", 12);
-            helptext.append("text")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 0.15*rank_chartHeight)
-                    .text("worse than")
-                    .append("tspan")
-                    .text("usual")
-                    .attr("x", x)
-                    .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 12);
+        //     var svg = d3.select("#column1").append("svg")
+        //                 .attr("width",rank_outerWidth)
+        //                 .attr("height",rank_outerHeight);
 
 
-            svg.selectAll("circle")
-                .data(result2)
-                .enter()
-                .append("circle")
-                .attr("class","datapoints")
-                .attr("cx", function(d){
-                    return xScale(d["avrrank"]);
-                })
-                .attr("cy", function(d){
-                    return yScale(d["graderank"]);
-                })
-                .attr("r", 3);
 
-            $('svg circle').tipsy({ 
-                gravity: 's', 
-                html: true, 
-                title: function() {
-                    var d = this.__data__;
-                    return d["username"] + "<br/>Rank for " + quizname +": "  + d["graderank"] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
-                }
-            });
+        //     svg.append("line")
+        //         .attr("class", "diagonal")
+        //         .attr('x1', rank_margin.left)
+        //         .attr('x2', rank_outerWidth-rank_margin.right)
+        //         .attr('y1', rank_outerHeight-rank_margin.bottom)
+        //         .attr('y2', rank_margin.top)
 
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate(0,"+(rank_outerHeight-rank_margin.bottom)+")")
-                .call(xAxis);
+        //     //help text
+        //     var helptext = svg.append("g")
+        //                         .attr("class", "helptext");
+        //     var x = $('.diagonal').attr("x2");
+        //     var y = $('.diagonal').attr("y2");
 
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate("+rank_margin.left+",0)")
-                .call(yAxis);
+        //     helptext.append("text")
+        //             .attr("x", x)
+        //             .attr("y", y)
+        //             .attr("dx", -rank_chartWidth/10)
+        //             .attr("dy", 20)
+        //             .text("better than")
+        //             .append("tspan")
+        //             .text("usual")
+        //             .attr("x",x)
+        //             .attr("dx", -rank_chartWidth/10)
+        //             .attr("dy", 12);
+        //     helptext.append("text")
+        //             .attr("x", x)
+        //             .attr("y", y)
+        //             .attr("dx", -0.5 * $('text').width())
+        //             .attr("dy", 0.15*rank_chartHeight)
+        //             .text("worse than")
+        //             .append("tspan")
+        //             .text("usual")
+        //             .attr("x", x)
+        //             .attr("dx", -0.5 * $('text').width())
+        //             .attr("dy", 12);
 
-            //X-AXIS LABEL
-            svg.append("text")
-                .attr("class", "xaxis-label")
-                // .attr("x",chartWidth/2)
-                .attr("x", rank_outerWidth/2)
-                .attr("y", rank_chartHeight+avr_margin.top)
-                .attr("dy", rank_margin.bottom*0.9)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Overall Rank");
 
-            //Y-AXIS LABEL
-            svg.append("text")
-                .attr("class", "yaxis-label")
-                .attr("x",0)
-                .attr("y", 0)
-                .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -rank_margin.top-rank_chartHeight/2)
-                .attr("dy", rank_margin.left*0.2)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Rank for "+ quizname);
-        }
+        //     svg.selectAll("circle")
+        //         .data(result2)
+        //         .enter()
+        //         .append("circle")
+        //         .attr("class","datapoints")
+        //         .attr("cx", function(d){
+        //             return xScale(d["avrrank"]);
+        //         })
+        //         .attr("cy", function(d){
+        //             return yScale(d["graderank"]);
+        //         })
+        //         .attr("r", 3);
 
-        function drawAllRankScatterPlots() {
+        //     $('svg circle').tipsy({ 
+        //         gravity: 's', 
+        //         html: true, 
+        //         title: function() {
+        //             var d = this.__data__;
+        //             return d["username"] + "<br/>Rank for " + quizname +": "  + d["graderank"] + "<br/>Avg Quiz Score: "  + d["avr"].toFixed(2) + "<br/>Grade For " + quizname+ ": "  + parseFloat(d["grade"]); 
+        //         }
+        //     });
 
-        }
+        //     svg.append("g")
+        //         .attr("class","axis")
+        //         .attr("transform", "translate(0,"+(rank_outerHeight-rank_margin.bottom)+")")
+        //         .call(xAxis);
+
+        //     svg.append("g")
+        //         .attr("class","axis")
+        //         .attr("transform", "translate("+rank_margin.left+",0)")
+        //         .call(yAxis);
+
+        //     //X-AXIS LABEL
+        //     svg.append("text")
+        //         .attr("class", "xaxis-label")
+        //         // .attr("x",chartWidth/2)
+        //         .attr("x", rank_outerWidth/2)
+        //         .attr("y", rank_chartHeight+avr_margin.top)
+        //         .attr("dy", rank_margin.bottom*0.9)
+        //         .attr("font-weight", "bold")
+        //         .attr("text-anchor", "middle")
+        //         .text("Overall Rank");
+
+        //     //Y-AXIS LABEL
+        //     svg.append("text")
+        //         .attr("class", "yaxis-label")
+        //         .attr("x",0)
+        //         .attr("y", 0)
+        //         .attr("transform", function(d) {return "rotate(-90)" })
+        //         .attr("dx", -rank_margin.top-rank_chartHeight/2)
+        //         .attr("dy", rank_margin.left*0.2)
+        //         .attr("font-weight", "bold")
+        //         .attr("text-anchor", "middle")
+        //         .text("Rank for "+ quizname);
+        // }
+
+        // function drawAllRankScatterPlots() {
+
+        // }
 
         function updateAvrScatterPlot(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
             var chartWidth = outerWidth - margin.left - margin.right;
@@ -1335,13 +1337,13 @@ var gradeDistr = (function() {
                             updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                         }
                     }
-                    else if (modeBools[1]) {
-                        if ($('.btn-l').attr("disabled")=="disabled") {
-                            $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
-                        }
-                        controller.calcAverage();
-                        controller.updateRankScatterPlot(quizname)
-                    }
+                    // else if (modeBools[1]) {
+                    //     if ($('.btn-l').attr("disabled")=="disabled") {
+                    //         $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
+                    //     }
+                    //     controller.calcAverage();
+                    //     controller.updateRankScatterPlot(quizname)
+                    // }
                     else if (modeBools[2]) {
                         if ($('.btn-l').attr("disabled")=="disabled") {
                             $('.btn-l').attr("disabled",false); $('.btn-r').attr("disabled",false);
@@ -1377,10 +1379,10 @@ var gradeDistr = (function() {
                     top = Math.abs(100 - sliderObj.slider("values", 1));
                     updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                 }
-                else if (modeBools[1]) {
-                    controller.calcAverage();
-                    controller.updateRankScatterPlot(quizname);
-                }
+                // else if (modeBools[1]) {
+                //     controller.calcAverage();
+                //     controller.updateRankScatterPlot(quizname);
+                // }
                 else if (modeBools[2]) {
                     controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                 }
@@ -1399,10 +1401,10 @@ var gradeDistr = (function() {
                     top = Math.abs(100 - sliderObj.slider("values", 1));
                     updateBarGraph([controller.groupPeopleByAvr(quizname, bottom, 100-top),quizname])
                 }
-                else if (modeBools[1]) {
-                    controller.calcAverage();
-                    controller.updateRankScatterPlot(quizname);
-                }
+                // else if (modeBools[1]) {
+                //     controller.calcAverage();
+                //     controller.updateRankScatterPlot(quizname);
+                // }
                 else if (modeBools[2]){
                     controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                 }
@@ -1415,9 +1417,9 @@ var gradeDistr = (function() {
             updateBarGraph(data);
         });
 
-        model.on('rank mode', function(data) {
-            updateRankScatterPlot(data);
-        });
+        // model.on('rank mode', function(data) {
+        //     updateRankScatterPlot(data);
+        // });
 
         model.on('avr mode', function(data) {
             updateAvrScatterPlot(data[0],data[1],data[2],data[3],data[4],data[5]);
