@@ -6,6 +6,10 @@
 	text-align: center;
 }
 
+#column1 {
+	padding-top: 20px;
+}
+
 .axis path,
 .axis line {
 	fill: none;

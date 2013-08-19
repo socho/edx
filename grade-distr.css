@@ -10,6 +10,9 @@
 	padding-top: 20px;
 }
 
+#sliderbg {
+	padding-top: 15%;
+}
 .chart rect {
 	stroke: white;
 	shape-rendering: crispEdges;
