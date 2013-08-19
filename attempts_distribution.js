@@ -2,12 +2,6 @@ var attempts = (function() {
   
     var exports = {};
 
-    var inNav = false; //checks to see if the user is clicking a link in the navigation box
-  
-////////////////////////////////// global variables 
-//stuff goes here    
-////////////////////////////////// helper functions
-//stuff goes here
 
     function UpdateHandler() {
         var handlers = {};
@@ -48,7 +42,6 @@ var attempts = (function() {
 
 
         var peopleData = makeFullData(200);
-        console.log(peopleData);
 
         function getPeopleData(){
             return peopleData;
@@ -82,10 +75,12 @@ var attempts = (function() {
                 }
             }
             var sd = Math.sqrt(sqDiffSum / numPeople);
-            console.log(assignment,numPeople,avr,sd);
             return [numPeople, avr, sd];           
         }
 
+        /*
+        calculates student's grade average in the class
+        */
         function calcAverage() {
             var quizzesOfInterest = getQuizzesArray();
             for (var person in peopleData){
@@ -105,14 +100,17 @@ var attempts = (function() {
             }
         }
 
+
+        /*
+        Calculates the average grade on the quiz, the standard deviation and the number of 
+        students who took the quiz
+        */
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
                 sum += parseFloat(peopleData[person]["avr"]);
-                // console.log(person,'avr',peopleData[person]["avr"]);
                 numPeople += 1;
             }
-            // console.log('sum',sum,'numpeople',numPeople)
             var avr = sum / numPeople;
 
             //sd
@@ -121,7 +119,6 @@ var attempts = (function() {
                 sqDiffSum += Math.pow(peopleData[person]["avr"]-avr,2);
             }
             var sd = Math.sqrt(sqDiffSum / numPeople);
-            // console.log(avr,sd);
             return [avr, sd];            
         }
 
@@ -157,7 +154,7 @@ var attempts = (function() {
         +'</div>'
         );
         
-        //MODE BOOLS
+        //MODE BOOLS 
 
         var modeBool = [true, false];
 
@@ -191,11 +188,13 @@ var attempts = (function() {
 
 
         
-
+        //initial graph
         model.calcAverage();
         drawGraph("Ex 1");
 
-
+        /*
+        draws the scatter plot graph everytime when called
+        */
         function drawGraph(quizname) {
             $('svg').remove();
             var dataset = [];
@@ -229,12 +228,7 @@ var attempts = (function() {
 
             var xaxisData = [];
             var yaxisData = [];
-            // for (var i = -2; i <= 2; i++) {
-            //     xaxisData.push(avrOverall + i * sdOverall);
-            //     //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
-            //     yaxisData.push(info[1] + i * info[2]);
-            // }
-            // console.log(xaxisData,yaxisData);
+            
             for (var i = 1; i<xScale.domain()[0]; i++) {
                 xaxisData.push(i);
             }            
@@ -339,8 +333,7 @@ var attempts = (function() {
                     return yScale(d["attempts"]);
                 })
                 .attr("r", 3)
-                .on("mouseover", function(d) {
-                    // console.log(d);   
+                .on("mouseover", function(d) {  
                     tooltip.transition()        
                         .duration(100)      
                         .style("opacity", .9);      
@@ -389,28 +382,7 @@ var attempts = (function() {
                 .attr("text-anchor", "middle")
                 .text("Overall # Attempts");
 
-            // //x ticks description
-            // var desc = ["avr-2sd","avr-sd","avr","avr+sd","avr+2sd"]
-            // for (var i = 0; i < xaxisData.length; i++) {
-            //     svg.append("text")
-            //         .attr("class", "ticks-desc")
-            //         .attr("x", xScale(xaxisData[i]))
-            //         .attr("y", chartHeight+margin.top)
-            //         .attr("dy", $('.xaxis-label').height()*2)
-            //         .attr("text-anchor", "middle")
-            //         .text(desc[i]);
-            //     }
-            // //y ticks description
-            // for (var i = 0; i < yaxisData.length; i++) {
-            //     svg.append("text")
-            //         .attr("class", "ticks-desc")
-            //         .attr("x", margin.left)
-            //         .attr("dx", -margin.left*0.4)
-            //         .attr("y", yScale(yaxisData[i]))
-            //         .attr("dy", $('.yaxis-label').height()+2)
-            //         .attr("text-anchor", "middle")
-            //         .text(desc[i]);
-            //     }
+            
         }
 
         var legend = $('<div id="legend"></div>');
@@ -430,10 +402,7 @@ var attempts = (function() {
 
 
 
-        $('#column2').append(legend); // legend, checkboxes
-        // $('#sliderbg').append(labelSlider, sliderObj,lowerLabel, upperLabel);
-        // $('ui-slider-range ui-widget-header ui-corner-all').css("background", "darkgray");
-
+        $('#column2').append(legend); 
         $("#lowerLabel").text(25);
         $("#lowerLabel").css('top',"-10px");
         $("#lowerLabel").css('left', String(0.01 * 25 * parseFloat($('#slider').css("width")) - 0.5 * parseFloat($("#lowerLabel").css("width")))+"px"); 
@@ -441,6 +410,10 @@ var attempts = (function() {
         $("#upperLabel").css('top',"-10px");
         $("#upperLabel").css('left', String(0.01 * 75 * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px");
         
+        /*
+        Displays the number of students who took the quiz, the standard dev, and the
+        grade average of the class for the assignment
+        */
         function displayBasicInfo(assignment) {
             var info = model.getBasicInfo(assignment); 
             $('#total p').text(info[0]);
@@ -451,6 +424,7 @@ var attempts = (function() {
             $('#sd p').css({"margin-left": "20px", 'font-weight':'normal'});
         }
 
+        //displays initial info for the graph
         displayBasicInfo("Ex 1");
 
         ///////
@@ -458,7 +432,6 @@ var attempts = (function() {
         ///////
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
-                //inNav = true;
                 var quizname = String($(this).attr('id'));
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
                 if (modeBool[0]) {
@@ -502,6 +475,7 @@ var attempts = (function() {
             }
         });
 
+        //sets up tab views
         var modes = $('<ul class="nav nav-tabs"></ul>');
         var leftButton = $('<li class="active"><a href="#">Scatter Plot View</a></li>');
         var rightButton = $('<li><a href="#">Bar Graph View</a></li>');
@@ -526,13 +500,13 @@ var attempts = (function() {
             changeToBar($('#asgn-nav').text());
         });
 
+        //graphs the bar chart when called or in barchart mode
         function changeToBar(quizname) {
             $('svg').remove();
             var dataset = [];
             var dataDict = model.getPeopleData();
             var counter = 0;
             var quiz = quizname;
-            console.log('quizname getting sent', quiz);
             var attemptsarray = [0,0,0,0,0,0,0,0,0,0,0];
             var maxattempt = 0;
             for (var person in dataDict) {
@@ -544,6 +518,7 @@ var attempts = (function() {
                 }
             }
 
+            //counts the students' attempts
             for (var person in dataset) {
                 var attempt = dataset[person].attempts;
                 switch(attempt) {
@@ -584,7 +559,6 @@ var attempts = (function() {
                 
                 
             }
-            console.log('attempt array', attemptsarray);
 
             //variables for bar chart
             var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
@@ -594,7 +568,7 @@ var attempts = (function() {
 
             var attemptsbar_chartWidth = attemptsbar_outerWidth - attemptsbar_margin.left - attemptsbar_margin.right;
             var attemptsbar_chartHeight = attemptsbar_outerHeight - attemptsbar_margin.top - attemptsbar_margin.bottom;
-            console.log('outer',attemptsbar_outerWidth,'inner',attemptsbar_chartWidth);
+           
 
             var info = model.getBasicInfo(quiz);
             var infoOverall = model.getInfoOverAll();
@@ -706,16 +680,11 @@ var attempts = (function() {
 
         var model = Model();
         var controller = Controller(model);
-        view = View(div, model, controller);
-        
-        exports.view = view; //delete later
+        var view = View(div, model, controller);
 
     }
    
     exports.setup = setup;
-
-    exports.model = Model; //delete later
-    exports.control = Controller; //delete later
 
     return exports;
 
