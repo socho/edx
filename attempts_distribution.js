@@ -156,6 +156,11 @@ var attempts = (function() {
         +   '</div>'
         +'</div>'
         );
+        
+        //MODE BOOLS
+
+        var modeBool = [true, false];
+
 
 
 
@@ -414,6 +419,9 @@ var attempts = (function() {
         var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
         var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
 
+        totalLabel.css('font-weight', 'bold');
+        averageLabel.css('font-weight', 'bold');
+        sdLabel.css('font-weight', 'bold');
         
         legend.append(totalLabel, averageLabel, sdLabel);
        
@@ -436,8 +444,11 @@ var attempts = (function() {
         function displayBasicInfo(assignment) {
             var info = model.getBasicInfo(assignment); 
             $('#total p').text(info[0]);
+            $('#total p').css({"margin-left": "20px", 'font-weight':'normal'});
             $('#average p').text(info[1].toFixed(3));
+            $('#average p').css({"margin-left": "20px", 'font-weight':'normal'});
             $('#sd p').text(info[2].toFixed(3));
+            $('#sd p').css({"margin-left": "20px", 'font-weight':'normal'});
         }
 
         displayBasicInfo("Ex 1");
@@ -450,7 +461,13 @@ var attempts = (function() {
                 //inNav = true;
                 var quizname = String($(this).attr('id'));
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-                drawGraph(quizname);
+                if (modeBool[0]) {
+                    drawGraph(quizname);
+                }
+                else if (modeBool[1]) {
+                    changeToBar(quizname);
+                }
+                
             });
         });
 
@@ -460,7 +477,12 @@ var attempts = (function() {
             if (index != 0){
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index-1]);
-                drawGraph(quizzesArray[index-1]);
+                if (modeBool[0]) {
+                    drawGraph(quizzesArray[index-1]);   
+                }
+                else if (modeBool[1]) {
+                    changeToBar(quizzesArray[index-1]);
+                }
             }
         });
 
@@ -470,7 +492,13 @@ var attempts = (function() {
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index+1]);
-                drawGraph(quizzesArray[index+1])
+                if (modeBool[0]) {
+                    drawGraph(quizzesArray[index+1]);   
+                }
+                else if (modeBool[1]) {
+                    changeToBar(quizzesArray[index+1])
+                }
+                
             }
         });
 
@@ -485,21 +513,26 @@ var attempts = (function() {
         leftButton.on('click', function() {
             leftButton.attr("class","active");
             rightButton.attr("class","");
+            modeBool[0] = true;
+            modeBool[1] = false;
             drawGraph($('#asgn-nav').text());
         });
 
         rightButton.on('click', function() {
             leftButton.attr("class","");
             rightButton.attr("class","active");
-            changeToBar();
+            modeBool[0] = false;
+            modeBool[1] = true;
+            changeToBar($('#asgn-nav').text());
         });
 
-        function changeToBar() {
+        function changeToBar(quizname) {
             $('svg').remove();
             var dataset = [];
             var dataDict = model.getPeopleData();
             var counter = 0;
-            var quiz = $('#asgn-nav').text();
+            var quiz = quizname;
+            console.log('quizname getting sent', quiz);
             var attemptsarray = [0,0,0,0,0,0,0,0,0,0,0];
             var maxattempt = 0;
             for (var person in dataDict) {
@@ -557,7 +590,7 @@ var attempts = (function() {
             var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
             var attemptsbar_outerHeight = 600;
 
-            var attemptsbar_margin = { top: 10, right: 20, bottom: 50, left: 30 };
+            var attemptsbar_margin = { top: 0, right: 20, bottom: 50, left: 30 };
 
             var attemptsbar_chartWidth = attemptsbar_outerWidth - attemptsbar_margin.left - attemptsbar_margin.right;
             var attemptsbar_chartHeight = attemptsbar_outerHeight - attemptsbar_margin.top - attemptsbar_margin.bottom;
@@ -618,7 +651,7 @@ var attempts = (function() {
                 })
                 .attr("width",attemptsbar_chartWidth / attemptsarray.length - barPadding)
                 .attr("height", function(d) {
-                    return yScale(d)
+                    return yScale(d);
                 })
                 .attr('fill', 'lightblue');
 
@@ -670,12 +703,6 @@ var attempts = (function() {
                 .call(yAxis);
 
 
-            var ticks = $('.axis');
-            var tickss = ticks.find('g');
-            console.log('num of ticks: ', tickss[11]);
-            for (var i = 1; i < 10; i++) {
-                tickss[i].attr("transform", 'translate(30,0)');
-            }
 
         }
 
