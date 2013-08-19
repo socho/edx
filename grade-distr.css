@@ -10,9 +10,6 @@
 	padding-top: 20px;
 }
 
-#sliderbg {
-	padding-top: 15%;
-}
 .chart rect {
 	stroke: white;
 	shape-rendering: crispEdges;
@@ -70,9 +67,9 @@
 	border-radius: 10px;
 	width: 300px;
 	height: 150px;
-	padding: 10px;
-	margin-top: 5px;
-}
+/*	padding: 10px;
+*//*	margin-top: 5px;
+*/}
 
 #legend p {
 	margin-left: 15px;
@@ -83,9 +80,7 @@
 	border-radius: 10px;
 	width: 300px;
 	height: 95px;
-	padding: 10px 15px 0px 7px;
-	margin-top: 5px;
-	margin-bottom: 40px;
+	padding: 25px 15px 0px 7px;
 }
 
 
@@ -115,6 +110,10 @@ div.tooltip {
 	font: 12px sans-serif;
 	border-radius: 5px;
 	padding: 2px;
+}
+
+.nav.nav-tabs {
+	margin-bottom: 15px;
 }
 
 .axis path,
