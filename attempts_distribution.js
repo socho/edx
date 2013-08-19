@@ -609,6 +609,10 @@ var attempts = (function() {
                             .domain([0, Math.max.apply(Math,attemptsarray)])
                             .range([attemptsbar_outerHeight - attemptsbar_margin.bottom, attemptsbar_margin.top]);
 
+            var yscaleticks = d3.scale.linear() //scale is a function!!!!!
+                                .domain([Math.max.apply(Math,attemptsarray),0])
+                                .range([attemptsbar_margin.top,attemptsbar_outerHeight-attemptsbar_margin.bottom]);           
+
             var xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient("bottom");
