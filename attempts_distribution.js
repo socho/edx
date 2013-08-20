@@ -41,7 +41,8 @@ var attempts = (function() {
 
 
 
-        var peopleData = makeFullData(200);
+        var peopleData = makeFullData(200); //comment this out when ready for deployment
+        // var peopleData = dataExport.exports.extracts(jsonarray); uncomment this when ready for deployment
 
         function getPeopleData(){
             return peopleData;
