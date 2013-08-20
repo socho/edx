@@ -20,7 +20,6 @@ var generateNames = function(numberOfNames){
     return names;
 }
 
-var problemIDs = ["Ex 1","Ex 2","Ex 3","Ex 4","Ex 5"];
 
 var generateNumAttempts = function() {
     var maxAttempts = Math.floor(Math.random()*4+8);
@@ -28,6 +27,7 @@ var generateNumAttempts = function() {
 }
 
 var makeFullData = function(numberStudents) {
+    var problemIDs = ["Ex 1","Ex 2","Ex 3","Ex 4","Ex 5"];
     var names = generateNames(numberStudents);
     var data = {}
     for (var i=0;i<names.length;i++){
@@ -40,4 +40,24 @@ var makeFullData = function(numberStudents) {
         }
     }
     return data;
+}
+
+var makeDummyTrackingLogs = function(numberOfLogs){
+    var dummyTrackingLogs = [];
+    var names = generateNames(Math.round(numberOfLogs/3));
+    var event_types = ["show_answer","save_problem_check","save_problem_check","save_problem_check","page_close","play_video"];
+    var problem_ids = ["Ex1", "Ex2", "Ex3", "Ex4"]
+    var successes = ["correct", "incorrect","incorrect"]
+    for (var i = 0; i < numberOfLogs; i++) {
+        var thisLog = {};
+        thisLog["username"] = names[Math.floor(Math.random() * names.length)];
+        thisLog["event_type"] = event_types[Math.floor(Math.random() * event_types.length)];
+        thisLog["event"] = {};
+        if (thisLog["event_type"] == "save_problem_check") {
+            thisLog["event"]["problem_id"] = problem_ids[Math.floor(Math.random() * problem_ids.length)];
+            thisLog["event"]["success"] = successes[Math.floor(Math.random() * successes.length)];
+        }
+        dummyTrackingLogs.push(thisLog);
+    }
+    return dummyTrackingLogs;
 }
