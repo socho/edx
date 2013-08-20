@@ -1,5 +1,6 @@
 var trackinglogs_to_mydataformat = function(dataArr) {
 	var formattedArray = {};
+	var quizProblems = [];
 
 	for (var i in dataArr) {
 		//the first item in the array of dictionaries should be a username
@@ -9,6 +10,10 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 					if (dataArr[i].event.success == "correct") {
 						// { username: { problemID: attempts }}
 						formattedArray[dataArr[i].username][dataArr[i].event.problem_id] = dataArr[i].event.attempts;
+
+						if !(dataArr[i].event.problem_id in quizProblems) {
+							quizProblems.push(dataArr[i].event.problem_id);
+						}
 					}
 					 
 			}
@@ -25,5 +30,6 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 			}
 		}
 	}
-	return formattedArray;
+	quizProblems.sort();
+	return [formattedArray, quizProblems];
 }
