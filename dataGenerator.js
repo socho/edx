@@ -56,8 +56,10 @@ var makeDummyTrackingLogs = function(numberOfLogs){
         if (thisLog["event_type"] == "save_problem_check") {
             thisLog["event"]["problem_id"] = problem_ids[Math.floor(Math.random() * problem_ids.length)];
             thisLog["event"]["success"] = successes[Math.floor(Math.random() * successes.length)];
+            thisLog["event"]["attempts"] = Math.floor(Math.random() * 8) + 1;
         }
         dummyTrackingLogs.push(thisLog);
     }
+    console.log("dummy tracking log", dummyTrackingLogs);
     return dummyTrackingLogs;
 }

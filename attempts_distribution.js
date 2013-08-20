@@ -42,8 +42,10 @@ var attempts = (function() {
 
 
         //var peopleData = makeFullData(200); //comment this out when ready for deployment
-        var dummyTrackingLogs = makeDummyTrackingLogs(1000);
-        var peopleData = trackinglogs_to_mydataformat(dummyTrackingLogs); 
+        var dummyTrackingLogs = makeDummyTrackingLogs(10000);
+        // var myDataFormat = trackinglogs_to_mydataformat(dummyTrackingLogs); 
+        // var peopleData = myDataFormat[0];
+        // var problemIDs = myDataFormat[1];
         
         // var peopleData = dataExport.exports.extract(jsonarray); uncomment this when ready for deployment
         // var jsonarray = 
@@ -58,6 +60,10 @@ var attempts = (function() {
         // },
         // {"username": "socho",
         // "event_type": "save_problem_check",
+        // "event" : {"problem_id": "p3","success": "correct", "attempts": 2}
+        // },
+        // {"username": "socho",
+        // "event_type": "save_problem_check",
         // "event" : {"problem_id": "p1","success": "incorrect", "attempts": 3}
         // },
         // {"username": "mich",
@@ -66,7 +72,12 @@ var attempts = (function() {
         // },
         // ];
 
-        // console.log(trackinglogs_to_mydataformat(jsonarray))
+        var myDataFormat = trackinglogs_to_mydataformat(dummyTrackingLogs);
+        console.log(myDataFormat);
+        var peopleData = $.extend({}, myDataFormat[0]);
+        var problemIDs = $.extend([], myDataFormat[1]);
+        // var peopleData = $(myDataFormat[0]).clone();
+        // var problemIDs = myDataFormat[1].clone();
 
         function getPeopleData(){
             return peopleData;
@@ -84,6 +95,7 @@ var attempts = (function() {
             var numPeople = 0;
             var sum = 0;
             for (var key in peopleData) {
+                console.log("assignment",assignment)
                 if (assignment in peopleData[key]) {
                     numPeople++;
                     sum += peopleData[key][assignment];
@@ -91,7 +103,6 @@ var attempts = (function() {
             }
             //calc average grade
             var avr = sum/numPeople;
-
             //calc std dev
             var sqDiffSum = 0;
             for (var key in peopleData) {
@@ -107,8 +118,11 @@ var attempts = (function() {
         calculates student's grade average in the class
         */
         function calcAverage() {
+            console.log("calc aver");
             var quizzesOfInterest = getQuizzesArray();
+            console.log("quizzesArray", quizzesOfInterest);
             for (var person in peopleData){
+                console.log(peopleData);
                 var personData = peopleData[person];
                 personData["avr"] = 0;
                 var sum = 0;
@@ -118,11 +132,13 @@ var attempts = (function() {
                     if (quizname in personData) {
                         numQuizzes += 1;
                         sum += parseFloat(personData[quizname]);
+                        console.log('person', person, 'quizname', quizname, 'sum', sum, 'numQuizzes', numQuizzes);                
                     }
                 }
                 var avr = sum / numQuizzes;
                 personData["avr"] = avr;
             }
+            console.log("second");
         }
 
 
@@ -133,9 +149,11 @@ var attempts = (function() {
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
+                console.log("each average",peopleData[person]["avr"], person);
                 sum += parseFloat(peopleData[person]["avr"]);
                 numPeople += 1;
             }
+            console.log('sum',sum, 'numPeople',numPeople);
             var avr = sum / numPeople;
 
             //sd
@@ -190,8 +208,9 @@ var attempts = (function() {
        //NAVIGATION
        ////////
         var dropdown = $('.dropdown-menu');
-        for (var i = 0; i < problemIDs.length; i++) {
-            var key = problemIDs[i]
+        var quizzesArray = model.getQuizzesArray();
+        for (var i = 0; i < quizzesArray.length; i++) {
+            var key = quizzesArray[i]
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
@@ -213,9 +232,9 @@ var attempts = (function() {
 
 
         
-        //initial graph
-        model.calcAverage();
-        drawGraph("Ex 1");
+        // //initial graph
+        // model.calcAverage();
+        // drawGraph("p1");
 
         /*
         draws the scatter plot graph everytime when called
@@ -230,11 +249,12 @@ var attempts = (function() {
                     dataset.push({"username": person ,"attempts": dataDict[person][quizname], "avrattempts": dataDict[person]["avr"]});
                 }
             }
-
+            console.log("dataset",dataset);
             var info = model.getBasicInfo(quizname);
             var infoOverall = model.getInfoOverAll();
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
+            console.log("info",info, 'avroverall', avrOverall, 'sdOverall', sdOverall);
 
             var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
@@ -407,7 +427,7 @@ var attempts = (function() {
                 .attr("text-anchor", "middle")
                 .text("Overall # Attempts");
 
-            
+            console.log("third");
         }
 
         var legend = $('<div id="legend"></div>');
@@ -695,6 +715,10 @@ var attempts = (function() {
                 .call(yAxis);
 
         }
+        //initial graph
+        model.calcAverage();
+        drawGraph("Ex1");
+
 
             
 
