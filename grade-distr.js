@@ -45,6 +45,23 @@ var gradeDistr = (function() {
     function Model(){
         var handler = UpdateHandler();
 
+        //////////////////////////////////////////////////////
+        ////////////////Need to Manually Change///////////////
+        //////////////////////////////////////////////////////
+
+        //the student module file
+        var courseware_studentmodule = dummymodule;
+        //course_id you're interested in
+        var course_id = "6.813";
+        //an array of module_types you're interested in visualizing
+        var module_type_array = ["problem"];
+
+        //////////////////////////////////////////////////////
+        /////////////////////////END//////////////////////////
+        //////////////////////////////////////////////////////
+
+
+        var quizzes = edxStudentModuleToMyFormat(courseware_studentmodule, course_id, module_type_array);
 
         //define peopleData
         var peopleData = {};
@@ -52,7 +69,7 @@ var gradeDistr = (function() {
             var sheet = quizzes[quiz];
             for (var i = 0; i < sheet.length; i++) {
                 var row = sheet[i];
-                var name = row["username"];
+                var name = row["student_id"];
                 if (name in peopleData) {
                     peopleData[name][quiz] = row;
                 }
@@ -76,7 +93,7 @@ var gradeDistr = (function() {
             for (var quiz in quizzes){
                 quizzesArray.push(quiz);
             }
-            return quizzesArray;
+            return quizzesArray.sort();
         }
 
         /**
@@ -429,8 +446,6 @@ var gradeDistr = (function() {
 
         displayBasicInfo("Quiz 21");
 
-        
-        console.log($('#slider-container .ui-widget-header'));
         //.css({ 'border': '1px solid #aaaaaa', 'background': 'lightpink' });
         // #slider-container #slider-max-value {float:right;margin-top:6px;}
 
@@ -508,7 +523,8 @@ var gradeDistr = (function() {
 
        //NAVIGATION
         var dropdown = $('.dropdown-menu');
-        for (var key in quizzes) {
+        for (var i = 0; i < model.getQuizzesArray().length; i++) {
+            var key = model.getQuizzesArray()[i];
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         }
@@ -1014,7 +1030,7 @@ var gradeDistr = (function() {
             var dataDict = model.getPeopleData();
             for (var person in dataDict) {
                 if (quizname in dataDict[person]){
-                    dataset.push({"username": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                    dataset.push({"student_id": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
                 }
             }
 
@@ -1267,7 +1283,7 @@ var gradeDistr = (function() {
                 html: true, 
                 title: function() {
                     var d = this.__data__;
-                    return d["username"] + "<br/> Grade in Class: "  + d["avr"].toFixed(1)*10 + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(1)*10; 
+                    return d["student_id"] + "<br/> Grade in Class: "  + d["avr"].toFixed(1)*10 + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(1)*10; 
                 }
             });
         }
