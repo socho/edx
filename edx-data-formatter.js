@@ -1,4 +1,4 @@
-var dataExport = (function() {
+var dataExport = function() {
 	var exports = {};
 
 	function extract(dataArr) {
@@ -28,10 +28,3 @@ var dataExport = (function() {
 
 		return formattedArray;
 	}
-
-
-
-	exports.extract = extract;
-
-	return exports;
-}());
