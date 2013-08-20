@@ -6,7 +6,7 @@ var dataExport = (function() {
 
 		for (var i in dataArr) {
 			//the first item in the array of dictionaries should be a username
-			if !(dataArr[i].username in formattedArray) {
+			if (!(dataArr[i].username in formattedArray)) {
 				formattedArray[dataArr[i].username] = {};
 				if (dataArr[i].event_type == "save_problem_check"){
 						if (dataArr[i].event.success == "correct") {
@@ -35,3 +35,7 @@ var dataExport = (function() {
 
 	return exports;
 }());
+$(document).ready(function() {
+    dataExport.setup($('.gradeDistr'));
+
+});

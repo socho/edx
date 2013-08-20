@@ -43,7 +43,23 @@ var attempts = (function() {
 
         var peopleData = makeFullData(200); //comment this out when ready for deployment
         // var peopleData = dataExport.exports.extracts(jsonarray); uncomment this when ready for deployment
+        var jsonarray = 
+        [
+        {"username": "socho",
+        "event_type": "save_problem_check",
+        "event" : {"problem_id": "p1","success": "correct", "attempts": 4}
+        },
+        {"username": "socho",
+        "event_type": "save_problem_check",
+        "event" : {"problem_id": "p1","success": "incorrect", "attempts": 3}
+        },
+        {"username": "mich",
+        "event_type": "save_problem_check",
+        "event" : {"problem_id": "p2","success": "correct", "attempts": 7}
+        },
+        ];
 
+        console.log(dataExport.exports.extracts(jsonarray))
         function getPeopleData(){
             return peopleData;
         }
