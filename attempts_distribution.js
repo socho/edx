@@ -42,7 +42,7 @@ var attempts = (function() {
 
 
         var peopleData = makeFullData(200); //comment this out when ready for deployment
-        // var peopleData = dataExport.exports.extracts(jsonarray); uncomment this when ready for deployment
+        // var peopleData = dataExport.exports.extract(jsonarray); uncomment this when ready for deployment
         var jsonarray = 
         [
         {"username": "socho",
@@ -59,7 +59,7 @@ var attempts = (function() {
         },
         ];
 
-        console.log(dataExport.exports.extracts(jsonarray))
+        console.log(trackinglogs_to_mydataformat(jsonarray))
         function getPeopleData(){
             return peopleData;
         }
