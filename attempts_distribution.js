@@ -41,25 +41,33 @@ var attempts = (function() {
 
 
 
-        var peopleData = makeFullData(200); //comment this out when ready for deployment
+        //var peopleData = makeFullData(200); //comment this out when ready for deployment
+        var dummyTrackingLogs = makeDummyTrackingLogs(1000);
+        var peopleData = trackinglogs_to_mydataformat(dummyTrackingLogs); 
+        
         // var peopleData = dataExport.exports.extract(jsonarray); uncomment this when ready for deployment
-        var jsonarray = 
-        [
-        {"username": "socho",
-        "event_type": "save_problem_check",
-        "event" : {"problem_id": "p1","success": "correct", "attempts": 4}
-        },
-        {"username": "socho",
-        "event_type": "save_problem_check",
-        "event" : {"problem_id": "p1","success": "incorrect", "attempts": 3}
-        },
-        {"username": "mich",
-        "event_type": "save_problem_check",
-        "event" : {"problem_id": "p2","success": "correct", "attempts": 7}
-        },
-        ];
+        // var jsonarray = 
+        // [
+        // {"username": "socho",
+        // "event_type": "save_problem_check",
+        // "event" : {"problem_id": "p1","success": "correct", "attempts": 4}
+        // },
+        // {"username": "socho",
+        // "event_type": "save_problem_check",
+        // "event" : {"problem_id": "p1","success": "correct", "attempts": 5}
+        // },
+        // {"username": "socho",
+        // "event_type": "save_problem_check",
+        // "event" : {"problem_id": "p1","success": "incorrect", "attempts": 3}
+        // },
+        // {"username": "mich",
+        // "event_type": "save_problem_check",
+        // "event" : {"problem_id": "p2","success": "correct", "attempts": 7}
+        // },
+        // ];
 
-        console.log(trackinglogs_to_mydataformat(jsonarray))
+        // console.log(trackinglogs_to_mydataformat(jsonarray))
+
         function getPeopleData(){
             return peopleData;
         }
