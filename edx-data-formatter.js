@@ -17,7 +17,10 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 			if (dataArr[i].event_type == "save_problem_check"){
 				if (dataArr[i].event.success == "correct") {
 						// { username: { problemID: attempts } }
-						formattedArray[dataArr[i].username][dataArr[i].event.problem_id] = dataArr[i].event.attempts;
+						if ( dataArr[i].event.attempts <= formattedArray[dataArr[i].username][dataArr[i].event.problem_id]) {
+							formattedArray[dataArr[i].username][dataArr[i].event.problem_id] = dataArr[i].event.attempts;
+						}
+						
 					}
 			}
 		}
