@@ -42,7 +42,7 @@ var attempts = (function() {
         var trackingLogs; 
 
         $.ajax({
-            url: 'dummyTrackingLogs.json',
+            url: 'dummyTrackingLogs.json', //change url for your use
             async: false,
             dataType: 'json',
             success: function (response) {
@@ -50,21 +50,8 @@ var attempts = (function() {
             }
         });
 
-        //////////////////////////////////////////////////////
-        ////////////////Need to Manually Change///////////////
-        //////////////////////////////////////////////////////
-
-        //the tracking logs file
+        // tracking logs file
         // trackingLogs = makeDummyTrackingLogs(10000);
-
-        // //course_id you're interested in
-        // var course_id = "6.813";
-        // //an array of module_types you're interested in visualizing
-        // var module_type_array = ["problem"];
-
-        //////////////////////////////////////////////////////
-        /////////////////////////END//////////////////////////
-        //////////////////////////////////////////////////////
 
         var myDataFormat = trackinglogs_to_mydataformat(trackingLogs);
         // var peopleData = $.extend({}, myDataFormat[0]);
