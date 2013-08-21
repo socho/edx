@@ -573,13 +573,37 @@ var attempts = (function() {
                     else if (modeBools[1]) {
                         drawAttemptsBarGraph(quizname, '#column1', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, 0, 0, false);
                     }
+                    var listOfQuizzes = model.getQuizzesArray();
+                    if (quizname == listOfQuizzes[0]) {
+                        $('.btn-l').attr("disabled", true);
+                        $('.btn-r').attr("disabled", false);
+                    }
+                    else if (quizname == listOfQuizzes[listOfQuizzes.length-1]){
+                        $('.btn-r').attr("disabled", true);
+                        $('.btn-l').attr("disabled", false);
+                    }
+                    else {
+                        //renable the buttons
+                        $('.btn-l').attr("disabled", false);
+                        $('.btn-r').attr("disabled", false);
+                    }
                 }
             });
         });
 
+        $('.btn-l').attr("disabled", true); //initial button state;
+
         $('.btn-l').on('click', function(){
             var quizzesArray = model.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if ($('#asgn-nav').text() == quizzesArray[1]) {
+                $(this).attr("disabled", true);
+                $('.btn-r').attr("disabled", false);
+            } else {
+                $(this).attr("disabled", false);
+                $('.btn-r').attr("disabled", false);
+
+            }
             if (index != 0){
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index-1]);
@@ -595,6 +619,13 @@ var attempts = (function() {
         $('.btn-r').on('click', function(){
             var quizzesArray = model.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if ($('#asgn-nav').text() == quizzesArray[quizzesArray.length-2]) {
+                $(this).attr("disabled", true);
+                $('.btn-l').attr("disabled", false);
+            } else {
+                $(this).attr("disabled", false);
+                $('.btn-l').attr("disabled", false);
+            }
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index+1]);
