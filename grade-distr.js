@@ -45,12 +45,14 @@ var gradeDistr = (function() {
     function Model(){
         var handler = UpdateHandler();
 
+        var courseware_studentmodule; 
+
         $.ajax({
             url: 'dummymodule.json',
             async: false,
             dataType: 'json',
             success: function (response) {
-                var courseware_studentmodule = response;
+                courseware_studentmodule = response;
             }
         });
 
