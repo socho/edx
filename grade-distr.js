@@ -45,12 +45,15 @@ var gradeDistr = (function() {
     function Model(){
         var handler = UpdateHandler();
 
+
+        var courseware_studentmodule; 
+
         // $.ajax({
         //     url: 'dummymodule.json',
         //     async: false,
         //     dataType: 'json',
         //     success: function (response) {
-        //         var courseware_studentmodule = response;
+        //         courseware_studentmodule = response;
         //     }
         // });
 
@@ -59,7 +62,7 @@ var gradeDistr = (function() {
         //////////////////////////////////////////////////////
 
         //the student module file
-        var courseware_studentmodule = dummymodule;
+        courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -1345,8 +1348,11 @@ var gradeDistr = (function() {
 
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
+
                 //inNav = true;
                 var quizname = String($(this).attr('id'));
+
+                
 
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
                 if (quizname != "ViewAll") {
@@ -1375,6 +1381,21 @@ var gradeDistr = (function() {
                         }
                         controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                     }
+
+                    var listOfQuizzes = controller.getQuizzesArray();
+                    if (quizname == listOfQuizzes[0]) {
+                        $('.btn-l').attr("disabled", true);
+                        $('.btn-r').attr("disabled", false);
+                    }
+                    else if (quizname == listOfQuizzes[listOfQuizzes.length-1]){
+                        $('.btn-r').attr("disabled", true);
+                        $('.btn-l').attr("disabled", false);
+                    }
+                    else {
+                        //renable the buttons
+                        $('.btn-l').attr("disabled", false);
+                        $('.btn-r').attr("disabled", false);
+                    }
                 }
                 else { //when clicks View All
                     $('.btn-l').attr("disabled", true);
@@ -1391,10 +1412,20 @@ var gradeDistr = (function() {
                 }
             });
         });
+        
+        $('.btn-l').attr("disabled", true); //initial button state;
 
         $('.btn-l').on('click', function(){
             var quizzesArray = controller.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if ($('#asgn-nav').text() == quizzesArray[1]) {
+                $(this).attr("disabled", true);
+                $('.btn-r').attr("disabled", false);
+            } else {
+                $(this).attr("disabled", false);
+                $('.btn-r').attr("disabled", false);
+
+            }
             if (index != 0){
                 var quizname = quizzesArray[index-1];
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
@@ -1417,6 +1448,13 @@ var gradeDistr = (function() {
         $('.btn-r').on('click', function(){
             var quizzesArray = controller.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
+            if ($('#asgn-nav').text() == quizzesArray[quizzesArray.length-2]) {
+                $(this).attr("disabled", true);
+                $('.btn-l').attr("disabled", false);
+            } else {
+                $(this).attr("disabled", false);
+                $('.btn-l').attr("disabled", false);
+            }
             if (index != quizzesArray.length-1){
                 var quizname = quizzesArray[index+1];
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
@@ -1434,7 +1472,9 @@ var gradeDistr = (function() {
                     controller.updateAvrScatterPlot(quizname,"#column1",avr_outerWidth,avr_outerHeight,avr_margin,false);
                 }
             }
+
         });
+
 
 
         model.on('changed', function(data) {
