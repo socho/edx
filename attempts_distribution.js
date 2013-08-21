@@ -41,20 +41,20 @@ var attempts = (function() {
 
         var trackingLogs; 
 
-        load appropriate json file
-        $.ajax({
-            url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
-            async: false,
-            dataType: 'json',
-            success: function (response) {
-                trackingLogs = response;
-            }
-        });
+        //load appropriate json file
+        // $.ajax({
+        //     url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
+        //     async: false,
+        //     dataType: 'json',
+        //     success: function (response) {
+        //         trackingLogs = response;
+        //     }
+        // });
 
         // uncomment this to test on local server
         // comment this to test on actual server
         
-        // trackingLogs = makeDummyTrackingLogs(10000);
+        trackingLogs = makeDummyTrackingLogs(10000);
 
         var myDataFormat = trackinglogs_to_mydataformat(trackingLogs);
         // var peopleData = $.extend({}, myDataFormat[0]);
