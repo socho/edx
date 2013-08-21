@@ -43,21 +43,21 @@ var gradeDistr = (function() {
 
         var courseware_studentmodule; 
 
-        $.ajax({
-            url: 'dummymodule.json',
-            async: false,
-            dataType: 'json',
-            success: function (response) {
-                courseware_studentmodule = response;
-            }
-        });
+        // $.ajax({
+        //     url: 'dummymodule.json',
+        //     async: false,
+        //     dataType: 'json',
+        //     success: function (response) {
+        //         courseware_studentmodule = response;
+        //     }
+        // });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        // courseware_studentmodule = dummymodule;
+        courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -1306,14 +1306,3 @@ $(document).ready(function() {
     gradeDistr.setup($('.gradeDistr'));
 
 });
-
-
-
-/* ideas 
-    remove legend and average over sections
-    diagonal scatter plot (ex. the sequal plot of movies)
-    view of multiple quizzes
-    textual visualization, a matrix  where students are on thy y axis, quiz is the x axis
-        grade in each cell, and color based on the percentages
-        can zoom in and zoom out
-*/

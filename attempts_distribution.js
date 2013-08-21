@@ -470,6 +470,11 @@ var attempts = (function() {
                         .text(quizname);
             }
         }
+
+        /**
+        hides the legend, remove previous plots,
+        and draw viewall mode for attempts scatter plot
+        **/
         function drawAllAttemptsScatter(){
             $('#legend').hide();
             $('#column1').children().remove();
@@ -478,6 +483,7 @@ var attempts = (function() {
             var numCols = 3;
             var numRows = Math.ceil(quizzesArray.length/numCols);
 
+            //create smaller divs for each mini plot
             for (var i = 0; i < numRows; i++) {
                 var thisrow = $("<div class='scatter-row-"+i+"'></div>");
                 for (var j=0; j < numCols; j++) {
@@ -549,6 +555,8 @@ var attempts = (function() {
         ///////
         ///EVENT LISTENERS
         ///////
+
+        //dropdown list event listener
         dropdown.find('li').each(function() {
             $(this).on('click', function() {
                 var quizname = String($(this).attr('id'));
@@ -594,6 +602,7 @@ var attempts = (function() {
 
         $('.btn-l').attr("disabled", true); //initial button state;
 
+        //left arrow button event listener
         $('.btn-l').on('click', function(){
             var quizzesArray = model.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
@@ -616,7 +625,8 @@ var attempts = (function() {
                 }
             }
         });
-
+        
+        //right arrow button event listener
         $('.btn-r').on('click', function(){
             var quizzesArray = model.getQuizzesArray();
             var index = quizzesArray.indexOf($('#asgn-nav').text());
@@ -649,6 +659,7 @@ var attempts = (function() {
         modes.css('padding', 'auto auto');
         $('#column2').prepend(modes, '<br>');
 
+        //scatter mode button
         leftButton.on('click', function() {
             leftButton.attr("class","active");
             rightButton.attr("class","");
@@ -663,6 +674,7 @@ var attempts = (function() {
             }
         });
 
+        //bar graph mode button
         rightButton.on('click', function() {
             leftButton.attr("class","");
             rightButton.attr("class","active");
@@ -841,8 +853,12 @@ var attempts = (function() {
                         .attr("dy", 12)
                         .text(quizname);
             }
-
         }
+
+        /**
+        hides the legend, removes previous plots,
+        and draw viewall mode of bar graphs
+        **/
         function drawAllAttemptsBarGraphs(){
             $('#column1').children().remove();
             $('#legend').hide();
