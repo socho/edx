@@ -190,7 +190,7 @@ var attempts = (function() {
         
         //MODE BOOLS 
 
-        var modeBool = [true, false];
+        var modeBools = [true, false];
 
 
 
@@ -205,7 +205,7 @@ var attempts = (function() {
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
-        // dropdown.append("<li id='ViewAll'><a>ViewAll</a></li>");
+        dropdown.append("<li id='ViewAll'><a>ViewAll</a></li>");
 
 
         var tooltip = d3.select("body").append("div")   
@@ -226,7 +226,7 @@ var attempts = (function() {
             var chartWidth = outerWidth - margin.left - margin.right;
             var chartHeight = outerHeight - margin.top - margin.bottom;
 
-            $('svg').remove();
+            if (!isSmall) {$('svg').remove();}
             var dataset = [];
             var dataDict = model.getPeopleData();
             for (var person in dataDict) {
@@ -239,10 +239,12 @@ var attempts = (function() {
             var infoOverall = model.getInfoOverAll();
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
+            console.log("avroverall", avrOverall, "sdOverall", sdOverall);
 
             var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
+            console.log("maxzscore",maxzscore);
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([avrOverall+maxzscore*sdOverall,avrOverall-maxzscore*sdOverall])
@@ -304,50 +306,71 @@ var attempts = (function() {
                 .attr("y2",yScale.range()[1])
 
             //avr guidelines label
-            svg.append("text")
-                .attr("class", "guidelinelabel")
-                .attr("x",xScale.range()[0])
-                .attr("y",yScale(info[1]))
-                .attr("dx", 5)
-                .attr("dy", -5)
-                .text("Avr of # attempts");
+            if (!isSmall) {
+                svg.append("text")
+                    .attr("class", "guidelinelabel")
+                    .attr("x",xScale.range()[0])
+                    .attr("y",yScale(info[1]))
+                    .attr("dx", 5)
+                    .attr("dy", -5)
+                    .text("Avr of # attempts");
 
-            svg.append("text")
-                .attr("class", "guidelinelabel")
-                .attr("x",xScale(avrOverall))
-                .attr("y",yScale.range()[0])
-                .attr("dx",5)
-                .attr("dy", -5)
-                .text("Avr of overall")
+                svg.append("text")
+                    .attr("class", "guidelinelabel")
+                    .attr("x",xScale(avrOverall))
+                    .attr("y",yScale.range()[0])
+                    .attr("dx",5)
+                    .attr("dy", -5)
+                    .text("Avr of overall")
+            }
+            else {
+                svg.append("text")
+                    .attr("class", "viewall-guidelinelabel")
+                    .attr("x",xScale.range()[0])
+                    .attr("y",yScale(info[1]))
+                    .attr("dx", 5)
+                    .attr("dy", -5)
+                    .text("Avr of # attempts");
+
+                svg.append("text")
+                    .attr("class", "viewall-guidelinelabel")
+                    .attr("x",xScale(avrOverall))
+                    .attr("y",yScale.range()[0])
+                    .attr("dx",5)
+                    .attr("dy", -5)
+                    .text("Avr of overall")                
+            }
 
             //help text
-            var helptext = svg.append("g")
-                                .attr("class", "helptext");
-            var x = $('.diagonal').attr("x2");
-            var y = $('.diagonal').attr("y2");
+            if (!isSmall) {
+                var helptext = svg.append("g")
+                                    .attr("class", "helptext");
+                var x = $('.diagonal').attr("x2");
+                var y = $('.diagonal').attr("y2");
 
-            helptext.append("text")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dx", -chartWidth/10)
-                    .attr("dy", chartHeight/30)
-                    .text("better than")
-                    .append("tspan")
-                    .text("usual")
-                    .attr("x",x)
-                    .attr("dx", -chartWidth/10)
-                    .attr("dy", 12);
-            helptext.append("text")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 0.16*chartHeight)
-                    .text("worse than")
-                    .append("tspan")
-                    .text("usual")
-                    .attr("x", x)
-                    .attr("dx", -0.5 * $('text').width())
-                    .attr("dy", 12);
+                helptext.append("text")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dx", -chartWidth/10)
+                        .attr("dy", chartHeight/30)
+                        .text("better than")
+                        .append("tspan")
+                        .text("usual")
+                        .attr("x",x)
+                        .attr("dx", -chartWidth/10)
+                        .attr("dy", 12);
+                helptext.append("text")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dx", -0.5 * $('text').width())
+                        .attr("dy", 0.16*chartHeight)
+                        .text("worse than")
+                        .append("tspan")
+                        .text("usual")
+                        .attr("x", x)
+                        .attr("dx", -0.5 * $('text').width())
+                        .attr("dy", 12);
+            }
 
             //dots
             svg.selectAll("circle")
@@ -376,40 +399,108 @@ var attempts = (function() {
                         .style("opacity", 0);   
                 });
 
-            //xaxis
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
-                .call(xAxis);
+            if (!isSmall) {
+                //xaxis
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                    .call(xAxis);
 
-            //yaxis
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate("+margin.left+",0)")
-                .call(yAxis);
+                //yaxis
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate("+margin.left+",0)")
+                    .call(yAxis);
+            }
+            else {
+                //xaxis
+                svg.append("g")
+                    .attr("class","small-axis")
+                    .attr("transform", "translate(0,"+(outerHeight-margin.bottom)+")")
+                    .call(xAxis);
 
-            //Y-AXIS LABEL
-            svg.append("text")
-                .attr("class", "yaxis-label")
-                .attr("x",0)
-                .attr("y", 0)
-                .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -margin.top-chartHeight/2)
-                .attr("dy", margin.left*0.2)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("# Attempts for "+quizname);
+                //yaxis
+                svg.append("g")
+                    .attr("class","small-axis")
+                    .attr("transform", "translate("+margin.left+",0)")
+                    .call(yAxis);
+            }
 
-            //X-AXIS LABEL
-            svg.append("text")
-                .attr("class", "xaxis-label")
-                // .attr("x",chartWidth/2)
-                .attr("x", outerWidth/2)
-                .attr("y", chartHeight+margin.top)
-                .attr("dy", margin.bottom*0.9)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Overall # Attempts");
+            //Y-AXIS and X-AXIS LABELS
+            if (!isSmall) {
+                //X-AXIS LABEL
+                svg.append("text")
+                    .attr("class", "yaxis-label")
+                    .attr("x",0)
+                    .attr("y", 0)
+                    .attr("transform", function(d) {return "rotate(-90)" })
+                    .attr("dx", -margin.top-chartHeight/2)
+                    .attr("dy", margin.left*0.2)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("# Attempts for "+quizname);
+
+                //X-AXIS LABEL
+                svg.append("text")
+                    .attr("class", "xaxis-label")
+                    // .attr("x",chartWidth/2)
+                    .attr("x", outerWidth/2)
+                    .attr("y", chartHeight+margin.top)
+                    .attr("dy", margin.bottom*0.9)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("Overall # Attempts");
+            }
+
+            // Title for mini plots
+            if (isSmall) {
+                svg.append("text")
+                        .attr("class","title")
+                        .attr("x", "50%")
+                        .attr("y", 0)
+                        .attr("dy", 12)
+                        .text(quizname);
+            }
+        }
+        function drawAllAttemptsScatter(){
+            $('#legend').hide();
+            $('.chart-container').children().remove();
+            var quizzesArray = model.getQuizzesArray();
+
+            var numCols = 3;
+            var numRows = Math.ceil(quizzesArray.length/numCols);
+
+            for (var i = 0; i < numRows; i++) {
+                var thisrow = $("<div class='scatter-row-"+i+"'></div>");
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        thisrow.append("<div class='col-lg-4 scatter-col-"+j+"'></div>");
+                    }
+                }
+                $('#column1').append(thisrow);
+            }
+
+            //iterate through each grid div and append a bar graph to each
+            for (var i = 0; i < numRows; i++) {
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        var quizname = quizzesArray[i*numCols+j];
+                        var parentDiv = ".scatter-row-"+i+" .scatter-col-"+j;
+                        var outerWidth = parseInt($('.scatter-row-'+i+' .scatter-col-'+j).css("width"));
+                        var outerHeight = $(document).height()/3;
+                        var margin = { top: 10, right: 5, bottom: 20, left: 15};
+                        drawAttemptsScatter(quizname, parentDiv, outerWidth, outerHeight, margin, true);
+                    }
+                }
+            }
+            //x and y axes labels
+            var allbars_xaxislabel = d3.select('#column1').append("div")
+                            .attr("class", "viewall-xaxislabel")
+                            .text("# Attempts for Each Quiz");   
+            // allbars_xaxislabel.attr();        
+            d3.select('#column1').append("div")
+                            .attr("class", "viewall-yaxislabel")
+                            .text("Overall # Attempts");            
         }
 
         var legend = $('<div id="legend"></div>');
@@ -461,14 +552,28 @@ var attempts = (function() {
             $(this).on('click', function() {
                 var quizname = String($(this).attr('id'));
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
-                displayBasicInfo(quizname);
-                if (modeBool[0]) {
-                    drawAttemptsScatter(quizname, '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
+                if (quizname == "ViewAll") {
+                    $('.btn-l').attr("disabled", true);
+                    $('.btn-r').attr("disabled", true);
+                    if (modeBools[0]){
+                        drawAllAttemptsScatter();
+                    }
+                    else if (modeBools[1]){
+                        //drawAllAttemptsBarGraph();
+                    }
                 }
-                else if (modeBool[1]) {
-                    drawAttemptsBarGraph(quizname, '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
+                else {
+                    $('#legend').show();
+                    $('.btn-l').attr("disabled", false);
+                    $('.btn-r').attr("disabled", false);
+                    displayBasicInfo(quizname);
+                    if (modeBools[0]) {
+                        drawAttemptsScatter(quizname, '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
+                    }
+                    else if (modeBools[1]) {
+                        drawAttemptsBarGraph(quizname, '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
+                    }
                 }
-                
             });
         });
 
@@ -478,10 +583,10 @@ var attempts = (function() {
             if (index != 0){
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index-1]);
-                if (modeBool[0]) {
+                if (modeBools[0]) {
                     drawAttemptsScatter(quizzesArray[index-1], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
                 }
-                else if (modeBool[1]) {
+                else if (modeBools[1]) {
                     drawAttemptsBarGraph(quizzesArray[index-1], '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
                 }
             }
@@ -493,10 +598,10 @@ var attempts = (function() {
             if (index != quizzesArray.length-1){
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index+1]);
-                if (modeBool[0]) {
+                if (modeBools[0]) {
                     drawAttemptsScatter(quizzesArray[index+1], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
                 }
-                else if (modeBool[1]) {
+                else if (modeBools[1]) {
                     drawAttemptsBarGraph(quizzesArray[index+1], '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false)
                 }
                 
@@ -515,16 +620,16 @@ var attempts = (function() {
         leftButton.on('click', function() {
             leftButton.attr("class","active");
             rightButton.attr("class","");
-            modeBool[0] = true;
-            modeBool[1] = false;
+            modeBools[0] = true;
+            modeBools[1] = false;
             drawAttemptsScatter($('#asgn-nav').text(), '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
         });
 
         rightButton.on('click', function() {
             leftButton.attr("class","");
             rightButton.attr("class","active");
-            modeBool[0] = false;
-            modeBool[1] = true;
+            modeBools[0] = false;
+            modeBools[1] = true;
             drawAttemptsBarGraph($('#asgn-nav').text(), '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
         });
 

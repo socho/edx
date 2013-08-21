@@ -32,6 +32,11 @@
 	fill: lightgray;
 }
 
+.viewall-guidelinelabel {
+	font-size: 7pt;
+	fill: lightgray;
+}
+
 .helptext {
 	fill: teal;
 	stroke: none;
@@ -48,6 +53,36 @@
 .helptext {
 	text-anchor: middle;
 	fill: teal;
+}
+
+.small-axis path,
+.small-axis line {
+	fill: none;
+	stroke: black;
+	shape-rendering: crispEdges
+}
+
+.small-axis text{
+	font-size: 7pt;
+}
+
+.viewall-xaxislabel {
+	position: absolute;
+	left: 50%;
+	top: 100%;
+	font-weight: bold;
+}
+
+.viewall-yaxislabel {
+	position: absolute;
+	left:-8%;
+	top: 50%;
+	font-weight: bold;
+	transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg); 
+    -webkit-transform: rotate(-90deg); 
+    -o-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
 }
 
 circle {
