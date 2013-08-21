@@ -41,8 +41,9 @@ var attempts = (function() {
 
         var trackingLogs; 
 
+        load appropriate json file
         $.ajax({
-            url: 'dummyTrackingLogs.json', //change url for your use
+            url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
             async: false,
             dataType: 'json',
             success: function (response) {
@@ -50,7 +51,9 @@ var attempts = (function() {
             }
         });
 
-        // tracking logs file
+        // uncomment this to test on local server
+        // comment this to test on actual server
+        
         // trackingLogs = makeDummyTrackingLogs(10000);
 
         var myDataFormat = trackinglogs_to_mydataformat(trackingLogs);
@@ -59,10 +62,18 @@ var attempts = (function() {
         var peopleData = myDataFormat[0];
         var problemIDs = myDataFormat[1];
 
+        /**
+        returns a dictionary with keys of all usernames, 
+        the corresponding value for a username are a dictionary with keys of all assignments he/she took,
+        and the corresponding values for an assignment is number of attempts.
+        **/
         function getPeopleData(){
             return peopleData;
         }
 
+        /**
+        returns an array of all quiznames in the json file.
+        **/
         function getQuizzesArray() {
             return problemIDs;
         }
@@ -115,6 +126,9 @@ var attempts = (function() {
             }
         }
 
+        /**
+        returns an array of number of students for each # of attempts. 
+        **/
         function computeBarHeights(quizname) {
             var quiz = quizname;
             var attemptsarray = []; var dataset = [];
@@ -191,11 +205,7 @@ var attempts = (function() {
         );
         
         //MODE BOOLS 
-
         var modeBools = [true, false];
-
-
-
 
        ////////
        //NAVIGATION
@@ -221,14 +231,15 @@ var attempts = (function() {
         var scatter_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
         var scatter_margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
-       /*
+        /*
+        removes previous plots and
         draws the scatter plot graph everytime when called
         */
         function drawAttemptsScatter(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
             var chartWidth = outerWidth - margin.left - margin.right;
             var chartHeight = outerHeight - margin.top - margin.bottom;
 
-            if (!isSmall) {$('#column1').children().remove();}
+            if (!isSmall) {$('#column1').children().remove();} //remove previous plots only if it's drawing the big plot.
             var dataset = [];
             var dataDict = model.getPeopleData();
             for (var person in dataDict) {
@@ -252,10 +263,6 @@ var attempts = (function() {
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([info[1]+maxzscore*info[2],info[1]-maxzscore*info[2]])
                             .range([outerHeight-margin.bottom,margin.top]);
-
-            var xtoyScale = d3.scale.linear()
-                                .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
-                                .range([10*(info[1]-3*info[2]),10*(info[1]+3*info[2])]);
 
             var xaxisData = [];
             var yaxisData = [];
@@ -341,7 +348,7 @@ var attempts = (function() {
                     .text("Avr of overall")                
             }
 
-            //help text
+            //help text only for big plot
             if (!isSmall) {
                 var helptext = svg.append("g")
                                     .attr("class", "helptext");
@@ -399,6 +406,7 @@ var attempts = (function() {
                         .style("opacity", 0);   
                 });
 
+            //x and y axes
             if (!isSmall) {
                 //xaxis
                 svg.append("g")
@@ -503,6 +511,7 @@ var attempts = (function() {
                             .text("Overall # Attempts");            
         }
 
+        //setup legend
         var legend = $('<div id="legend"></div>');
 
         var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
@@ -518,15 +527,7 @@ var attempts = (function() {
         var lowerLabel = $('<div id="lowerLabel"></div>');
         var upperLabel = $('<div id="upperLabel"></div>');
 
-
-
         $('#column2').append(legend); 
-        $("#lowerLabel").text(25);
-        $("#lowerLabel").css('top',"-10px");
-        $("#lowerLabel").css('left', String(0.01 * 25 * parseFloat($('#slider').css("width")) - 0.5 * parseFloat($("#lowerLabel").css("width")))+"px"); 
-        $("#upperLabel").text(75);
-        $("#upperLabel").css('top',"-10px");
-        $("#upperLabel").css('left', String(0.01 * 75 * parseFloat($('#slider').css("width")) - parseFloat($("#lowerLabel").css("width")) - 0.5 * parseFloat($("#upperLabel").css("width")))+"px");
         
         /*
         Displays the number of students who took the quiz, the standard dev, and the
@@ -813,6 +814,7 @@ var attempts = (function() {
         }
         function drawAllAttemptsBarGraphs(){
             $('#column1').children().remove();
+            $('#legend').hide();
             var quizzesArray = model.getQuizzesArray();
 
             var numCols = 3;
