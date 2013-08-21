@@ -48,24 +48,25 @@ var gradeDistr = (function() {
 
         var courseware_studentmodule; 
 
-        // $.ajax({
-        //     url: 'dummymodule.json',
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         courseware_studentmodule = response;
-        //     }
-        // });
+        $.ajax({
+            url: 'dummymodule.json',
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                courseware_studentmodule = response;
+            }
+        });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        courseware_studentmodule = dummymodule;
+        // courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
+        //possible module_types are "problem", "selfassessment", and "combinedopenended".
         var module_type_array = ["problem"];
 
         //////////////////////////////////////////////////////

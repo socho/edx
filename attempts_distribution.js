@@ -39,44 +39,38 @@ var attempts = (function() {
     function Model(){
         var handler = UpdateHandler();
 
+        var trackingLogs; 
 
+        $.ajax({
+            url: 'dummyTrackingLogs.json',
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                trackingLogs = response;
+            }
+        });
 
-        //var peopleData = makeFullData(200); //comment this out when ready for deployment
-        var dummyTrackingLogs = makeDummyTrackingLogs(10000);
-        // var myDataFormat = trackinglogs_to_mydataformat(dummyTrackingLogs); 
-        // var peopleData = myDataFormat[0];
-        // var problemIDs = myDataFormat[1];
-        
-        // var peopleData = dataExport.exports.extract(jsonarray); uncomment this when ready for deployment
-        // var jsonarray = 
-        // [
-        // {"username": "socho",
-        // "event_type": "save_problem_check",
-        // "event" : {"problem_id": "p1","success": "correct", "attempts": 4}
-        // },
-        // {"username": "socho",
-        // "event_type": "save_problem_check",
-        // "event" : {"problem_id": "p1","success": "correct", "attempts": 5}
-        // },
-        // {"username": "socho",
-        // "event_type": "save_problem_check",
-        // "event" : {"problem_id": "p3","success": "correct", "attempts": 2}
-        // },
-        // {"username": "socho",
-        // "event_type": "save_problem_check",
-        // "event" : {"problem_id": "p1","success": "incorrect", "attempts": 3}
-        // },
-        // {"username": "mich",
-        // "event_type": "save_problem_check",
-        // "event" : {"problem_id": "p2","success": "correct", "attempts": 7}
-        // },
-        // ];
+        //////////////////////////////////////////////////////
+        ////////////////Need to Manually Change///////////////
+        //////////////////////////////////////////////////////
 
-        var myDataFormat = trackinglogs_to_mydataformat(dummyTrackingLogs);
-        var peopleData = $.extend({}, myDataFormat[0]);
-        var problemIDs = $.extend([], myDataFormat[1]);
-        // var peopleData = $(myDataFormat[0]).clone();
-        // var problemIDs = myDataFormat[1].clone();
+        //the tracking logs file
+        // trackingLogs = makeDummyTrackingLogs(10000);
+
+        // //course_id you're interested in
+        // var course_id = "6.813";
+        // //an array of module_types you're interested in visualizing
+        // var module_type_array = ["problem"];
+
+        //////////////////////////////////////////////////////
+        /////////////////////////END//////////////////////////
+        //////////////////////////////////////////////////////
+
+        var myDataFormat = trackinglogs_to_mydataformat(trackingLogs);
+        // var peopleData = $.extend({}, myDataFormat[0]);
+        // var problemIDs = $.extend([], myDataFormat[1]);
+        var peopleData = myDataFormat[0];
+        var problemIDs = myDataFormat[1];
 
         function getPeopleData(){
             return peopleData;
@@ -237,7 +231,7 @@ var attempts = (function() {
         //setup variables for Graph
         ////////
         var scatter_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var scatter_outerHeight = 600;
+        var scatter_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
         var scatter_margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
        /*
@@ -260,12 +254,10 @@ var attempts = (function() {
             var infoOverall = model.getInfoOverAll();
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
-            console.log("avroverall", avrOverall, "sdOverall", sdOverall);
 
             var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
-            console.log("maxzscore",maxzscore);
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([avrOverall+maxzscore*sdOverall,avrOverall-maxzscore*sdOverall])
@@ -668,7 +660,7 @@ var attempts = (function() {
 
         //variables for bar chart
         var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var attemptsbar_outerHeight = 600;
+        var attemptsbar_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
 
         var attemptsbar_margin = { top: 20, right: 20, bottom: 50, left: 50 };
 
@@ -857,8 +849,8 @@ var attempts = (function() {
                         var thisQuiz = quizzesArray[i*numCols+j];
                         var barHeights = model.computeBarHeights(thisQuiz);
                         if (barHeights.length > overallMaxX) {overallMaxX = barHeights.length;}
-                        for (var i in barHeights) {
-                            if (barHeights[i] > overallMaxY) {overallMaxY = barHeights[i];}
+                        for (var k in barHeights) {
+                            if (barHeights[k] > overallMaxY) {overallMaxY = barHeights[k];}
                         }
                     }
                 }
@@ -872,7 +864,7 @@ var attempts = (function() {
                         var parentDiv = ".bar-row-"+i+" .bar-col-"+j;
                         var outerWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
                         var outerHeight = $(document).height()/3;
-                        var margin = { top: 10, right: 5, bottom: 20, left: 20};
+                        var margin = { top: 10, right: 5, bottom: 20, left: 25};
                         drawAttemptsBarGraph(quizname, parentDiv, outerWidth, outerHeight, margin, overallMaxX, overallMaxY, true);
                     }
                 }

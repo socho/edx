@@ -38,5 +38,6 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 		}
 	}
 	quizProblems.sort();
+	console.log("quizproblems", quizProblems);
 	return [formattedArray, quizProblems];
 }

@@ -60,6 +60,5 @@ var makeDummyTrackingLogs = function(numberOfLogs){
         }
         dummyTrackingLogs.push(thisLog);
     }
-    console.log("dummy tracking log", dummyTrackingLogs);
     return dummyTrackingLogs;
 }
