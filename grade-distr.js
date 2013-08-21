@@ -45,21 +45,21 @@ var gradeDistr = (function() {
     function Model(){
         var handler = UpdateHandler();
 
-        $.ajax({
-            url: 'dummymodule.json',
-            async: false,
-            dataType: 'json',
-            success: function (response) {
-                var courseware_studentmodule = response;
-            }
-        });
+        // $.ajax({
+        //     url: 'dummymodule.json',
+        //     async: false,
+        //     dataType: 'json',
+        //     success: function (response) {
+        //         var courseware_studentmodule = response;
+        //     }
+        // });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        // var courseware_studentmodule = dummymodule;
+        var courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing

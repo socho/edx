@@ -134,6 +134,28 @@ var attempts = (function() {
             }
         }
 
+        function computeBarHeights(quizname) {
+            var quiz = quizname;
+            var attemptsarray = []; var dataset = [];
+            var maxattempt = 0;
+            var dataDict = getPeopleData();
+            for (var person in dataDict) {                
+                if (quiz in dataDict[person]){
+                    //pushes in the person's score on problem and attempts
+                    var numAttempts = dataDict[person][quiz];
+                    dataset.push({"username": person ,"attempts": numAttempts, "avrattempts": dataDict[person]["avr"]});
+                    if (maxattempt < numAttempts) {maxattempt = numAttempts;}
+                }
+            }
+            for (var i = 0; i < maxattempt; i++) {attemptsarray.push(0);}
+
+            //counts the students' attempts
+            for (var person in dataset) {
+                var attempt = dataset[person].attempts;
+                attemptsarray[attempt-1]++;                
+            } 
+            return attemptsarray;
+        }
 
         /*
         Calculates the average grade on the quiz, the standard deviation and the number of 
@@ -156,7 +178,7 @@ var attempts = (function() {
             return [avr, sd];            
         }
 
-        return {getPeopleData: getPeopleData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, getInfoOverAll: getInfoOverAll, on: handler.on};
+        return {getPeopleData: getPeopleData, getQuizzesArray: getQuizzesArray, getBasicInfo: getBasicInfo, calcAverage: calcAverage, computeBarHeights: computeBarHeights, getInfoOverAll: getInfoOverAll, on: handler.on};
     }
 
     function Controller(model){
@@ -181,7 +203,6 @@ var attempts = (function() {
         +'<div class = "body-content">'
         +   '<div class = "row">'
         +       '<div class="col-lg-8" id="column1">'
-        +           '<div class="chart-container"></div>'
         +       '</div>'
         +       '<div class="col-lg-4" id="column2"></div>'
         +   '</div>'
@@ -226,7 +247,7 @@ var attempts = (function() {
             var chartWidth = outerWidth - margin.left - margin.right;
             var chartHeight = outerHeight - margin.top - margin.bottom;
 
-            if (!isSmall) {$('svg').remove();}
+            if (!isSmall) {$('#column1').children().remove();}
             var dataset = [];
             var dataDict = model.getPeopleData();
             for (var person in dataDict) {
@@ -379,10 +400,10 @@ var attempts = (function() {
                 .append("circle")
                 .attr("class","datapoints")
                 .attr("cx", function(d){
-                    return xScale(d["avrattempts"]);
+                    return xScale(d["avrattempts"]+Math.random()/4);
                 })
                 .attr("cy", function(d){
-                    return yScale(d["attempts"]);
+                    return yScale(d["attempts"]+Math.random()/4);
                 })
                 .attr("r", 3)
                 .on("mouseover", function(d) {  
@@ -464,7 +485,7 @@ var attempts = (function() {
         }
         function drawAllAttemptsScatter(){
             $('#legend').hide();
-            $('.chart-container').children().remove();
+            $('#column1').children().remove();
             var quizzesArray = model.getQuizzesArray();
 
             var numCols = 3;
@@ -559,7 +580,7 @@ var attempts = (function() {
                         drawAllAttemptsScatter();
                     }
                     else if (modeBools[1]){
-                        //drawAllAttemptsBarGraph();
+                        drawAllAttemptsBarGraphs();
                     }
                 }
                 else {
@@ -568,10 +589,10 @@ var attempts = (function() {
                     $('.btn-r').attr("disabled", false);
                     displayBasicInfo(quizname);
                     if (modeBools[0]) {
-                        drawAttemptsScatter(quizname, '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
+                        drawAttemptsScatter(quizname, '#column1', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
                     }
                     else if (modeBools[1]) {
-                        drawAttemptsBarGraph(quizname, '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
+                        drawAttemptsBarGraph(quizname, '#column1', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, 0, 0, false);
                     }
                 }
             });
@@ -584,10 +605,10 @@ var attempts = (function() {
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index-1]);
                 if (modeBools[0]) {
-                    drawAttemptsScatter(quizzesArray[index-1], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
+                    drawAttemptsScatter(quizzesArray[index-1], '#column1', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
                 }
                 else if (modeBools[1]) {
-                    drawAttemptsBarGraph(quizzesArray[index-1], '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
+                    drawAttemptsBarGraph(quizzesArray[index-1], '#column1', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, 0, 0, false);
                 }
             }
         });
@@ -599,10 +620,10 @@ var attempts = (function() {
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index+1]);
                 if (modeBools[0]) {
-                    drawAttemptsScatter(quizzesArray[index+1], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
+                    drawAttemptsScatter(quizzesArray[index+1], '#column1', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
                 }
                 else if (modeBools[1]) {
-                    drawAttemptsBarGraph(quizzesArray[index+1], '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false)
+                    drawAttemptsBarGraph(quizzesArray[index+1], '#column1', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, 0, 0, false)
                 }
                 
             }
@@ -622,7 +643,13 @@ var attempts = (function() {
             rightButton.attr("class","");
             modeBools[0] = true;
             modeBools[1] = false;
-            drawAttemptsScatter($('#asgn-nav').text(), '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
+            var quizname = $('#asgn-nav').text();
+            if (quizname == "ViewAll") {
+                drawAllAttemptsScatter();
+            }
+            else {
+                drawAttemptsScatter(quizname, '#column1', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
+            }
         });
 
         rightButton.on('click', function() {
@@ -630,7 +657,13 @@ var attempts = (function() {
             rightButton.attr("class","active");
             modeBools[0] = false;
             modeBools[1] = true;
-            drawAttemptsBarGraph($('#asgn-nav').text(), '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
+            var quizname = $('#asgn-nav').text();
+            if (quizname == "ViewAll") {
+                drawAllAttemptsBarGraphs();
+            }
+            else {
+                drawAttemptsBarGraph(quizname, '#column1', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, 0, 0, false);
+            }
         });
 
         //variables for bar chart
@@ -640,84 +673,54 @@ var attempts = (function() {
         var attemptsbar_margin = { top: 20, right: 20, bottom: 50, left: 50 };
 
         //graphs the bar chart when called or in barchart mode
-        function drawAttemptsBarGraph(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
+        function drawAttemptsBarGraph(quizname, parentDiv, outerWidth, outerHeight, margin, maxX, maxY, isSmall) {
             var chartWidth = outerWidth - margin.left - margin.right;
             var chartHeight = outerHeight - margin.top - margin.bottom;
-            $('svg').remove();
-            var dataset = [];
-            var dataDict = model.getPeopleData();
-            var counter = 0;
+            if (!isSmall) {$('#column1').children().remove();}
             var quiz = quizname;
-            var attemptsarray = [0,0,0,0,0,0,0,0,0,0,0];
-            var maxattempt = 0;
-            for (var person in dataDict) {
-                
-                if (quiz in dataDict[person]){
-                    //pushes in the person's score on problem and attempts
-                    dataset.push({"username": person ,"attempts": dataDict[person][quiz], "avrattempts": dataDict[person]["avr"]});
-
-                }
-            }
-
-            //counts the students' attempts
-            for (var person in dataset) {
-                var attempt = dataset[person].attempts;
-                switch(attempt) {
-                    case 1:
-                        attemptsarray[0]++;
-                        break;
-                    case 2:
-                        attemptsarray[1]++;
-                        break;
-                    case 3:
-                        attemptsarray[2]++;
-                        break;
-                    case 4:
-                        attemptsarray[3]++;
-                        break;
-                    case 5:
-                        attemptsarray[4]++;
-                        break;
-                    case 6:
-                        attemptsarray[5]++;
-                        break;
-                    case 7:
-                        attemptsarray[6]++;
-                        break;
-                    case 8:
-                        attemptsarray[7]++;
-                        break;
-                    case 9:
-                        attemptsarray[8]++;
-                        break;
-                    case 10:
-                        attemptsarray[9]++;
-                        break;
-                    case 11:
-                        attemptsarray[10]++;
-                        break;
-                }
-                
-                
-            }           
-
+            var attemptsarray = model.computeBarHeights(quiz);
             var info = model.getBasicInfo(quiz);
             var infoOverall = model.getInfoOverAll();
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
-            var xScale = d3.scale.ordinal()
-                            .domain([1,2,3,4,5,6,7,8,9,10,11])
-                            .rangeRoundBands([attemptsbar_margin.left,attemptsbar_outerWidth-attemptsbar_margin.right],0.05);
+            var xScaleDomain = [];
 
-            var yScale = d3.scale.linear()
-                            .domain([0, Math.max.apply(Math,attemptsarray)])
-                            .range([attemptsbar_outerHeight - attemptsbar_margin.bottom, attemptsbar_margin.top]);
+            if (!isSmall) {
+                for (var i = 1; i <= attemptsarray.length; i++) {
+                    xScaleDomain.push(i);
+                }
 
-            var yscaleticks = d3.scale.linear() //scale is a function!!!!!
-                                .domain([Math.max.apply(Math,attemptsarray),0])
-                                .range([attemptsbar_margin.top,attemptsbar_outerHeight-attemptsbar_margin.bottom]);           
+                var xScale = d3.scale.ordinal()
+                                .domain(xScaleDomain)
+                                .rangeRoundBands([margin.left,outerWidth-margin.right],0.05);
 
+                var yScale = d3.scale.linear()
+                                .domain([0, Math.max.apply(Math,attemptsarray)])
+                                .range([outerHeight - margin.bottom, margin.top]);
+
+                var yscaleticks = d3.scale.linear() //scale is a function!!!!!
+                                    .domain([Math.max.apply(Math,attemptsarray),0])
+                                    .range([margin.top,outerHeight-margin.bottom]);           
+            }
+            else {
+                for (var i = 1; i <= maxX; i++) {
+                    xScaleDomain.push(i);
+                }
+
+                var xScale = d3.scale.ordinal()
+                                .domain(xScaleDomain)
+                                .rangeRoundBands([margin.left,outerWidth-margin.right],0.05);
+
+                var yScale = d3.scale.linear()
+                                .domain([0, maxY])
+                                .range([outerHeight - margin.bottom, margin.top]);
+
+                var yscaleticks = d3.scale.linear() //scale is a function!!!!!
+                                    .domain([maxY,0])
+                                    .range([margin.top,outerHeight-margin.bottom]);           
+
+            }
             var xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient("bottom");
@@ -727,8 +730,8 @@ var attempts = (function() {
                             .ticks(5);
 
             var svg = d3.select(parentDiv).append("svg")
-                        .attr("width",attemptsbar_outerWidth)
-                        .attr("height",attemptsbar_outerHeight);
+                        .attr("width",outerWidth)
+                        .attr("height",outerHeight);
 
             // Y AXIS GRID LINES
             svg.selectAll("line").data(yScale.ticks(5))
@@ -764,47 +767,129 @@ var attempts = (function() {
                     return d; 
                 }
             });
-                
-            //Y-AXIS LABEL
-            svg.append("text")
-                .attr("class", "yaxis-label")
-                .attr("x",0)
-                .attr("y", 0)
-                .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -margin.top-chartHeight/2)
-                .attr("dy", margin.left*0.2)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Number of Students");
 
-            //X-AXIS LABEL
-            svg.append("text")
-                .attr("class", "xaxis-label")
-                // .attr("x",chartWidth/2)
-                .attr("x", chartWidth/2)
-                .attr("y", chartHeight+margin.top)
-                .attr("dy", margin.bottom*.75)
-                .attr("font-weight", "bold")
-                .attr("text-anchor", "middle")
-                .text("Number of Attempts");
+            if (!isSmall) {                
+                //Y-AXIS LABEL
+                svg.append("text")
+                    .attr("class", "yaxis-label")
+                    .attr("x",0)
+                    .attr("y", 0)
+                    .attr("transform", function(d) {return "rotate(-90)" })
+                    .attr("dx", -margin.top-chartHeight/2)
+                    .attr("dy", margin.left*0.2)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("Number of Students");
 
-            //xaxis
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate(0,"+(chartHeight + margin.top)+")")
-                .call(xAxis);
+                //X-AXIS LABEL
+                svg.append("text")
+                    .attr("class", "xaxis-label")
+                    // .attr("x",chartWidth/2)
+                    .attr("x", chartWidth/2)
+                    .attr("y", chartHeight+margin.top)
+                    .attr("dy", margin.bottom*.75)
+                    .attr("font-weight", "bold")
+                    .attr("text-anchor", "middle")
+                    .text("Number of Attempts");
+            }
 
-            //yaxis
-            svg.append("g")
-                .attr("class","axis")
-                .attr("transform", "translate("+(margin.left)+",0)")
-                .call(yAxis);
+            if (!isSmall) {
+                //xaxis
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate(0,"+(chartHeight + margin.top)+")")
+                    .call(xAxis);
 
+                //yaxis
+                svg.append("g")
+                    .attr("class","axis")
+                    .attr("transform", "translate("+(margin.left)+",0)")
+                    .call(yAxis);
+            }
+
+            else {
+                //xaxis
+                svg.append("g")
+                    .attr("class","small-axis")
+                    .attr("transform", "translate(0,"+(chartHeight + margin.top)+")")
+                    .call(xAxis);
+
+                //yaxis
+                svg.append("g")
+                    .attr("class","small-axis")
+                    .attr("transform", "translate("+(margin.left)+",0)")
+                    .call(yAxis);                
+            }
+
+            // Title for mini plots
+            if (isSmall) {
+                svg.append("text")
+                        .attr("class","title")
+                        .attr("x", "50%")
+                        .attr("y", 0)
+                        .attr("dy", 12)
+                        .text(quizname);
+            }
+
+        }
+        function drawAllAttemptsBarGraphs(){
+            $('#column1').children().remove();
+            var quizzesArray = model.getQuizzesArray();
+
+            var numCols = 3;
+            var numRows = Math.ceil(quizzesArray.length/numCols);
+
+            for (var i = 0; i < numRows; i++) {
+                var thisrow = $("<div class='bar-row-"+i+"'></div>");
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        thisrow.append("<div class='col-lg-4 bar-col-"+j+"'></div>");
+                    }
+                }
+                $('#column1').append(thisrow);
+            }
+
+            //calculate absolute max y value of all plots
+            var overallMaxY = 0; var overallMaxX = 0;
+            for (var i = 0; i < numRows; i++) {
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        var thisQuiz = quizzesArray[i*numCols+j];
+                        var barHeights = model.computeBarHeights(thisQuiz);
+                        if (barHeights.length > overallMaxX) {overallMaxX = barHeights.length;}
+                        for (var i in barHeights) {
+                            if (barHeights[i] > overallMaxY) {overallMaxY = barHeights[i];}
+                        }
+                    }
+                }
+            }
+
+            //iterate through each grid div and append a bar graph to each
+            for (var i = 0; i < numRows; i++) {
+                for (var j=0; j < numCols; j++) {
+                    if (i*numCols+j < quizzesArray.length) {
+                        var quizname = quizzesArray[i*numCols+j];
+                        var parentDiv = ".bar-row-"+i+" .bar-col-"+j;
+                        var outerWidth = parseInt($('.bar-row-'+i+' .bar-col-'+j).css("width"));
+                        var outerHeight = $(document).height()/3;
+                        var margin = { top: 10, right: 5, bottom: 20, left: 20};
+                        drawAttemptsBarGraph(quizname, parentDiv, outerWidth, outerHeight, margin, overallMaxX, overallMaxY, true);
+                    }
+                }
+            }
+            //x and y axes labels
+            var allbars_xaxislabel = d3.select('#column1').append("div")
+                            .attr("class", "viewall-xaxislabel")
+                            .text("Number of Attempts for Each Assignment");   
+            // allbars_xaxislabel.attr();        
+            d3.select('#column1').append("div")
+                            .attr("class", "viewall-yaxislabel")
+                            .text("Number of Students");            
         }
 
         //initial graph
         model.calcAverage();
-        drawAttemptsScatter(model.getQuizzesArray()[0], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
+        drawAttemptsScatter(model.getQuizzesArray()[0], '#column1', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
             
     }
 
