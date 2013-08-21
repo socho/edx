@@ -73,7 +73,6 @@ var attempts = (function() {
         // ];
 
         var myDataFormat = trackinglogs_to_mydataformat(dummyTrackingLogs);
-        console.log(myDataFormat);
         var peopleData = $.extend({}, myDataFormat[0]);
         var problemIDs = $.extend([], myDataFormat[1]);
         // var peopleData = $(myDataFormat[0]).clone();
@@ -95,7 +94,6 @@ var attempts = (function() {
             var numPeople = 0;
             var sum = 0;
             for (var key in peopleData) {
-                console.log("assignment",assignment)
                 if (assignment in peopleData[key]) {
                     numPeople++;
                     sum += peopleData[key][assignment];
@@ -118,11 +116,8 @@ var attempts = (function() {
         calculates student's grade average in the class
         */
         function calcAverage() {
-            console.log("calc aver");
             var quizzesOfInterest = getQuizzesArray();
-            console.log("quizzesArray", quizzesOfInterest);
             for (var person in peopleData){
-                console.log(peopleData);
                 var personData = peopleData[person];
                 personData["avr"] = 0;
                 var sum = 0;
@@ -132,13 +127,11 @@ var attempts = (function() {
                     if (quizname in personData) {
                         numQuizzes += 1;
                         sum += parseFloat(personData[quizname]);
-                        console.log('person', person, 'quizname', quizname, 'sum', sum, 'numQuizzes', numQuizzes);                
                     }
                 }
                 var avr = sum / numQuizzes;
                 personData["avr"] = avr;
             }
-            console.log("second");
         }
 
 
@@ -149,11 +142,9 @@ var attempts = (function() {
         function getInfoOverAll() {
             var sum = 0; var numPeople = 0;
             for (var person in peopleData) {
-                console.log("each average",peopleData[person]["avr"], person);
                 sum += parseFloat(peopleData[person]["avr"]);
                 numPeople += 1;
             }
-            console.log('sum',sum, 'numPeople',numPeople);
             var avr = sum / numPeople;
 
             //sd
@@ -180,7 +171,7 @@ var attempts = (function() {
         +   '<div class = "btn-group">'
         +       '<button type = "button" class="btn btn-default btn-l"><span class="glyphicon glyphicon-chevron-left"></span></button>'
         +       '<div class = "btn-group">'
-        +           '<button id="asgn-nav" type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">Ex 1<span class="caret"></span></button>'
+        +           '<button id="asgn-nav" type = "button" class="btn btn-default dropdown-toggle" data-toggle = "dropdown">'+model.getQuizzesArray()[0]+'<span class="caret"></span></button>'
         +           '<ul class="dropdown-menu">'
         +           '</ul>'
         +       '</div>'
@@ -214,6 +205,8 @@ var attempts = (function() {
             var link = $('<li id="' + key + '"><a>' + key + '</a></li>');
             dropdown.append(link);
         } 
+        // dropdown.append("<li id='ViewAll'><a>ViewAll</a></li>");
+
 
         var tooltip = d3.select("body").append("div")   
             .attr("class", "tooltip")               
@@ -222,24 +215,17 @@ var attempts = (function() {
         ////////
         //setup variables for Graph
         ////////
-        var outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var outerHeight = 600;
+        var scatter_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
+        var scatter_outerHeight = 600;
+        var scatter_margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
-        var margin = { top: 20, right: 20, bottom: 60, left: 50 };
-
-        var chartWidth = outerWidth - margin.left - margin.right;
-        var chartHeight = outerHeight - margin.top - margin.bottom;
-
-
-        
-        // //initial graph
-        // model.calcAverage();
-        // drawGraph("p1");
-
-        /*
+       /*
         draws the scatter plot graph everytime when called
         */
-        function drawGraph(quizname) {
+        function drawAttemptsScatter(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
+            var chartWidth = outerWidth - margin.left - margin.right;
+            var chartHeight = outerHeight - margin.top - margin.bottom;
+
             $('svg').remove();
             var dataset = [];
             var dataDict = model.getPeopleData();
@@ -249,12 +235,10 @@ var attempts = (function() {
                     dataset.push({"username": person ,"attempts": dataDict[person][quizname], "avrattempts": dataDict[person]["avr"]});
                 }
             }
-            console.log("dataset",dataset);
             var info = model.getBasicInfo(quizname);
             var infoOverall = model.getInfoOverAll();
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
-            console.log("info",info, 'avroverall', avrOverall, 'sdOverall', sdOverall);
 
             var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
@@ -292,7 +276,7 @@ var attempts = (function() {
                             .tickValues(yaxisData)
                             //.tickFormat(d3.format(".1f"))
 
-            var svg = d3.select(".chart-container").append("svg")
+            var svg = d3.select(parentDiv).append("svg")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 
@@ -426,8 +410,6 @@ var attempts = (function() {
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Overall # Attempts");
-
-            console.log("third");
         }
 
         var legend = $('<div id="legend"></div>');
@@ -470,7 +452,7 @@ var attempts = (function() {
         }
 
         //displays initial info for the graph
-        displayBasicInfo("Ex 1");
+        displayBasicInfo(model.getQuizzesArray()[0]);
 
         ///////
         ///EVENT LISTENERS
@@ -479,11 +461,12 @@ var attempts = (function() {
             $(this).on('click', function() {
                 var quizname = String($(this).attr('id'));
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
+                displayBasicInfo(quizname);
                 if (modeBool[0]) {
-                    drawGraph(quizname);
+                    drawAttemptsScatter(quizname, '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
                 }
                 else if (modeBool[1]) {
-                    changeToBar(quizname);
+                    drawAttemptsBarGraph(quizname, '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
                 }
                 
             });
@@ -496,10 +479,10 @@ var attempts = (function() {
                 $('#asgn-nav').html(quizzesArray[index-1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index-1]);
                 if (modeBool[0]) {
-                    drawGraph(quizzesArray[index-1]);   
+                    drawAttemptsScatter(quizzesArray[index-1], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
                 }
                 else if (modeBool[1]) {
-                    changeToBar(quizzesArray[index-1]);
+                    drawAttemptsBarGraph(quizzesArray[index-1], '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
                 }
             }
         });
@@ -511,10 +494,10 @@ var attempts = (function() {
                 $('#asgn-nav').html(quizzesArray[index+1]+"<span class='caret'></span>");
                 displayBasicInfo(quizzesArray[index+1]);
                 if (modeBool[0]) {
-                    drawGraph(quizzesArray[index+1]);   
+                    drawAttemptsScatter(quizzesArray[index+1], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);   
                 }
                 else if (modeBool[1]) {
-                    changeToBar(quizzesArray[index+1])
+                    drawAttemptsBarGraph(quizzesArray[index+1], '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false)
                 }
                 
             }
@@ -534,7 +517,7 @@ var attempts = (function() {
             rightButton.attr("class","");
             modeBool[0] = true;
             modeBool[1] = false;
-            drawGraph($('#asgn-nav').text());
+            drawAttemptsScatter($('#asgn-nav').text(), '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
         });
 
         rightButton.on('click', function() {
@@ -542,11 +525,19 @@ var attempts = (function() {
             rightButton.attr("class","active");
             modeBool[0] = false;
             modeBool[1] = true;
-            changeToBar($('#asgn-nav').text());
+            drawAttemptsBarGraph($('#asgn-nav').text(), '.chart-container', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, false);
         });
 
+        //variables for bar chart
+        var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
+        var attemptsbar_outerHeight = 600;
+
+        var attemptsbar_margin = { top: 20, right: 20, bottom: 50, left: 50 };
+
         //graphs the bar chart when called or in barchart mode
-        function changeToBar(quizname) {
+        function drawAttemptsBarGraph(quizname, parentDiv, outerWidth, outerHeight, margin, isSmall) {
+            var chartWidth = outerWidth - margin.left - margin.right;
+            var chartHeight = outerHeight - margin.top - margin.bottom;
             $('svg').remove();
             var dataset = [];
             var dataDict = model.getPeopleData();
@@ -603,17 +594,7 @@ var attempts = (function() {
                 }
                 
                 
-            }
-
-            //variables for bar chart
-            var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-            var attemptsbar_outerHeight = 600;
-
-            var attemptsbar_margin = { top: 20, right: 20, bottom: 50, left: 50 };
-
-            var attemptsbar_chartWidth = attemptsbar_outerWidth - attemptsbar_margin.left - attemptsbar_margin.right;
-            var attemptsbar_chartHeight = attemptsbar_outerHeight - attemptsbar_margin.top - attemptsbar_margin.bottom;
-           
+            }           
 
             var info = model.getBasicInfo(quiz);
             var infoOverall = model.getInfoOverAll();
@@ -640,7 +621,7 @@ var attempts = (function() {
                             .orient("left")
                             .ticks(5);
 
-            var svg = d3.select(".chart-container").append("svg")
+            var svg = d3.select(parentDiv).append("svg")
                         .attr("width",attemptsbar_outerWidth)
                         .attr("height",attemptsbar_outerHeight);
 
@@ -648,8 +629,8 @@ var attempts = (function() {
             svg.selectAll("line").data(yScale.ticks(5))
                 .enter().append("line")
                 .attr("class", "horizontal_line")
-                .attr("x1", attemptsbar_margin.left)
-                .attr("x2", attemptsbar_chartWidth + attemptsbar_margin.left)
+                .attr("x1", margin.left)
+                .attr("x2", chartWidth + margin.left)
                 .attr("y1", yScale)
                 .attr("y2", yScale);
           
@@ -666,7 +647,7 @@ var attempts = (function() {
                 })
                 .attr("width", xScale.rangeBand())
                 .attr("height", function(d) {
-                    return attemptsbar_chartHeight + attemptsbar_margin.top - yScale(d);
+                    return chartHeight + margin.top - yScale(d);
                 })
                 .attr('fill', 'lightblue');
 
@@ -685,8 +666,8 @@ var attempts = (function() {
                 .attr("x",0)
                 .attr("y", 0)
                 .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -attemptsbar_margin.top-chartHeight/2)
-                .attr("dy", attemptsbar_margin.left*0.2)
+                .attr("dx", -margin.top-chartHeight/2)
+                .attr("dy", margin.left*0.2)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Number of Students");
@@ -695,9 +676,9 @@ var attempts = (function() {
             svg.append("text")
                 .attr("class", "xaxis-label")
                 // .attr("x",chartWidth/2)
-                .attr("x", attemptsbar_chartWidth/2)
-                .attr("y", attemptsbar_chartHeight+attemptsbar_margin.top)
-                .attr("dy", attemptsbar_margin.bottom*.75)
+                .attr("x", chartWidth/2)
+                .attr("y", chartHeight+margin.top)
+                .attr("dy", margin.bottom*.75)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
                 .text("Number of Attempts");
@@ -705,23 +686,21 @@ var attempts = (function() {
             //xaxis
             svg.append("g")
                 .attr("class","axis")
-                .attr("transform", "translate(0,"+(attemptsbar_chartHeight + attemptsbar_margin.top)+")")
+                .attr("transform", "translate(0,"+(chartHeight + margin.top)+")")
                 .call(xAxis);
 
             //yaxis
             svg.append("g")
                 .attr("class","axis")
-                .attr("transform", "translate("+(attemptsbar_margin.left)+",0)")
+                .attr("transform", "translate("+(margin.left)+",0)")
                 .call(yAxis);
 
         }
+
         //initial graph
         model.calcAverage();
-        drawGraph("Ex1");
-
-
+        drawAttemptsScatter(model.getQuizzesArray()[0], '.chart-container', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
             
-
     }
 
   //setup main structure of app

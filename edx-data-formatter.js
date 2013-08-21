@@ -1,5 +1,4 @@
 var trackinglogs_to_mydataformat = function(dataArr) {
-	console.log("input",dataArr);
 	var formattedArray = {};
 	var quizProblems = [];
 
@@ -12,10 +11,7 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 						formattedArray[dataArr[i].username] = {};
 						formattedArray[dataArr[i].username][dataArr[i].event.problem_id] = dataArr[i].event.attempts;
 
-						console.log('currentlist',quizProblems);
-						console.log('tryingtoadd',dataArr[i].event.problem_id);
 						if (quizProblems.indexOf(dataArr[i].event.problem_id) == -1) {
-							console.log("not in");
 							quizProblems.push(dataArr[i].event.problem_id);
 						}
 					}
@@ -33,7 +29,6 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 						}
 						else {
 							if (quizProblems.indexOf(dataArr[i].event.problem_id) == -1) {
-								console.log("not in");
 								quizProblems.push(dataArr[i].event.problem_id);
 							}
 							formattedArray[dataArr[i].username][dataArr[i].event.problem_id] = dataArr[i].event.attempts;					
@@ -43,8 +38,5 @@ var trackinglogs_to_mydataformat = function(dataArr) {
 		}
 	}
 	quizProblems.sort();
-	console.log("first");
-	console.log('formatted',formattedArray);
-	console.log('list of quizzes',quizProblems);
 	return [formattedArray, quizProblems];
 }
