@@ -43,21 +43,21 @@ var gradeDistr = (function() {
 
         var courseware_studentmodule; 
 
-        $.ajax({
-            url: 'dummymodule.json',
-            async: false,
-            dataType: 'json',
-            success: function (response) {
-                courseware_studentmodule = response;
-            }
-        });
+        // $.ajax({
+        //     url: 'dummymodule.json',
+        //     async: false,
+        //     dataType: 'json',
+        //     success: function (response) {
+        //         courseware_studentmodule = response;
+        //     }
+        // });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        // courseware_studentmodule = dummymodule;
+        courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -469,13 +469,14 @@ var gradeDistr = (function() {
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
                 controller.drawAllBarGraphs();
+                hoverInfos();
+
             }
             else {
                 controller.calcAverage();
                 bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                 top = Math.abs(100 - sliderObj.slider("values", 1));
                 controller.groupPeopleByAvr(quizname, bottom, 100-top);
-                hoverInfos();
                 displayBasicInfo(quizname);
                 drawInitialGraph(quizname, "#column1", bar_outerWidth, bar_outerHeight, bar_margin, 0, false);
             }
@@ -491,6 +492,7 @@ var gradeDistr = (function() {
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
                 controller.drawAllAvrScatterPlots();
+                hoverInfos();
             }
             else {
                 displayBasicInfo(quizname);
@@ -1186,32 +1188,20 @@ var gradeDistr = (function() {
                     $('.btn-r').attr("disabled", true);
                     if (modeBools[0]){
                         controller.drawAllBarGraphs();
+                        hoverInfos();
                     }
                     else if (modeBools[1]){
                         controller.drawAllRankScatterPlots();
+                        hoverInfos();
                         
                     }
                     else if (modeBools[2]){
                         controller.drawAllAvrScatterPlots();
+                        hoverInfos();
                         
                     }
                     
-                    var legendArea = $('#legend');
-                    legendArea.show();
-
-                    var container = $('#column1');
-                    var items = container.find('.chart');
-                    items.each(function() {
-                        var title = $(this).find('.title');
-                        $(this).attr('id', title.text());
-
-                        $(this).hover(function() {
-                            legendArea.find('.legendTitle').remove();
-                            legendArea.prepend('<p class="legendTitle">'+title.text()+'</p>');
-                            $('.legendTitle').css({"text-align": "center", "font-size": "20px", "font-weight": "bold"});
-                            displayBasicInfo(title.text());
-                        });
-                    });
+                    
                     
 
                     
@@ -1221,6 +1211,22 @@ var gradeDistr = (function() {
         });
 
         function hoverInfos() {
+            var legendArea = $('#legend');
+            legendArea.show();
+
+            var container = $('#column1');
+            var items = container.find('.chart');
+            items.each(function() {
+                var title = $(this).find('.title');
+                $(this).attr('id', title.text());
+
+                $(this).hover(function() {
+                    legendArea.find('.legendTitle').remove();
+                    legendArea.prepend('<p class="legendTitle">'+title.text()+'</p>');
+                    $('.legendTitle').css({"text-align": "center", "font-size": "20px", "font-weight": "bold"});
+                    displayBasicInfo(title.text());
+                });
+            });
             
         }
         

@@ -574,14 +574,19 @@ var attempts = (function() {
             $(this).on('click', function() {
                 var quizname = String($(this).attr('id'));
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
+                if ($('.legendTitle').length > 0) {
+                        $('.legendTitle').remove();
+                    }
                 if (quizname == "ViewAll") {
                     $('.btn-l').attr("disabled", true);
                     $('.btn-r').attr("disabled", true);
                     if (modeBools[0]){
                         drawAllAttemptsScatter();
+                        hoverInfos();
                     }
                     else if (modeBools[1]){
                         drawAllAttemptsBarGraphs();
+                        hoverInfos();
                     }
                 }
                 else {
@@ -681,6 +686,7 @@ var attempts = (function() {
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
                 drawAllAttemptsScatter();
+                hoverInfos();
             }
             else {
                 drawAttemptsScatter(quizname, '#column1', scatter_outerWidth, scatter_outerHeight, scatter_margin, false);
@@ -696,11 +702,32 @@ var attempts = (function() {
             var quizname = $('#asgn-nav').text();
             if (quizname == "ViewAll") {
                 drawAllAttemptsBarGraphs();
+                hoverInfos();
             }
             else {
                 drawAttemptsBarGraph(quizname, '#column1', attemptsbar_outerWidth, attemptsbar_outerHeight, attemptsbar_margin, 0, 0, false);
             }
         });
+
+        function hoverInfos() {
+            var legendArea = $('#legend');
+            legendArea.show();
+
+            var container = $('#column1');
+            var items = container.find('.chart');
+            items.each(function() {
+                var title = $(this).find('.title');
+                $(this).attr('id', title.text());
+
+                $(this).hover(function() {
+                    legendArea.find('.legendTitle').remove();
+                    legendArea.prepend('<p class="legendTitle">'+title.text()+'</p>');
+                    $('.legendTitle').css({"text-align": "center", "font-size": "20px", "font-weight": "bold"});
+                    displayBasicInfo(title.text());
+                });
+            });
+            
+        }
 
         //variables for bar chart
         var attemptsbar_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
