@@ -554,10 +554,9 @@ var gradeDistr = (function() {
             if (!isSmall) {
                 chart.append("text")
                 .attr("class", "yaxis-label")
-                .attr("x",0)
+                .attr("x",-chartHeight/2)
                 .attr("y", 0)
                 .attr("transform", function(d) {return "rotate(-90)" })
-                .attr("dx", -chartHeight/2)
                 .attr("dy", -margin.left*0.75)
                 .attr("font-weight", "bold")
                 .attr("text-anchor", "middle")
@@ -1014,10 +1013,9 @@ var gradeDistr = (function() {
                 //Y-AXIS LABEL
                 svg.append("text")
                     .attr("class", "yaxis-label")
-                    .attr("x",0)
+                    .attr("x", -margin.top-chartHeight/2)
                     .attr("y", 0)
                     .attr("transform", function(d) {return "rotate(-90)" })
-                    .attr("dx", -margin.top-chartHeight/2)
                     .attr("dy", margin.left*0.2)
                     .attr("font-weight", "bold")
                     .attr("text-anchor", "middle")
@@ -1026,7 +1024,6 @@ var gradeDistr = (function() {
                 //X-AXIS LABEL
                 svg.append("text")
                     .attr("class", "xaxis-label")
-                    // .attr("x",chartWidth/2)
                     .attr("x", outerWidth/2)
                     .attr("y", chartHeight+margin.top)
                     .attr("dy", margin.bottom*0.9)
@@ -1040,16 +1037,16 @@ var gradeDistr = (function() {
             for (var i = 0; i < xaxisData.length; i++) {
                 var ticks_desc = svg.append("text")
                     .attr("x", xScale(xaxisData[i]))
-                    .attr("y", chartHeight+margin.top)
+                    // .attr("y", chartHeight+margin.top)
                     .attr("text-anchor", "middle")
                     .text(desc[i]);
                 if (!isSmall) {
                     ticks_desc.attr("class", "ticks-desc")
-                        .attr("dy", $('.axis text').height()*2);
+                        .attr("y", chartHeight+margin.top+parseInt($('.axis text').css("line-height"))*1.5);
                 }
                 else {
                     ticks_desc.attr("class","small-ticks-desc")
-                        .attr("dy", $('.small-axis text').height()*2);
+                        .attr("y", chartHeight+margin.top+parseInt($('.small-axis text').css("line-height"))*1.5);
                 }
             }
 
@@ -1059,16 +1056,16 @@ var gradeDistr = (function() {
                         .attr("class", "ticks-desc")
                         .attr("x", margin.left)
                         .attr("dx", -margin.left*0.4)
-                        .attr("y", yScale(yaxisData[i]))
+                        // .attr("y", yScale(yaxisData[i]))
                         .attr("text-anchor", "middle")
                         .text(desc[i]);
                 if (!isSmall) {
                     ticks_desc.attr("class", "ticks-desc")
-                        .attr("dy", $('.axis text').height()+2);
+                        .attr("y", yScale(yaxisData[i])+parseInt($('.axis text').css("line-height")));
                 }
                 else {
                     ticks_desc.attr("class","small-ticks-desc")
-                        .attr("dy", $('.small-axis text').height()+2);
+                        .attr("y", yScale(yaxisData[i])+parseInt($('.small-axis text').css("line-height")));
                 }
             }
 
