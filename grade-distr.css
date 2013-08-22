@@ -15,6 +15,12 @@
 	shape-rendering: crispEdges;
 }
 
+.diagonal {
+	stroke: orange !important;
+	stroke-width: 2px;
+	stroke-dasharray: 10,10;
+}
+
 .chart line {
 	stroke: lightgrey;
 }
@@ -121,11 +127,6 @@ div.tooltip {
 	shape-rendering: crispEdges
 }
 
-.diagonal {
-	stroke: orange;
-	stroke-width: 2px;
-	stroke-dasharray: 10,10;
-}
 
 .xaxis,
 .yaxis {

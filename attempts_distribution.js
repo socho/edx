@@ -41,20 +41,19 @@ var attempts = (function() {
 
         var trackingLogs; 
 
-        //load appropriate json file
-        // $.ajax({
-        //     url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         trackingLogs = response;
-        //     }
-        // });
+        // load appropriate json file
+        $.ajax({
+            url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                trackingLogs = response;
+            }
+        });
 
         // uncomment this to test on local server
         // comment this to test on actual server
-        
-        trackingLogs = makeDummyTrackingLogs(10000);
+        // trackingLogs = makeDummyTrackingLogs(10000);
 
         var myDataFormat = trackinglogs_to_mydataformat(trackingLogs);
         // var peopleData = $.extend({}, myDataFormat[0]);
@@ -303,6 +302,7 @@ var attempts = (function() {
                             //.tickFormat(d3.format(".1f"))
 
             var svg = d3.select(parentDiv).append("svg")
+                        .attr("class", "chart")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 
@@ -766,6 +766,7 @@ var attempts = (function() {
                             .ticks(5);
 
             var svg = d3.select(parentDiv).append("svg")
+                        .attr("class", "chart")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 

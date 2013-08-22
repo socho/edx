@@ -43,21 +43,21 @@ var gradeDistr = (function() {
 
         var courseware_studentmodule; 
 
-        // $.ajax({
-        //     url: 'dummymodule-2.json',
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         courseware_studentmodule = response;
-        //     }
-        // });
+        $.ajax({
+            url: 'dummymodule.json',
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                courseware_studentmodule = response;
+            }
+        });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        courseware_studentmodule = dummymodule;
+        // courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -878,6 +878,7 @@ var gradeDistr = (function() {
                             .tickValues(yaxisData)
 
             var svg = d3.select(parentDiv).append("svg")
+                        .attr("class", "chart")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 
