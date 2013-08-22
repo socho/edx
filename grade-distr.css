@@ -82,12 +82,16 @@
 }
 
 #sliderbg { 
-	background-color: #fff;
+	background-image: white;
 	border-radius: 10px;
 	width: 300px;
 	height: 95px;
 	padding: 25px 15px 0px 7px;
 }
+
+/*#slider {
+	background-image: -moz-linear-gradient(left, lightpink, lightpink 25%,darkgray 25%,darkgray 75%,lightblue 75%,lightblue);
+}*/
 
 #total div,
 #average div,
