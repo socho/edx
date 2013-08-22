@@ -28,7 +28,12 @@
             var internetExplorer = false;
             <!--[if LT IE  9]>
             internetExplorer = true;
-            <![endif]-->
+            <!--[endif]>
+
+            if (internetExplorer) {
+                $('#slider').css('background-image', ieCss);
+            }
+            console.log(internetExplorer);
         </script>
 
     </head>

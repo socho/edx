@@ -392,17 +392,12 @@ var gradeDistr = (function() {
             }
             // end with the last color to the right
             colorstops += colors[colors.length-1];
-            console.log(colorstops);
-            /* Safari 5.1, Chrome 10+, Firefox */
+
+            /* Safari 5.1, Chrome 10+ */
             var css = '-webkit-linear-gradient(left,' + colorstops + ')';
             var firefoxCss = '-moz-linear-gradient(left,' + colorstops + ')';
             var ieCss = '-ms-linear-gradient(left,' + colorstops + ')';
-            if (internetExplorer) {
-                $('#slider').css('background-image', ieCss);
-            } else {
-                $('#slider').css('background-image', firefoxCss);
-            }
-            
+            $('#slider').css('background-image', firefoxCss);
             sliderObj.css('background-image', css);
         }
 

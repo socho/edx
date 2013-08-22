@@ -322,7 +322,7 @@ var attempts = (function() {
                     .attr("y",yScale(info[1]))
                     .attr("dx", 5)
                     .attr("dy", -5)
-                    .text("Avr of # attempts");
+                    .text("Avr Attempts for "+quizname);
 
                 svg.append("text")
                     .attr("class", "guidelinelabel")
@@ -330,7 +330,7 @@ var attempts = (function() {
                     .attr("y",yScale.range()[0])
                     .attr("dx",5)
                     .attr("dy", -5)
-                    .text("Avr of overall")
+                    .text("Avr of Overall")
             }
             else {
                 svg.append("text")
@@ -339,7 +339,7 @@ var attempts = (function() {
                     .attr("y",yScale(info[1]))
                     .attr("dx", 5)
                     .attr("dy", -5)
-                    .text("Avr of # attempts");
+                    .text("Avr Attempts for "+quizname);
 
                 svg.append("text")
                     .attr("class", "viewall-guidelinelabel")
@@ -347,7 +347,7 @@ var attempts = (function() {
                     .attr("y",yScale.range()[0])
                     .attr("dx",5)
                     .attr("dy", -5)
-                    .text("Avr of overall")                
+                    .text("Avr of Overall")                
             }
 
             //help text for big plot only
@@ -392,9 +392,8 @@ var attempts = (function() {
                 })
                 .attr("cy", function(d){
                     return yScale(d["attempts"]+Math.random()/4);
-                })
-                .attr("r", 3);
-
+                });
+            
             $('svg circle').tipsy({ 
                 gravity: 's', 
                 html: true, 
@@ -504,11 +503,11 @@ var attempts = (function() {
             //x and y axes labels
             var allbars_xaxislabel = d3.select('#column1').append("div")
                             .attr("class", "viewall-xaxislabel")
-                            .text("# Attempts for Each Quiz");   
+                            .text("Overall Attempts");   
             // allbars_xaxislabel.attr();        
             d3.select('#column1').append("div")
                             .attr("class", "viewall-yaxislabel")
-                            .text("Overall # Attempts");            
+                            .text("Attempts for Each Quiz");            
         }
 
         //setup legend
