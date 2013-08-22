@@ -475,6 +475,7 @@ var gradeDistr = (function() {
                 bottom = Math.abs(sliderObj.slider("values", 0) - 0);
                 top = Math.abs(100 - sliderObj.slider("values", 1));
                 controller.groupPeopleByAvr(quizname, bottom, 100-top);
+                hoverInfos();
                 displayBasicInfo(quizname);
                 drawInitialGraph(quizname, "#column1", bar_outerWidth, bar_outerHeight, bar_margin, 0, false);
             }
@@ -1142,6 +1143,9 @@ var gradeDistr = (function() {
 
                 $('#asgn-nav').html(quizname+"<span class='caret'></span>");
                 if (quizname != "ViewAll") {
+                    if ($('.legendTitle').length > 0) {
+                        $('.legendTitle').remove();
+                    }
                     displayBasicInfo(quizname);
                     if (modeBools[0]) {
                         if ($('.btn-l').attr("disabled")=="disabled") {
@@ -1184,13 +1188,40 @@ var gradeDistr = (function() {
                     }
                     else if (modeBools[1]){
                         controller.drawAllRankScatterPlots();
+                        
                     }
                     else if (modeBools[2]){
                         controller.drawAllAvrScatterPlots();
+                        
                     }
+                    
+                    var legendArea = $('#legend');
+                    legendArea.show();
+
+                    var container = $('#column1');
+                    var items = container.find('.chart');
+                    items.each(function() {
+                        var title = $(this).find('.title');
+                        $(this).attr('id', title.text());
+
+                        $(this).hover(function() {
+                            legendArea.find('.legendTitle').remove();
+                            legendArea.prepend('<p class="legendTitle">'+title.text()+'</p>');
+                            $('.legendTitle').css({"text-align": "center", "font-size": "20px", "font-weight": "bold"});
+                            displayBasicInfo(title.text());
+                        });
+                    });
+                    
+
+                    
+
                 }
             });
         });
+
+        function hoverInfos() {
+            
+        }
         
         $('.btn-l').attr("disabled", true); //initial button state;
 
