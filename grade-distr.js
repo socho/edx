@@ -115,7 +115,7 @@ var gradeDistr = (function() {
             for (var key in peopleData) {
                 if (assignment in peopleData[key]) {
                     numPeople++;
-                    sum += peopleData[key][assignment]["grade"];
+                    sum += peopleData[key][assignment]["grade"] / peopleData[key][assignment]["max_grade"] * 100;
                 }
             }
             //calc average grade
@@ -125,12 +125,12 @@ var gradeDistr = (function() {
             var sqDiffSum = 0;
             for (var key in peopleData) {
                 if (assignment in peopleData[key]) {
-                    sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment]["grade"])-avr,2);
+                    sqDiffSum += Math.pow(parseFloat(peopleData[key][assignment]["grade"]) / peopleData[key][assignment]["max_grade"] * 100 -avr,2);
                 }
             }
             var sd = Math.sqrt(sqDiffSum / numPeople);
 
-            return [numPeople, avr*10, sd*10];           
+            return [numPeople, avr, sd];           
         }
 
         /**
@@ -191,12 +191,12 @@ var gradeDistr = (function() {
                 var thisArray = threeArrays[index];
                 var counter = [];
                 var groupedPeople = []; 
-                for (var i = 0; i < 10; i++) {
+                for (var i = 0; i < 10; i++) { //10 is number of bins. There will be 10 bars.
                     counter.push(0);
                     groupedPeople.push([]);
                 }
                 for (var i = 0; i < thisArray.length; i++){
-                    var grade = parseInt(thisArray[i][assignment]["grade"]);
+                    var grade = Math.floor(thisArray[i][assignment]["grade"] / thisArray[i][assignment]["max_grade"] * 10);
                     if (grade == 10) {
                         counter[9] += 1;
                         groupedPeople[9].push(thisArray[i]);
@@ -227,7 +227,7 @@ var gradeDistr = (function() {
                 for (var i = 0; i < quizzesOfInterest.length; i++){
                     var quizname = quizzesOfInterest[i];
                     if (quizname in personData) {
-                        sum += parseFloat(personData[quizname]["grade"]);
+                        sum += personData[quizname]["grade"] / personData[quizname]["max_grade"] * 100;
                     }
                 }
                 if (quizzesOfInterest.length != 0){
@@ -252,7 +252,7 @@ var gradeDistr = (function() {
                     var quizname = quizzesOfInterest[i];
                     if (quizname in personData) {
                         numQuizzes += 1;
-                        sum += parseFloat(personData[quizname]["grade"]);
+                        sum += personData[quizname]["grade"] / personData[quizname]["max_grade"] * 100;
                     }
                 }
                 var avr = sum / numQuizzes;
@@ -440,8 +440,8 @@ var gradeDistr = (function() {
         function displayBasicInfo(assignment) {
             var info = controller.getBasicInfo(assignment); 
             $('#total p').text(info[0]);
-            $('#average p').text(info[1].toFixed(3));
-            $('#sd p').text(info[2].toFixed(3));
+            $('#average p').text(info[1].toFixed(1));
+            $('#sd p').text(info[2].toFixed(1));
         }
 
         displayBasicInfo("Quiz 21");
@@ -521,19 +521,9 @@ var gradeDistr = (function() {
 
         var bar_color_scale = d3.scale.ordinal().range(["lightpink", "darkgray", "lightblue"]);
 
-        //variables for rank graph
-        var rank_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
-        var rank_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
-
-        var rank_margin = { top: 20, right: 20, bottom: 40, left: 40 };
-
-        var rank_chartWidth = rank_outerWidth - rank_margin.left - rank_margin.right;
-        var rank_chartHeight = rank_outerHeight - rank_margin.top - rank_margin.bottom;
-
         //variables for avr scatter
         var avr_outerWidth = parseInt($('#column1').css("width"))-parseInt($('#column1').css("padding-left"))-parseInt($('#column1').css("padding-right"));
         var avr_outerHeight = $(document).height()-$('.assignment-row').height()-parseInt($('.container').css("margin-top"))-parseInt($('#column1').css("padding-top"));
-
         var avr_margin = { top: 20, right: 20, bottom: 60, left: 50 };
 
         //"#column1", bar_outerWidth, bar_outerHeight, bar_margin
@@ -619,6 +609,7 @@ var gradeDistr = (function() {
                                     // .attr("dx", function(d){return xScale.rangeBand()/2;})
                                     .attr("dy", margin.bottom*0.4)
                                     .text(function(d){return String(d*10);});
+
             if (!isSmall) {
                 xscale_label.attr("class", "xscale-label");
             }else {
@@ -734,7 +725,7 @@ var gradeDistr = (function() {
                 .attr("y", bar_chartHeight)
                 .attr("text-anchor", "center")
                 // .attr("dx", function(d){return xScale.rangeBand()/2;})
-                .attr("dy", bar_margin.bottom*0.5)
+                .attr("dy", bar_margin.bottom*0.4)
                 .text(function(d){return String(d*10);});
 
             //X-AXIS LABEL
@@ -838,7 +829,7 @@ var gradeDistr = (function() {
             var dataDict = model.getPeopleData();
             for (var person in dataDict) {
                 if (quizname in dataDict[person]){
-                    dataset.push({"student_id": person ,"grade": dataDict[person][quizname]["grade"], "avr": dataDict[person]["avr"]});
+                    dataset.push({"student_id": person ,"grade": dataDict[person][quizname]["grade"]/dataDict[person][quizname]["max_grade"]*100, "avr": dataDict[person]["avr"]});
                 }
             }
 
@@ -851,27 +842,27 @@ var gradeDistr = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
-            var maxgradezscore = d3.max(dataset, function(d){return Math.abs(10*d["grade"]-info[1])/info[2];});
+            var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["grade"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avr"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
-                            .domain([10*(avrOverall-maxzscore*sdOverall),10*(avrOverall+maxzscore*sdOverall)])
+                            .domain([(avrOverall-maxzscore*sdOverall),(avrOverall+maxzscore*sdOverall)])
                             .range([margin.left,outerWidth-margin.right])
                             .clamp(true);
             var yScale = d3.scale.linear() //scale is a function!!!!!
-                            //.domain([Math.max(0,10*(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
+                            //.domain([Math.max(0,(info[1]-d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);}))),Math.min(100,10*(info[1]+d3.max(dataset, function(d){return Math.abs(info[1]-d["grade"]);})))])
                             .domain([info[1]-maxzscore*info[2],info[1]+maxzscore*info[2]])
                             .range([outerHeight-margin.bottom,margin.top])
                             .clamp(true);
 
             var xtoyScale = d3.scale.linear()
-                                .domain([10*(avrOverall-3*sdOverall),10*(avrOverall+3*sdOverall)])
+                                .domain([(avrOverall-3*sdOverall),(avrOverall+3*sdOverall)])
                                 .range([(info[1]-3*info[2]),(info[1]+3*info[2])]);
             var xaxisData = [];
             var yaxisData = [];
             for (var i = -2; i <= 2; i++) {
-                xaxisData.push(Math.max(Math.min((avrOverall + i * sdOverall)*10,100),0));
+                xaxisData.push(Math.max(Math.min((avrOverall + i * sdOverall),100),0));
                 //yaxisData.push(Math.max(Math.min((info[1] + i * info[2])*10,100),0));
                 yaxisData.push((info[1] + i * info[2]));
             }
@@ -954,10 +945,10 @@ var gradeDistr = (function() {
                 .append("circle")
                 .attr("class","datapoints")
                 .attr("cx", function(d){
-                    return xScale(10*d["avr"]+Math.random()/2);
+                    return xScale(d["avr"]+Math.random()/2);
                 })
                 .attr("cy", function(d){
-                    return yScale(10*d["grade"]+Math.random()/2);
+                    return yScale(d["grade"]+Math.random()/2);
                 })
                 .attr("r", 3);
 
@@ -1091,7 +1082,7 @@ var gradeDistr = (function() {
                 html: true, 
                 title: function() {
                     var d = this.__data__;
-                    return d["student_id"] + "<br/> Grade in Class: "  + d["avr"].toFixed(1)*10 + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(1)*10; 
+                    return d["student_id"] + "<br/> Grade in Class: "  + d["avr"].toFixed(0) + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(0); 
                 }
             });
         }

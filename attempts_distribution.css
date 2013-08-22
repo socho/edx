@@ -113,3 +113,13 @@ div.tooltip {
 .horizontal_line {
 	stroke: lightgrey;
 }
+
+#total div,
+#average div,
+#sd div {
+	font-weight: bold;
+}
+
+#legend p {
+	margin-left: 15px;
+}

@@ -259,10 +259,12 @@ var attempts = (function() {
 
             var xScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([avrOverall+maxzscore*sdOverall,avrOverall-maxzscore*sdOverall])
-                            .range([margin.left,outerWidth-margin.right]);
+                            .range([margin.left,outerWidth-margin.right])
+                            .clamp(true);
             var yScale = d3.scale.linear() //scale is a function!!!!!
                             .domain([info[1]+maxzscore*info[2],info[1]-maxzscore*info[2]])
-                            .range([outerHeight-margin.bottom,margin.top]);
+                            .range([outerHeight-margin.bottom,margin.top])
+                            .clamp(true);
 
             var xaxisData = [];
             var yaxisData = [];
@@ -524,9 +526,9 @@ var attempts = (function() {
         var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
         var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
 
-        totalLabel.css('font-weight', 'bold');
-        averageLabel.css('font-weight', 'bold');
-        sdLabel.css('font-weight', 'bold');
+        // totalLabel.css('font-weight', 'bold');
+        // averageLabel.css('font-weight', 'bold');
+        // sdLabel.css('font-weight', 'bold');
         
         legend.append(totalLabel, averageLabel, sdLabel);
        
@@ -542,11 +544,11 @@ var attempts = (function() {
         function displayBasicInfo(assignment) {
             var info = model.getBasicInfo(assignment); 
             $('#total p').text(info[0]);
-            $('#total p').css({"margin-left": "20px", 'font-weight':'normal'});
-            $('#average p').text(info[1].toFixed(3));
-            $('#average p').css({"margin-left": "20px", 'font-weight':'normal'});
-            $('#sd p').text(info[2].toFixed(3));
-            $('#sd p').css({"margin-left": "20px", 'font-weight':'normal'});
+            // $('#total p').css({"margin-left": "20px", 'font-weight':'normal'});
+            $('#average p').text(info[1].toFixed(1));
+            // $('#average p').css({"margin-left": "20px", 'font-weight':'normal'});
+            $('#sd p').text(info[2].toFixed(1));
+            // $('#sd p').css({"margin-left": "20px", 'font-weight':'normal'});
         }
 
         //displays initial info for the graph

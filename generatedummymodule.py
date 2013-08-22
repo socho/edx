@@ -1,6 +1,6 @@
 import json
-filetoread = open("/Users/soyeuncho/Desktop/dummydata.json",'r')
-data = json.loads(filetoread.read())
+f = open("/Users/soyeuncho/Desktop/dummydata.json",'r')
+data = json.loads(f.read())
 
 dummymodule = []
 
@@ -12,6 +12,7 @@ for quiz, logsArray in data.iteritems():
         newlog["student_id"] = newlog["username"]
         newlog.pop("username",None)
         newlog["course_id"] = "6.813"
+        newlog["max_grade"] = 10
         dummymodule.append(newlog)
 
 newfile = open("/Users/soyeuncho/Desktop/dummymodule.json",'w')
