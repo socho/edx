@@ -322,7 +322,7 @@ var attempts = (function() {
                     .attr("y",yScale(info[1]))
                     .attr("dx", 5)
                     .attr("dy", -5)
-                    .text("Avr of # attempts");
+                    .text("Avr Attempts for "+quizname);
 
                 svg.append("text")
                     .attr("class", "guidelinelabel")
@@ -330,7 +330,7 @@ var attempts = (function() {
                     .attr("y",yScale.range()[0])
                     .attr("dx",5)
                     .attr("dy", -5)
-                    .text("Avr of overall")
+                    .text("Avr of Overall")
             }
             else {
                 svg.append("text")
@@ -339,7 +339,7 @@ var attempts = (function() {
                     .attr("y",yScale(info[1]))
                     .attr("dx", 5)
                     .attr("dy", -5)
-                    .text("Avr of # attempts");
+                    .text("Avr Attempts for "+quizname);
 
                 svg.append("text")
                     .attr("class", "viewall-guidelinelabel")
@@ -347,7 +347,7 @@ var attempts = (function() {
                     .attr("y",yScale.range()[0])
                     .attr("dx",5)
                     .attr("dy", -5)
-                    .text("Avr of overall")                
+                    .text("Avr of Overall")                
             }
 
             //help text for big plot only
@@ -398,7 +398,7 @@ var attempts = (function() {
                     tooltip.transition()        
                         .duration(100)      
                         .style("opacity", .9);      
-                    tooltip.html(d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Attempts for " + quizname + ": "  + d["attempts"].toFixed(1))  
+                    tooltip.html(d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Number of Attempts for " + quizname + ": "  + d["attempts"].toFixed(1))  
                         .style("left", (d3.event.pageX) + "px")     
                         .style("top", (d3.event.pageY - 42) + "px");    
                 })                  
@@ -506,13 +506,12 @@ var attempts = (function() {
                 }
             }
             //x and y axes labels
-            var allbars_xaxislabel = d3.select('#column1').append("div")
+            d3.select('#column1').append("div")
                             .attr("class", "viewall-xaxislabel")
-                            .text("# Attempts for Each Quiz");   
-            // allbars_xaxislabel.attr();        
+                            .text("Overall Attempts");   
             d3.select('#column1').append("div")
                             .attr("class", "viewall-yaxislabel")
-                            .text("Overall # Attempts");            
+                            .text("# Attempts for Each Quiz");            
         }
 
         //setup legend
