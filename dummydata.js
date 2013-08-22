@@ -1,17 +1,17 @@
 var quizzes = 
 {
     "Quiz 21": [
-        // {
-        //     "timestamp": "Timestamp",
-        //     "username": "Username",
-        //     "question1": "Question 1",
-        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
-        //     "grade": "Grade"
-        // },
-        // {
-        //     "username": "TRUTH",
-        //     "question1": "A,D"
-        // },
+        {
+            "timestamp": "Timestamp",
+            "username": "Username",
+            "question1": "Question 1",
+            "reason": "Enter a one sentence reason for each choice you are unsure about.",
+            "grade": "Grade"
+        },
+        {
+            "username": "TRUTH",
+            "question1": "A,D"
+        },
         {
             "timestamp": "2013-04-22T20:51:46.000Z",
             "username": "snollygostercompass",
@@ -273,7 +273,7 @@ var quizzes =
             "username": "whispericy",
             "question1": "A, B, D, E, H",
             "reason": "- I thought kerning had more to do with text/font design than icons like this.\n- I'm not sure how right-to-left languages or double buffering applies to this example.",
-            "grade": 7
+            "grade": "7"
         },
         {
             "timestamp": "2013-04-22T20:53:42.000Z",
@@ -1028,17 +1028,17 @@ var quizzes =
         }
     ],
     "Quiz 22": [
-        // {
-        //     "timestamp": "Timestamp",
-        //     "username": "Username",
-        //     "question1": "Question 1",
-        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
-        //     "grade": "Grade"
-        // },
-        // {
-        //     "username": "TRUTH",
-        //     "question1": "C,D,F,I"
-        // },
+        {
+            "timestamp": "Timestamp",
+            "username": "Username",
+            "question1": "Question 1",
+            "reason": "Enter a one sentence reason for each choice you are unsure about.",
+            "grade": "Grade"
+        },
+        {
+            "username": "TRUTH",
+            "question1": "C,D,F,I"
+        },
         {
             "timestamp": "2013-04-29T20:12:25.000Z",
             "username": "snollygostercompass",
@@ -1852,17 +1852,17 @@ var quizzes =
         }
     ],
     "Quiz 23": [
-        // {
-        //     "timestamp": "Timestamp",
-        //     "username": "Username",
-        //     "question1": "Question 1",
-        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
-        //     "grade": "Grade"
-        // },
-        // {
-        //     "username": "TRUTH",
-        //     "question1": "B,C?,D,E,F,G,I"
-        // },
+        {
+            "timestamp": "Timestamp",
+            "username": "Username",
+            "question1": "Question 1",
+            "reason": "Enter a one sentence reason for each choice you are unsure about.",
+            "grade": "Grade"
+        },
+        {
+            "username": "TRUTH",
+            "question1": "B,C?,D,E,F,G,I"
+        },
         {
             "timestamp": "2013-05-01T20:16:31.000Z",
             "username": "snollygostercompass",
@@ -2779,17 +2779,17 @@ var quizzes =
         }
     ],
     "Quiz 24": [
-        // {
-        //     "timestamp": "Timestamp",
-        //     "username": "Username",
-        //     "question1": "Question 1",
-        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
-        //     "grade": "Grade"
-        // },
-        // {
-        //     "username": "TRUTH",
-        //     "question1": "A"
-        // },
+        {
+            "timestamp": "Timestamp",
+            "username": "Username",
+            "question1": "Question 1",
+            "reason": "Enter a one sentence reason for each choice you are unsure about.",
+            "grade": "Grade"
+        },
+        {
+            "username": "TRUTH",
+            "question1": "A"
+        },
         {
             "timestamp": "2013-05-06T20:10:43.000Z",
             "username": "snollygostercompass",
@@ -3599,23 +3599,23 @@ var quizzes =
         }
     ],
     "Quiz 25": [
-        // {
-        //     "timestamp": "Timestamp",
-        //     "username": "Username",
-        //     "question1": "Question 1",
-        //     "question2": "Question 2",
-        //     "question3": "Question 3",
-        //     "question4": "Question 4",
-        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
-        //     "grade": "Grade"
-        // },
-        // {
-        //     "username": "TRUTH",
-        //     "question1": "B",
-        //     "question2": "A",
-        //     "question3": "B",
-        //     "question4": "C"
-        // },
+        {
+            "timestamp": "Timestamp",
+            "username": "Username",
+            "question1": "Question 1",
+            "question2": "Question 2",
+            "question3": "Question 3",
+            "question4": "Question 4",
+            "reason": "Enter a one sentence reason for each choice you are unsure about.",
+            "grade": "Grade"
+        },
+        {
+            "username": "TRUTH",
+            "question1": "B",
+            "question2": "A",
+            "question3": "B",
+            "question4": "C"
+        },
         {
             "timestamp": "2013-05-10T20:09:56.000Z",
             "username": "snollygostercompass",
@@ -4664,23 +4664,23 @@ var quizzes =
         }
     ],
     "Quiz 26": [
-        // {
-        //     "timestamp": "Timestamp",
-        //     "username": "Username",
-        //     "question1": "Question 1",
-        //     "question2": "Question 2",
-        //     "question3": "Question 3",
-        //     "question4": "Question 4",
-        //     "reason": "Enter a one sentence reason for each choice you are unsure about.",
-        //     "grade": "Grade"
-        // },
-        // {
-        //     "username": "TRUTH",
-        //     "question1": "B",
-        //     "question2": "A",
-        //     "question3": "A",
-        //     "question4": "A"
-        // },
+        {
+            "timestamp": "Timestamp",
+            "username": "Username",
+            "question1": "Question 1",
+            "question2": "Question 2",
+            "question3": "Question 3",
+            "question4": "Question 4",
+            "reason": "Enter a one sentence reason for each choice you are unsure about.",
+            "grade": "Grade"
+        },
+        {
+            "username": "TRUTH",
+            "question1": "B",
+            "question2": "A",
+            "question3": "A",
+            "question4": "A"
+        },
         {
             "timestamp": "2013-05-13T20:10:29.000Z",
             "username": "snollygostercompass",

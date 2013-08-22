@@ -393,20 +393,16 @@ var attempts = (function() {
                 .attr("cy", function(d){
                     return yScale(d["attempts"]+Math.random()/4);
                 })
-                .attr("r", 3)
-                .on("mouseover", function(d) {  
-                    tooltip.transition()        
-                        .duration(100)      
-                        .style("opacity", .9);      
-                    tooltip.html(d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Attempts for " + quizname + ": "  + d["attempts"].toFixed(1))  
-                        .style("left", (d3.event.pageX) + "px")     
-                        .style("top", (d3.event.pageY - 42) + "px");    
-                })                  
-                .on("mouseout", function(d) {       
-                    tooltip.transition()        
-                        .duration(500)      
-                        .style("opacity", 0);   
-                });
+                .attr("r", 3);
+
+            $('svg circle').tipsy({ 
+                gravity: 's', 
+                html: true, 
+                title: function() {
+                    var d = this.__data__;
+                    return d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Attempts for " + quizname + ": "  + d["attempts"].toFixed(1); 
+                }
+            });
 
             //x and y axes
             if (!isSmall) {
