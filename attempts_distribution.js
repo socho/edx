@@ -252,13 +252,6 @@ var attempts = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
-            // var maxgradezscoreAbove = d3.max(dataset, function(d){return (d["attempts"]-info[1])/info[2];});
-            // var maxgradezscoreBelow = Math.abs(d3.min(dataset, function(d){return (d["attempts"]-info[1])/info[2];}));
-            // var maxavrzscoreAbove = d3.max(dataset, function(d){return (d["avrattempts"]-avrOverall)/sdOverall;});
-            // var maxavrzscoreBelow = Math.abs(d3.min(dataset, function(d){return (d["avrattempts"]-avrOverall)/sdOverall;}));
-            // var maxzscoreAbove = Math.max(maxgradezscoreAbove,maxavrzscoreAbove);
-            // var maxzscoreBelow = Math.max(maxgradezscoreBelow,maxavrzscoreBelow);
-
             var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
@@ -271,14 +264,6 @@ var attempts = (function() {
                             .domain([info[1]+maxzscore*info[2],info[1]-maxzscore*info[2]])
                             .range([outerHeight-margin.bottom,margin.top])
                             .clamp(true);
-            // var xScale = d3.scale.linear() //scale is a function!!!!!
-            //                 .domain([avrOverall+maxzscoreAbove*sdOverall,avrOverall-maxzscoreBelow*sdOverall])
-            //                 .range([margin.left,outerWidth-margin.right])
-            //                 .clamp(true);
-            // var yScale = d3.scale.linear() //scale is a function!!!!!
-            //                 .domain([info[1]+maxzscoreAbove*info[2],info[1]-maxzscoreBelow*info[2]])
-            //                 .range([outerHeight-margin.bottom,margin.top])
-            //                 .clamp(true);
 
             var xaxisData = [];
             var yaxisData = [];
@@ -365,7 +350,7 @@ var attempts = (function() {
                     .text("Avr of overall")                
             }
 
-            //help text only for big plot
+            //help text for big plot only
             if (!isSmall) {
                 var helptext = svg.append("g")
                                     .attr("class", "helptext");
@@ -413,7 +398,7 @@ var attempts = (function() {
                     tooltip.transition()        
                         .duration(100)      
                         .style("opacity", .9);      
-                    tooltip.html(d["username"] + "<br/>Avg # attempts: "  + d["avrattempts"].toFixed(1) + "<br/># Attempts: "  + d["attempts"].toFixed(1))  
+                    tooltip.html(d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Attempts for " + quizname + ": "  + d["attempts"].toFixed(1))  
                         .style("left", (d3.event.pageX) + "px")     
                         .style("top", (d3.event.pageY - 42) + "px");    
                 })                  
@@ -456,25 +441,21 @@ var attempts = (function() {
                 //X-AXIS LABEL
                 svg.append("text")
                     .attr("class", "yaxis-label")
-                    .attr("x",0)
-                    .attr("y", 0)
+                    .attr("x", -margin.top-chartHeight/2)
+                    .attr("y", margin.left*0.2)
                     .attr("transform", function(d) {return "rotate(-90)" })
-                    .attr("dx", -margin.top-chartHeight/2)
-                    .attr("dy", margin.left*0.2)
                     .attr("font-weight", "bold")
                     .attr("text-anchor", "middle")
-                    .text("# Attempts for "+quizname);
+                    .text("Attempts for "+quizname);
 
                 //X-AXIS LABEL
                 svg.append("text")
                     .attr("class", "xaxis-label")
-                    // .attr("x",chartWidth/2)
                     .attr("x", outerWidth/2)
-                    .attr("y", chartHeight+margin.top)
-                    .attr("dy", margin.bottom*0.9)
+                    .attr("y", chartHeight+margin.top+margin.bottom*0.9)
                     .attr("font-weight", "bold")
                     .attr("text-anchor", "middle")
-                    .text("Overall # Attempts");
+                    .text("Overall Attempts");
             }
 
             // Title for mini plots
@@ -836,11 +817,9 @@ var attempts = (function() {
                 //Y-AXIS LABEL
                 svg.append("text")
                     .attr("class", "yaxis-label")
-                    .attr("x",0)
-                    .attr("y", 0)
+                    .attr("x", -margin.top-chartHeight/2)
+                    .attr("y", margin.left*0.2)
                     .attr("transform", function(d) {return "rotate(-90)" })
-                    .attr("dx", -margin.top-chartHeight/2)
-                    .attr("dy", margin.left*0.2)
                     .attr("font-weight", "bold")
                     .attr("text-anchor", "middle")
                     .text("Number of Students");
