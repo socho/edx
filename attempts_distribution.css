@@ -75,7 +75,7 @@
 
 .viewall-yaxislabel {
 	position: absolute;
-	left:-8%;
+	left:-10%;
 	top: 50%;
 	font-weight: bold;
 	transform: rotate(-90deg);

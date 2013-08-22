@@ -43,21 +43,21 @@ var gradeDistr = (function() {
 
         var courseware_studentmodule; 
 
-        // $.ajax({
-        //     url: 'dummymodule.json',
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         courseware_studentmodule = response;
-        //     }
-        // });
+        $.ajax({
+            url: 'dummymodule.json',
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                courseware_studentmodule = response;
+            }
+        });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        courseware_studentmodule = dummymodule;
+        // courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -392,11 +392,9 @@ var gradeDistr = (function() {
             }
             // end with the last color to the right
             colorstops += colors[colors.length-1];
-            console.log(colorstops);
-            /* Safari 5.1, Chrome 10+, Firefox */
+
+            /* Safari 5.1, Chrome 10+ */
             var css = '-webkit-linear-gradient(left,' + colorstops + ')';
-            var firefoxCss = '-moz-linear-gradient(left,' + colorstops + ')';
-            $('#slider').css('background-image', firefoxCss);
             sliderObj.css('background-image', css);
         }
 

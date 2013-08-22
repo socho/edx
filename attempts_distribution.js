@@ -506,12 +506,13 @@ var attempts = (function() {
                 }
             }
             //x and y axes labels
-            d3.select('#column1').append("div")
+            var allbars_xaxislabel = d3.select('#column1').append("div")
                             .attr("class", "viewall-xaxislabel")
                             .text("Overall Attempts");   
+            // allbars_xaxislabel.attr();        
             d3.select('#column1').append("div")
                             .attr("class", "viewall-yaxislabel")
-                            .text("# Attempts for Each Quiz");            
+                            .text("Attempts for Each Quiz");            
         }
 
         //setup legend
