@@ -41,20 +41,19 @@ var attempts = (function() {
 
         var trackingLogs; 
 
-        //load appropriate json file
-        // $.ajax({
-        //     url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         trackingLogs = response;
-        //     }
-        // });
+        // load appropriate json file
+        $.ajax({
+            url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                trackingLogs = response;
+            }
+        });
 
         // uncomment this to test on local server
         // comment this to test on actual server
-        
-        trackingLogs = makeDummyTrackingLogs(10000);
+        // trackingLogs = makeDummyTrackingLogs(10000);
 
         var myDataFormat = trackinglogs_to_mydataformat(trackingLogs);
         // var peopleData = $.extend({}, myDataFormat[0]);
@@ -253,6 +252,13 @@ var attempts = (function() {
             var avrOverall = infoOverall[0];
             var sdOverall = infoOverall[1];
 
+            // var maxgradezscoreAbove = d3.max(dataset, function(d){return (d["attempts"]-info[1])/info[2];});
+            // var maxgradezscoreBelow = Math.abs(d3.min(dataset, function(d){return (d["attempts"]-info[1])/info[2];}));
+            // var maxavrzscoreAbove = d3.max(dataset, function(d){return (d["avrattempts"]-avrOverall)/sdOverall;});
+            // var maxavrzscoreBelow = Math.abs(d3.min(dataset, function(d){return (d["avrattempts"]-avrOverall)/sdOverall;}));
+            // var maxzscoreAbove = Math.max(maxgradezscoreAbove,maxavrzscoreAbove);
+            // var maxzscoreBelow = Math.max(maxgradezscoreBelow,maxavrzscoreBelow);
+
             var maxgradezscore = d3.max(dataset, function(d){return Math.abs(d["attempts"]-info[1])/info[2];});
             var maxavrzscore = d3.max(dataset, function(d){return Math.abs(d["avrattempts"]-avrOverall)/sdOverall;});
             var maxzscore = Math.max(maxavrzscore, maxgradezscore);
@@ -265,6 +271,14 @@ var attempts = (function() {
                             .domain([info[1]+maxzscore*info[2],info[1]-maxzscore*info[2]])
                             .range([outerHeight-margin.bottom,margin.top])
                             .clamp(true);
+            // var xScale = d3.scale.linear() //scale is a function!!!!!
+            //                 .domain([avrOverall+maxzscoreAbove*sdOverall,avrOverall-maxzscoreBelow*sdOverall])
+            //                 .range([margin.left,outerWidth-margin.right])
+            //                 .clamp(true);
+            // var yScale = d3.scale.linear() //scale is a function!!!!!
+            //                 .domain([info[1]+maxzscoreAbove*info[2],info[1]-maxzscoreBelow*info[2]])
+            //                 .range([outerHeight-margin.bottom,margin.top])
+            //                 .clamp(true);
 
             var xaxisData = [];
             var yaxisData = [];
@@ -288,6 +302,7 @@ var attempts = (function() {
                             //.tickFormat(d3.format(".1f"))
 
             var svg = d3.select(parentDiv).append("svg")
+                        .attr("class", "chart")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 
@@ -523,13 +538,9 @@ var attempts = (function() {
         var legend = $('<div id="legend"></div>');
 
         var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
-        var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
-        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
+        var averageLabel = $('<div id="average"><div style="display: inline;">Average Number of Attempts: </div><p></p></div>');
+        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation of Attempts: </div><p></p></div>');
 
-        // totalLabel.css('font-weight', 'bold');
-        // averageLabel.css('font-weight', 'bold');
-        // sdLabel.css('font-weight', 'bold');
-        
         legend.append(totalLabel, averageLabel, sdLabel);
        
         var lowerLabel = $('<div id="lowerLabel"></div>');
@@ -755,6 +766,7 @@ var attempts = (function() {
                             .ticks(5);
 
             var svg = d3.select(parentDiv).append("svg")
+                        .attr("class", "chart")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 

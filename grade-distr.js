@@ -43,21 +43,21 @@ var gradeDistr = (function() {
 
         var courseware_studentmodule; 
 
-        // $.ajax({
-        //     url: 'dummymodule.json',
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         courseware_studentmodule = response;
-        //     }
-        // });
+        $.ajax({
+            url: 'dummymodule.json',
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                courseware_studentmodule = response;
+            }
+        });
 
         //////////////////////////////////////////////////////
         ////////////////Need to Manually Change///////////////
         //////////////////////////////////////////////////////
 
         //the student module file
-        courseware_studentmodule = dummymodule;
+        // courseware_studentmodule = dummymodule;
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -361,8 +361,8 @@ var gradeDistr = (function() {
         var legend = $('<div id="legend"></div>');
 
         var totalLabel = $('<div id="total"><div>Number of Students: </div><p></p></div>');
-        var averageLabel = $('<div id="average"><div style="display: inline;">Average: </div><p></p></div>');
-        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation: </div><p></p></div>');
+        var averageLabel = $('<div id="average"><div style="display: inline;">Average Grade: </div><p></p></div>');
+        var sdLabel = $('<div id="sd"><div style="display: inline;">Standard Deviation of Grades: </div><p></p></div>');
 
         
         legend.append(totalLabel, averageLabel, sdLabel);
@@ -879,6 +879,7 @@ var gradeDistr = (function() {
                             .tickValues(yaxisData)
 
             var svg = d3.select(parentDiv).append("svg")
+                        .attr("class", "chart")
                         .attr("width",outerWidth)
                         .attr("height",outerHeight);
 
