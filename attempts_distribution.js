@@ -41,15 +41,15 @@ var attempts = (function() {
 
         var trackingLogs; 
 
-        // load appropriate json file
-        // $.ajax({
-        //     url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
-        //     async: false,
-        //     dataType: 'json',
-        //     success: function (response) {
-        //         trackingLogs = response;
-        //     }
-        // });
+        load appropriate json file
+        $.ajax({
+            url: 'dummyTrackingLogs.json', ////////////change url for your use///////////////
+            async: false,
+            dataType: 'json',
+            success: function (response) {
+                trackingLogs = response;
+            }
+        });
 
         // uncomment this to test on local server
         // comment this to test on actual server
@@ -322,7 +322,7 @@ var attempts = (function() {
                     .attr("y",yScale(info[1]))
                     .attr("dx", 5)
                     .attr("dy", -5)
-                    .text("Avr Attempts for "+quizname);
+                    .text("Avr of # attempts");
 
                 svg.append("text")
                     .attr("class", "guidelinelabel")
@@ -330,7 +330,7 @@ var attempts = (function() {
                     .attr("y",yScale.range()[0])
                     .attr("dx",5)
                     .attr("dy", -5)
-                    .text("Avr of Overall")
+                    .text("Avr of overall")
             }
             else {
                 svg.append("text")
@@ -339,7 +339,7 @@ var attempts = (function() {
                     .attr("y",yScale(info[1]))
                     .attr("dx", 5)
                     .attr("dy", -5)
-                    .text("Avr Attempts for "+quizname);
+                    .text("Avr of # attempts");
 
                 svg.append("text")
                     .attr("class", "viewall-guidelinelabel")
@@ -347,7 +347,7 @@ var attempts = (function() {
                     .attr("y",yScale.range()[0])
                     .attr("dx",5)
                     .attr("dy", -5)
-                    .text("Avr of Overall")                
+                    .text("Avr of overall")                
             }
 
             //help text for big plot only
@@ -392,16 +392,43 @@ var attempts = (function() {
                 })
                 .attr("cy", function(d){
                     return yScale(d["attempts"]+Math.random()/4);
+                })
+                .attr("r", 3);
+
+
+
+            var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+            var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+
+            if (isChrome || isSafari) {
+                console.log('webkit');
+                $('svg circle').tipsy({
+                    gravity: 's',
+                    html: true,
+                    title: function() {
+                        var d = this.__data__;
+                        return d["username"] + "<br/>Avg Attempts: " + d["avrattempts"].toFixed(1) + "<br/>Attempts for " + quizname + ": " + d["attempts"].toFixed(1);  
+                    }
                 });
-            
-            $('svg circle').tipsy({ 
-                gravity: 's', 
-                html: true, 
-                title: function() {
-                    var d = this.__data__;
-                    return d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Attempts for " + quizname + ": "  + d["attempts"].toFixed(1); 
-                }
-            });
+            }
+            else {
+                console.log('firefox or ie');
+                svg.selectAll("circle")
+                    .on("mouseover", function(d) {  
+                    tooltip.transition()        
+                        .duration(100)      
+                        .style("opacity", .9);      
+                    tooltip.html(d["username"] + "<br/>Avg Attempts: "  + d["avrattempts"].toFixed(1) + "<br/>Number of Attempts for " + quizname + ": "  + d["attempts"].toFixed(1))  
+                        .style("left", (d3.event.pageX) + "px")     
+                        .style("top", (d3.event.pageY - 42) + "px");    
+                    })                  
+                    .on("mouseout", function(d) {       
+                        tooltip.transition()        
+                            .duration(500)      
+                            .style("opacity", 0);   
+                    });
+            }
+                
 
             //x and y axes
             if (!isSmall) {
@@ -503,11 +530,11 @@ var attempts = (function() {
             //x and y axes labels
             var allbars_xaxislabel = d3.select('#column1').append("div")
                             .attr("class", "viewall-xaxislabel")
-                            .text("Overall Attempts");   
+                            .text("# Attempts for Each Quiz");   
             // allbars_xaxislabel.attr();        
             d3.select('#column1').append("div")
                             .attr("class", "viewall-yaxislabel")
-                            .text("Attempts for Each Quiz");            
+                            .text("Overall # Attempts");            
         }
 
         //setup legend
@@ -798,15 +825,6 @@ var attempts = (function() {
                     return chartHeight + margin.top - yScale(d);
                 })
                 .attr('fill', 'lightblue');
-
-            $('svg rect').tipsy({ 
-                gravity: 's', 
-                html: true, 
-                title: function() {
-                    var d = this.__data__;
-                    return d; 
-                }
-            });
 
             if (!isSmall) {                
                 //Y-AXIS LABEL

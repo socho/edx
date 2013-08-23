@@ -42,7 +42,7 @@ var gradeDistr = (function() {
 
 
         var courseware_studentmodule; 
-
+        // comment out the ajax call if using local host
         $.ajax({
             url: 'dummymodule.json',
             async: false,
@@ -57,7 +57,7 @@ var gradeDistr = (function() {
         //////////////////////////////////////////////////////
 
         //the student module file
-        // courseware_studentmodule = dummymodule;
+        // courseware_studentmodule = dummymodule; //Uncomment this line if using local host
         //course_id you're interested in
         var course_id = "6.813";
         //an array of module_types you're interested in visualizing
@@ -398,7 +398,12 @@ var gradeDistr = (function() {
             var firefoxCss = '-moz-linear-gradient(left,' + colorstops + ')';
             var ieCss = '-ms-linear-gradient(left,' + colorstops + ')';
             $('#slider').css('background-image', firefoxCss);
+            if(internetExplorer) {
+                console.log("IE? ",internetExplorer);
+                $('#slider').css('background-image', ieCss);
+            }
             sliderObj.css('background-image', css);
+            
         }
 
         var handlers = [25, 75]
@@ -944,19 +949,8 @@ var gradeDistr = (function() {
                     .attr("dy", 12);
             }
 
-            //dots with jittering
-            svg.selectAll("circle")
-                .data(dataset)
-                .enter()
-                .append("circle")
-                .attr("class","datapoints")
-                .attr("cx", function(d){
-                    return xScale(d["avr"]+Math.random()/2);
-                })
-                .attr("cy", function(d){
-                    return yScale(d["grade"]+Math.random()/2);
-                })
-                .attr("r", 3);
+            
+            
 
             //max line
             svg.append("line")
@@ -1080,15 +1074,53 @@ var gradeDistr = (function() {
                         .text(quizname);
             }
 
+            //dots with jittering
+            svg.selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("class","datapoints")
+                .attr("cx", function(d){
+                    return xScale(d["avr"]+Math.random()/2);
+                })
+                .attr("cy", function(d){
+                    return yScale(d["grade"]+Math.random()/2);
+                })
+                .attr("r", 3);
 
-            $('svg circle').tipsy({ 
-                gravity: 's', 
-                html: true, 
-                title: function() {
-                    var d = this.__data__;
-                    return d["student_id"] + "<br/> Grade in Class: "  + d["avr"].toFixed(0) + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(0); 
-                }
-            });
+            var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+            var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+
+            if (isChrome || isSafari) {
+                console.log('webkit');
+                $('svg circle').tipsy({
+                    gravity: 's',
+                    html: true,
+                    title: function() {
+                        var d = this.__data__;
+                        return d["student_id"] + "<br/> Grade in Class: " + d["avr"].toFixed(0) + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(0); 
+                    }
+                });
+            }
+            else {
+                console.log('firefox or ie');
+                svg.selectAll("circle")
+                    .on("mouseover", function(d) {  
+                        tooltip.transition()        
+                            .duration(100)      
+                            .style("opacity", .9);      
+                        tooltip.html(d["student_id"] + "<br/> Grade in Class: "  + d["avr"].toFixed(0) + "<br/>Grade For " + quizname+ ": " + d["grade"].toFixed(0))  
+                            .style("left", (d3.event.pageX) + "px")     
+                            .style("top", (d3.event.pageY - 42) + "px");    
+                    })                  
+                    .on("mouseout", function(d) {       
+                        tooltip.transition()        
+                            .duration(500)      
+                            .style("opacity", 0);   
+                    });
+            }
+
+
         }
 
         function drawAllAvrScatterPlots() {
